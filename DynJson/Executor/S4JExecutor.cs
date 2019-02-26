@@ -154,7 +154,7 @@ namespace DynJson.Executor
             bool canBeEvaluated = true;
             if (token.Tags.Count > 0 && TagValidator != null)
             {
-                using (ExecutorContext context = new ExecutorContext(token, GetExecutiongVariables(token)))
+                using (ExecutorContext context = new ExecutorContext(token, GetExecutingVariables(token)))
                     canBeEvaluated = TagValidator(context);
             }
 
@@ -162,9 +162,13 @@ namespace DynJson.Executor
             if (!canBeEvaluated)
                 return;
 
-            if (token.State.StateType == EStateType.FUNCTION)
+            if (token is S4JTokenFunction function) //   .State.StateType == EStateType.FUNCTION)
             {
-                await EvaluateFunction(token);
+                await EvaluateFunction(function);
+            }
+            if (token is S4JTokenTextValue textValue && textValue.VariableName != null)
+            {
+                await EvaluateTokenVariable(textValue);
             }
             else
             {
@@ -177,42 +181,49 @@ namespace DynJson.Executor
             }
         }
 
-        async private Task EvaluateFunction(S4JToken token)
+        async private Task EvaluateTokenVariable(S4JTokenTextValue token)
         {
-            if (token == null)
+            var variables = GetExecutingVariables(token);
+            object value = null;
+            variables.TryGetValue(token.VariableName, out value);
+            token.Value = value;
+        }
+
+        async private Task EvaluateFunction(S4JTokenFunction function)
+        {
+            if (function == null)
                 return;
 
-            IDictionary<String, object> variables = GetExecutiongVariables(token);
-            S4JTokenFunction function = token as S4JTokenFunction;
+            IDictionary<String, object> variables = GetExecutingVariables(function);
 
             object result = null;
 
             bool canBeEvaluated = true;
-            if (token.Tags.Count > 0 && TagValidator != null)
+            if (function.Tags.Count > 0 && TagValidator != null)
             {
-                using (ExecutorContext context = new ExecutorContext(token, variables))
+                using (ExecutorContext context = new ExecutorContext(function, variables))
                     canBeEvaluated = TagValidator(context);
             }
 
 
-            token.IsVisible = canBeEvaluated;
+            function.IsVisible = canBeEvaluated;
             if (canBeEvaluated)
             {
                 if (function.State is S4JStateFunction stateFunction &&
                     stateFunction.FunctionTagExecutor != null)
                 {
-                    using (ExecutorContext context = new ExecutorContext(token, variables))
+                    using (ExecutorContext context = new ExecutorContext(function, variables))
                         stateFunction.FunctionTagExecutor(context);
                 }
 
-                result = await function.Evaluator?.Evaluate(this, token, variables);
+                result = await function.Evaluator?.Evaluate(this, function, variables);
             }
 
             function.IsEvaluated = true;
             function.Result = result;
 
             if (function.Parent is S4JTokenObject objectParent &&
-                token.IsObjectSingleKey)
+                function.IsObjectSingleKey)
             {
                 EvaluateFunctionInsideObject(
                     objectParent,
@@ -338,7 +349,7 @@ namespace DynJson.Executor
             function.Children.AddRange(tokens);
         }
 
-        private IDictionary<String, object> GetExecutiongVariables(S4JToken token)
+        private IDictionary<String, object> GetExecutingVariables(S4JToken token)
         {
             Dictionary<String, object> variables = new Dictionary<string, object>();
             {

@@ -282,6 +282,31 @@ namespace DynJson.Helpers.CoreHelpers
                 }
         }
 
+        public static Boolean IsVariable(this String Text)
+        {
+            Text = (Text ?? "").Trim();
+            if (Text.Length < 2)
+                return false;
+
+            if (Text[0] == '@')
+            {
+                if (Char.IsNumber(Text[1]))
+                {
+                    return false;
+                }
+                else
+                {
+                    if (IsQuotedText(Text.Substring(1)))
+                        return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static Boolean IsNumber(this String Text)
         {
             Text = (Text ?? "").Trim();

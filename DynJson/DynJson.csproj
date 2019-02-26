@@ -9,6 +9,7 @@
     <Copyright>Andrzej Ból</Copyright>
     <PackageReleaseNotes>dynlan python c# dynamic language expressions</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

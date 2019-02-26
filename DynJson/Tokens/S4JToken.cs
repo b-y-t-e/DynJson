@@ -128,6 +128,7 @@ namespace DynJson.Tokens
             if (!(lastChild is S4JTokenTextValue) || lastChild.IsCommited)
             {
                 lastChild = new S4JTokenTextValue();
+                lastChild.Parent = this;
                 AddChildToToken(lastChild);
             }
             lastChild.AppendCharsToToken(Chars);
@@ -313,6 +314,11 @@ namespace DynJson.Tokens
             newToken.Children = newToken.Children.Select(i => { S4JToken token = i.Clone(); token.Parent = newToken; return token; }).ToList();
             // newToken.Parent = newToken.Parent?.Clone();
             return newToken;
+        }
+
+        public override string ToString()
+        {
+            return this.ToJson();
         }
     }
 

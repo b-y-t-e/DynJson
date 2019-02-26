@@ -150,6 +150,7 @@ namespace DynJson.Parser
         S4J_OBJECT_CONTENT = 6,
         S4J_OBJECT = 7,
         S4J_PARAMETERS = 8,
+        S4J_VARIABLE = 16,
 
         FUNCTION = 9,
         FUNCTION_COMMENT = 10,

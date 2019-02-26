@@ -46,6 +46,9 @@ namespace DynJson.Tokens
                 if (State.StateType == EStateType.S4J_OBJECT_CONTENT)
                     result = new S4JTokenObjectContent();
 
+                if (State.StateType == EStateType.S4J_VARIABLE)
+                    result = new S4JTokenVariable();
+
                 //if (State.StateType == EStateType.S4J_VALUE_DELIMITER)
                 //    result = new JsArray();
 
