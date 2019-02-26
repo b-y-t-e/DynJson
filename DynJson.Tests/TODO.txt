@@ -1,0 +1,37 @@
+﻿
+TODO:  
+
+dodanie obslugi dla tagow -> np. 
+ + przekazujemy jakis dodatkowy parametr do funckji wewnatrz (np w sql tablice # zamiast @)
+
+refactoring dla Root'a -> de facto root to metoda s4j (czy zmiana nazwy) 
+refactoring dla Root'a -> oznaczenie stan'ów / token'ów które będą 'wystawiane' jako output (a nie ich usuwanie)
+refactoring dla Root'a -> zaprzestanie usuwania tokenów
+refactoring dla Root'a -> przemyślenie tematu tag'ów / parametrów dla root'a
+
+tagi dla funkcji wewnatrz
+cloning
+pararell tests
+integration with azure functions
+integration with self hosting environment
+support for http methods (get / post / put .. ) via tags
+
+support for storing tablename in data (is this safe?)
+support for global methods for data checking (c# / dynlan / sql)
+support for add refenernces for executing project / custom namespaces / custom dll's
+support for complex types
+? support for diffirent parameters parsing styles (dynamic / json / pure .net)
+support for redis cache
+support for table storage
+support for file storage
+support service bus
+support for table queue
+
+refactoing & simplifying exection (tokens should be immutable and results should be save in other collection)
+
+DONE:
+dodanie obslugi dla tagow -> np. 
+ + jesli mamy permission to wystawiamy wezel, 
+ + albo sprawdzamy czy funkcje mozna zawolac np. post / get
+support for saving data through api (dynlan)
+support for saving data through api (c#)

@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "storageAccountName": "http2s",
+    "storageAccountKey": "OK9m7U/sgFvT6Jg1+Fw7lpoOaxa/FL330UL/IwNWDOZXyvBP6wO+5cQP2p/d3UYN9k1reCtPaDOntxjlhbkJdw==",
+    "sqlConnectionString": "Server=tcp:http2s.database.windows.net,1433;Initial Catalog=http2s;Persist Security Info=False;User ID=dba;Password=Byte!234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+}
