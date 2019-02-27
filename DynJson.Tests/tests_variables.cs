@@ -64,9 +64,9 @@ method ( a : any )
 
             Assert.AreEqual(@"{""andrzej""}", result.ToString());
         }
-        
-        [Test]
-        /*async public Task test_variable_from_inner_result()
+
+        /*[Test]
+        async public Task test_variable_from_inner_result()
         {
             var script1 = @" 
 
