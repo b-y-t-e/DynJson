@@ -1,6 +1,8 @@
 ﻿
 TODO:  
 
+temat wydajnosciowy dla emtody AfterEvaluateToken -> dodanie metody BuildObject (zamiast BuildJson)
+
 dodanie obslugi dla tagow -> np. 
  + przekazujemy jakis dodatkowy parametr do funckji wewnatrz (np w sql tablice # zamiast @)
 

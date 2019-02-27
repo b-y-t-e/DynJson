@@ -187,13 +187,13 @@ namespace DynJson.Executor
             }
             else
             {
-                AfterEvaluateToken(token);
                 var children = token.Children.ToArray();
                 for (var i = 0; i < children.Length; i++)
                 {
                     S4JToken child = children[i];
                     await Evaluate(child);
                 }
+                AfterEvaluateToken(token);
             }
         }
 
@@ -202,7 +202,14 @@ namespace DynJson.Executor
             if (token.OutputVariableName == null)
                 return;
 
-            globalVariables[token.OutputVariableName] = token.Result;
+            var obj = token.Result;
+            if (obj == null)
+            {
+                var json = token.ToJson(true);
+                obj = JsonToDynamicDeserializer.Deserialize(json);
+            }
+
+            globalVariables[token.OutputVariableName] = obj;
         }
 
         async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
@@ -342,7 +349,7 @@ namespace DynJson.Executor
                     newTokens);
             }
 
-            function.Result = list;
+            // function.Result = list;
         }
 
         private void EvaluateFunctionInsideObjectInsideAnyOther(
@@ -358,7 +365,7 @@ namespace DynJson.Executor
                 function,
                 tokens);
 
-            function.Result = item;
+            // function.Result = item;
         }
 
         private void EvaluateFunctionInsideArray(
@@ -374,7 +381,7 @@ namespace DynJson.Executor
                 function,
                 tokens);
 
-            function.Result = list;
+            // function.Result = list;
         }
 
         private void EvaluateFunctionInsideAnyOther(
@@ -389,7 +396,7 @@ namespace DynJson.Executor
             function.Children.Clear();
             function.Children.AddRange(tokens);
 
-            function.Result = item;
+            // function.Result = item;
         }
 
         private IDictionary<String, object> GetExecutingVariables(S4JToken token)

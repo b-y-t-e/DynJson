@@ -66,16 +66,16 @@ method ( a : any )
         }
         
         [Test]
-        async public Task test_variable_from_inner_result()
+        /*async public Task test_variable_from_inner_result()
         {
             var script1 = @" 
 
 method ( numer : string ) 
-{
+
     #hidden
     sql( select * from dokument where numer = @numer ) as @dokument,
-    @dokument.numer
-}
+    @dokument[0].numer
+
 
 ";
 
@@ -83,6 +83,26 @@ method ( numer : string )
                 ExecuteWithParameters(script1, "numer1");
 
             Assert.AreEqual(@"{""numer1""}", result.ToString());
+        }*/
+
+        [Test]
+        async public Task test_variable_from_inner_object()
+        {
+            var script1 = @" 
+
+method ( numer : string ) 
+
+    #hidden
+    {sql( select numer, rodzaj from dokument where numer = @numer )} as @dokument,
+    @dokument
+
+
+";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1, "numer1");
+
+            Assert.AreEqual(@"{""numer"":""numer1"",""rodzaj"":0}", result.ToString());
         }
 
     }

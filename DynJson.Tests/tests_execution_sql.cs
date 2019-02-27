@@ -195,6 +195,7 @@ namespace DynJson.tests
             create table dbo.dokument(
                 id int identity(1,1), 
                 numer varchar(max),
+                rodzaj int
             )
 
         commit
@@ -207,14 +208,20 @@ namespace DynJson.tests
 
         delete from dbo.dokument
 
-        insert into dbo.dokument(numer)
-        select 'numer1'
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer1', 0
 
-        insert into dbo.dokument(numer)
-        select 'numer2'
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer2', 0
 
-        insert into dbo.dokument(numer)
-        select 'numer3'
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer3', 0
+
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer4', 1
+
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer5', 1
 
         delete from dbo.osoba
 

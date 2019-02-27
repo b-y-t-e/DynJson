@@ -110,6 +110,8 @@ namespace DynJson.Tokens
             S4JToken prevChild = Index > 0 ? Children[Index - 1] : null;
             S4JToken nextChild = Index + 1 < Children.Count ? Children[Index + 1] : null;
 
+            var child = this.Children[Index];
+            child.Parent = null;
             this.Children.RemoveAt(Index);
 
             if (prevChild != null)
@@ -266,10 +268,10 @@ namespace DynJson.Tokens
             }
         }
 
-        public virtual string ToJson()
+        public virtual string ToJson(Boolean Force = false)
         {
             StringBuilder builder = new StringBuilder();
-            BuildJson(builder, false);
+            BuildJson(builder, Force);
             return builder.ToString();
         }
 
