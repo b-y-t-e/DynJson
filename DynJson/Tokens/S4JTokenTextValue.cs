@@ -13,7 +13,7 @@ namespace DynJson.Tokens
 
         public Object Value { get; set; }
 
-        public String VariableName { get; set; }
+        public String VariablePath { get; set; }
 
         // public Boolean IsVariableReference { get; set; }
 
@@ -21,7 +21,7 @@ namespace DynJson.Tokens
         {
             Text = "";
             IsObjectKey = false;
-            VariableName = null;
+            VariablePath = null;
             //IsVariableReference = false;
             Children = new List<S4JToken>();
             State = new S4JState()
@@ -56,7 +56,7 @@ namespace DynJson.Tokens
             if (!IsVisible)
                 return false;
 
-            if (VariableName != null)
+            if (VariablePath != null)
             {
                 Builder.Append(Value.SerializeJson());
             }
@@ -95,7 +95,7 @@ namespace DynJson.Tokens
         {
             if (MyStringHelper.IsVariable(this.Text))
             {
-                this.VariableName = this.Text.Trim().Substring(1);
+                this.VariablePath = this.Text.Trim().Substring(1);
                 this.Value = null;
             }
         }

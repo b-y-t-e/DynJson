@@ -151,10 +151,12 @@ namespace DynJson.Executor
             if (token == null)
                 return;
 
+            IDictionary<string, object> variables = GetExecutingVariables(token);
+
             bool canBeEvaluated = true;
             if (token.Tags.Count > 0 && TagValidator != null)
             {
-                using (ExecutorContext context = new ExecutorContext(token, GetExecutingVariables(token)))
+                using (ExecutorContext context = new ExecutorContext(token, variables))
                     canBeEvaluated = TagValidator(context);
             }
 
@@ -162,13 +164,13 @@ namespace DynJson.Executor
             if (!canBeEvaluated)
                 return;
 
-            if (token is S4JTokenFunction function) //   .State.StateType == EStateType.FUNCTION)
+            if (token is S4JTokenFunction function) // .State.StateType == EStateType.FUNCTION)
             {
                 await EvaluateFunction(function);
             }
-            if (token is S4JTokenTextValue textValue && textValue.VariableName != null)
+            if (token is S4JTokenTextValue textValue && textValue.VariablePath != null)
             {
-                await EvaluateTokenVariable(textValue);
+                await EvaluateTokenVariable(textValue, variables);
             }
             else
             {
@@ -181,11 +183,12 @@ namespace DynJson.Executor
             }
         }
 
-        async private Task EvaluateTokenVariable(S4JTokenTextValue token)
+        async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
         {
-            var variables = GetExecutingVariables(token);
-            object value = null;
-            variables.TryGetValue(token.VariableName, out value);
+            Object value = MyReflectionHelper.GetValueFromPath(variables, token.VariablePath);
+
+            // object value = null;
+            //variables.TryGetValue(token.VariablePath, out value);
             token.Value = value;
         }
 
