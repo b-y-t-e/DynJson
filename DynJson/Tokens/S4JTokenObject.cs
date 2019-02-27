@@ -93,9 +93,9 @@ namespace DynJson.Tokens
             return result;
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             Builder.Append("{");
@@ -111,7 +111,7 @@ namespace DynJson.Tokens
 
                 if (child.IsObjectKey)
                 {
-                    keyWasAdded = child.BuildJson(Builder);
+                    keyWasAdded = child.BuildJson(Builder, Force);
                     if (keyWasAdded)
                     {
                         prevWasKey = true;
@@ -120,7 +120,7 @@ namespace DynJson.Tokens
                 }
                 else if (child.IsObjectSingleKey)
                 {
-                    keyWasAdded = child.BuildJson(Builder);
+                    keyWasAdded = child.BuildJson(Builder, Force);
                     if (keyWasAdded)
                     {
                         prevWasKey = false;
@@ -128,7 +128,7 @@ namespace DynJson.Tokens
                 }
                 else if (keyWasAdded)
                 {
-                    child.BuildJson(Builder);
+                    child.BuildJson(Builder, Force);
                     prevWasKey = false;
                 }
 
@@ -140,12 +140,4 @@ namespace DynJson.Tokens
         }
     }
 
-    /*public class JsObjectKeyValue
-    {
-        public Object Key { get; set; }
-
-        public Object Value { get; set; }
-
-        public Boolean OnlyKey { get; set; }
-    }*/
 }

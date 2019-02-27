@@ -42,9 +42,9 @@ namespace DynJson.Tokens
             return Parameters;
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             if (!string.IsNullOrEmpty(Name))
@@ -70,12 +70,12 @@ namespace DynJson.Tokens
                 Builder.Append(")");
             }
 
-            base.BuildJson(Builder);
+            base.BuildJson(Builder, Force);
 
             return true;
         }
 
-        public override void Commit()
+        public override bool Commit()
         {
             base.Commit();
 
@@ -128,6 +128,8 @@ namespace DynJson.Tokens
                 }
                 root.RemoveChild(parametersToken, null);
             }
+
+            return true;
         }
     }
 }

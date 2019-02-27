@@ -27,6 +27,12 @@ namespace DynJson.Tokens
 
         //////////////////////////////////////////////////
 
+        public String OutputVariableName { get; set; }
+
+        public Object Result { get; set; }
+
+        //////////////////////////////////////////////////
+
         public S4JToken this[int index]
         {
             get { return this.Children[index]; }
@@ -90,7 +96,7 @@ namespace DynJson.Tokens
             return childIndex;
         }
 
-        public virtual bool RemoveChild(S4JToken OldChild, IList<S4JToken> NewChilds)
+        public virtual bool RemoveChild(S4JToken OldChild, IList<S4JToken> NewChilds = null)
         {
             Int32 childIndex = IndexOfChild(OldChild);
             return RemoveChild(childIndex, NewChilds);
@@ -171,13 +177,24 @@ namespace DynJson.Tokens
             this.IsObjectSingleKey = true;
         }
 
-        public virtual void Commit()
+        public virtual bool Commit()
         {
             // IsCommited = true;
 
-            S4JToken lastChild = this.Children.LastOrDefault();
-            if (lastChild is S4JTokenTextValue txtVal)
-                txtVal.Commit();
+            S4JToken lastChild = null;
+            while (true)
+            {
+                lastChild = this.Children.LastOrDefault();
+                if (lastChild is S4JTokenTextValue txtVal)
+                {
+                    if (txtVal.Commit())
+                        break;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             CalculateIsSingleKey(this, lastChild);
 
@@ -200,6 +217,8 @@ namespace DynJson.Tokens
 
             //CalculateIsSingleKey(this, lastChild);
             // CalculateIsSingleKey(this.Parent, this);
+
+            return true;
         }
 
         public virtual void OnPop()
@@ -212,20 +231,20 @@ namespace DynJson.Tokens
 
         }
 
-        private void CalculateIsSingleKey(S4JToken Token, S4JToken Item)
+        private void CalculateIsSingleKey(S4JToken ParentToken, S4JToken ChildToken)
         {
-            if (Item == null)
+            if (ChildToken == null)
                 return;
 
             // ustalenie IsSingleKey = true
             // próba określenia czy token jest w obiekcie
             // oraz czy jest 'kluczem bez wartosci' 
-            if (Token is S4JTokenObject ||
-                Token is S4JTokenParameters ||
-                Token is S4JTokenTag)
+            if (ParentToken is S4JTokenObject ||
+                ParentToken is S4JTokenParameters ||
+                ParentToken is S4JTokenTag)
             {
                 S4JToken prevChild = null;
-                foreach (S4JToken child in Token.Children)
+                foreach (S4JToken child in ParentToken.Children)
                 {
                     if (!child.IsObjectKey)
                     {
@@ -250,13 +269,13 @@ namespace DynJson.Tokens
         public virtual string ToJson()
         {
             StringBuilder builder = new StringBuilder();
-            BuildJson(builder);
+            BuildJson(builder, false);
             return builder.ToString();
         }
 
-        public virtual bool BuildJson(StringBuilder Builder)
+        public virtual bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             ////////////////////////////////////
@@ -271,7 +290,7 @@ namespace DynJson.Tokens
             ////////////////////////////////////
 
             foreach (var child in Children)
-                child.BuildJson(Builder);
+                child.BuildJson(Builder, Force);
 
             ////////////////////////////////////
 
@@ -288,7 +307,7 @@ namespace DynJson.Tokens
         public string ToJsonWithoutGate()
         {
             StringBuilder builder = new StringBuilder();
-            BuildJson(builder);
+            BuildJson(builder, true);
             if (State?.FoundGates != null)
             {
                 if (builder.ToString().StartsWith(new string(State.FoundGates.First().Start.ToArray())))

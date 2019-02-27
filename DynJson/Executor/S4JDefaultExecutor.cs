@@ -11,7 +11,13 @@ namespace DynJson.Executor
         public S4JDefaultExecutor() :
             base(S4JDefaultStateBag.Get())
         {
-            
+            this.TagValidators.Add(context =>
+            {
+                if (context.Tags.ContainsKey("hidden"))
+                    return false;
+
+                return true;
+            });
         }
     }
 }

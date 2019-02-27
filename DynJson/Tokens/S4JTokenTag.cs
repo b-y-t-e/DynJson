@@ -14,13 +14,13 @@ namespace DynJson.Tokens
             Children = new List<S4JToken>();
         }
 
-        public override void Commit()
+        public override bool Commit()
         {
             base.Commit();
 
 
             if (this.Parent == null)
-                return;
+                return false;
 
             string lastKey = null;
 
@@ -44,6 +44,8 @@ namespace DynJson.Tokens
                     this.Tags[UniConvert.ToString(val)] = null;
                 }
             }
+
+            return true;
         }
     }
 

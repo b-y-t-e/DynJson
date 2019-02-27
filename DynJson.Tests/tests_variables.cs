@@ -14,6 +14,12 @@ namespace DynJson.tests
     [TestFixture]
     public class tests_variables
     {
+        [Test, Order(-1)]
+        async public Task prepare_db()
+        {
+            await new DbForTest().PrepareDb();
+        }
+
         [Test]
         async public Task test_simple_variable_as_parameter()
         {
@@ -63,16 +69,20 @@ method ( a : any )
         async public Task test_variable_from_inner_result()
         {
             var script1 = @" 
-method ( a : any ) 
+
+method ( numer : string ) 
 {
-    osoba : @a
-    @osoba.imie
-}";
+    #hidden
+    sql( select * from dokument where numer = @numer ) as @dokument,
+    @dokument.numer
+}
+
+";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, new osoba() { imie = "andrzej" });
+                ExecuteWithParameters(script1, "numer1");
 
-            Assert.AreEqual(@"{""andrzej""}", result.ToString());
+            Assert.AreEqual(@"{""numer1""}", result.ToString());
         }
 
     }

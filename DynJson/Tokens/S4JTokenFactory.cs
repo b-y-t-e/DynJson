@@ -22,6 +22,9 @@ namespace DynJson.Tokens
                 if (State.StateType == EStateType.S4J_COMMENT)
                     result = new S4JTokenComment();
 
+                //if (State.StateType == EStateType.S4J_VARIABLE_OUTPUT)
+                 //   result = new S4JTokenVariableOutput();
+
                 if (State.StateType == EStateType.S4J_OBJECT)
                     result = new S4JTokenObject();
 
@@ -46,8 +49,8 @@ namespace DynJson.Tokens
                 if (State.StateType == EStateType.S4J_OBJECT_CONTENT)
                     result = new S4JTokenObjectContent();
 
-                if (State.StateType == EStateType.S4J_VARIABLE)
-                    result = new S4JTokenVariable();
+                //if (State.StateType == EStateType.S4J_VARIABLE)
+                //    result = new S4JTokenVariable();
 
                 //if (State.StateType == EStateType.S4J_VALUE_DELIMITER)
                 //    result = new JsArray();

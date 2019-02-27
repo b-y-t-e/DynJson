@@ -8,7 +8,7 @@ namespace DynJson.Tokens
     {
         public String Text { get; set; }
 
-        public Object Value { get; set; }
+        // public Object Value { get; set; }
 
         public S4JTokenObjectContent()
         {
@@ -19,7 +19,7 @@ namespace DynJson.Tokens
 
         public override Dictionary<String, Object> GetParameters()
         {
-            if( Value is IDictionary<string, object> dict)
+            if (Result is IDictionary<string, object> dict)
             {
                 Dictionary<String, Object> variables = new Dictionary<string, object>();
                 foreach (var item in dict)
@@ -45,9 +45,9 @@ namespace DynJson.Tokens
             }
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             Builder.Append(Text);
@@ -55,11 +55,12 @@ namespace DynJson.Tokens
             return true;
         }
 
-        public override void Commit()
+        public override bool Commit()
         {
             this.Text = this.Text.Trim();
             // this.ValueFromText = this.Text.DeserializeJson();
             base.Commit();
+            return true;
         }
 
     }

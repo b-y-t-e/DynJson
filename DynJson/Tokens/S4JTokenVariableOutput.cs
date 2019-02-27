@@ -7,18 +7,18 @@ using System.Text;
 
 namespace DynJson.Tokens
 {
-    public class S4JTokenVariable : S4JToken
+    public class S4JTokenVariableOutput : S4JToken
     {
         public String VariableName { get; set; }
-        
-        public S4JTokenVariable()
+
+        public S4JTokenVariableOutput()
         {
             VariableName = "";
             IsObjectKey = false;
             Children = new List<S4JToken>();
             State = new S4JState()
             {
-                StateType = EStateType.S4J_VARIABLE,
+                StateType = EStateType.S4J_VARIABLE_OUTPUT,
                 IsValue = true,
             };
         }
@@ -62,42 +62,6 @@ namespace DynJson.Tokens
             // this.Value = this.Text.DeserializeJson();
             this.IsCommited = true;
             return true;
-        }
-
-        public override void MarkAsObjectKey()
-        {
-            base.MarkAsObjectKey();
-            AnalyseValue();
-        }
-
-        public override void MarkAsObjectValue()
-        {
-            base.MarkAsObjectValue();
-            AnalyseValue();
-        }
-
-        private void AnalyseValue()
-        {
-            try
-            {
-                if (MyStringHelper.IsVariable(this.VariableName))
-                {
-                    this.Result = this.VariableName.Trim();
-                }
-                else if (MyStringHelper.IsNumber(this.VariableName) ||
-                    MyStringHelper.IsQuotedText(this.VariableName))
-                {
-                    this.Result = this.VariableName.DeserializeJson();
-                }
-                else
-                {
-                    this.Result = this.VariableName.Trim();
-                }
-            }
-            catch
-            {
-                throw;
-            }
         }
     }
 }

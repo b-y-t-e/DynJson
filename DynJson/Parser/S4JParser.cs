@@ -87,10 +87,6 @@ namespace DynJson.Parser
 
                             if (stackEvent.Chars != null)
                             {
-                                if (stackEvent.State.IsSimpleValue)
-                                {
-                                }
-
                                 S4JToken currentVal = valueStack.Peek();
                                 currentVal.AppendCharsToToken(stackEvent.Chars);
                             }

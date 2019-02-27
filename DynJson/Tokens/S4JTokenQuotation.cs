@@ -12,13 +12,13 @@ namespace DynJson.Tokens
             Children = new List<S4JToken>();
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             //Builder.Append("'");
-            base.BuildJson(Builder);
+            base.BuildJson(Builder, Force);
             //Builder.Append("'");
 
             return true;

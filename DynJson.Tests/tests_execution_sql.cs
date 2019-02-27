@@ -174,6 +174,9 @@ namespace DynJson.tests
 
         begin transaction
 
+        if object_id('dbo.dokument') is not null  
+            drop table dbo.dokument
+
         if object_id('dbo.osoba') is not null  
             drop table dbo.osoba
 
@@ -188,6 +191,12 @@ namespace DynJson.tests
                 utworzono datetime default(getdate())
             )
 
+        if object_id('dbo.dokument') is null  
+            create table dbo.dokument(
+                id int identity(1,1), 
+                numer varchar(max),
+            )
+
         commit
 
     ),
@@ -195,6 +204,17 @@ namespace DynJson.tests
     sql(
 
         begin transaction
+
+        delete from dbo.dokument
+
+        insert into dbo.dokument(numer)
+        select 'numer1'
+
+        insert into dbo.dokument(numer)
+        select 'numer2'
+
+        insert into dbo.dokument(numer)
+        select 'numer3'
 
         delete from dbo.osoba
 

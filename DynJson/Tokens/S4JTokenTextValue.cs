@@ -7,18 +7,30 @@ using System.Text;
 
 namespace DynJson.Tokens
 {
+    public enum TokenTextType
+    {
+        TEXT = 0,
+        VARIABLE_REFERENCE = 1,
+        VARIABLE_OUTPUT = 2
+    }
+
     public class S4JTokenTextValue : S4JToken
     {
-        public String Text { get; set; }
+        public TokenTextType WorkType { get; private set; }
 
-        public Object Value { get; set; }
+        public String Text { get; set; }
+        
+        ////////////////////////////////////
 
         public String VariablePath { get; set; }
 
-        // public Boolean IsVariableReference { get; set; }
+        // public String OutputVariableName { get; set; }
+
+        ////////////////////////////////////
 
         public S4JTokenTextValue()
         {
+            WorkType = TokenTextType.TEXT;
             Text = "";
             IsObjectKey = false;
             VariablePath = null;
@@ -45,38 +57,43 @@ namespace DynJson.Tokens
         {
             foreach (var Char in Chars)
             {
-                //if (this.Text.Length == 0 && System.Char.IsWhiteSpace(Char))
-                //    continue;
                 this.Text += Char;
             }
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             if (VariablePath != null)
             {
-                Builder.Append(Value.SerializeJson());
+                Builder.Append(Result.SerializeJson());
             }
             else
             {
-                //if(Value != null)
-                //    Builder.Append(UniConvert.to);
-                //else
                 Builder.Append(Text);
             }
 
             return true;
         }
 
-        public override void Commit()
+        public override bool Commit()
         {
             //this.Text = this.Text.Trim();
             // this.Value = this.Text.DeserializeJson();
+
             this.IsCommited = true;
             this.CheckVariable();
+
+            if (this.WorkType == TokenTextType.VARIABLE_OUTPUT)
+            {
+                this.PrevToken.OutputVariableName = VariablePath;
+                this.Parent.RemoveChild(this);
+                return false;
+            }
+
+            return true;
         }
 
         public override void MarkAsObjectKey()
@@ -95,8 +112,19 @@ namespace DynJson.Tokens
         {
             if (MyStringHelper.IsVariable(this.Text))
             {
-                this.VariablePath = this.Text.Trim().Substring(1);
-                this.Value = null;
+                this.WorkType = TokenTextType.VARIABLE_REFERENCE;
+                this.VariablePath = this.Text.Trim().Substring(1).Trim();
+                this.Result = null;
+            }
+            else if (MyStringHelper.IsVariableOutput(this.Text))
+            {
+                this.WorkType = TokenTextType.VARIABLE_OUTPUT;
+                this.VariablePath = this.Text.Trim().Substring(3).Trim();
+                if (MyStringHelper.IsVariable(this.VariablePath))
+                {
+                    this.VariablePath = this.VariablePath.Substring(1).Trim();
+                }
+                this.Result = null;
             }
         }
 
@@ -107,11 +135,11 @@ namespace DynJson.Tokens
                 if (MyStringHelper.IsNumber(this.Text) ||
                     MyStringHelper.IsQuotedText(this.Text))
                 {
-                    this.Value = this.Text.DeserializeJson();
+                    this.Result = this.Text.DeserializeJson();
                 }
                 else
                 {
-                    this.Value = this.Text.Trim();
+                    this.Result = this.Text.Trim();
                 }
             }
             catch

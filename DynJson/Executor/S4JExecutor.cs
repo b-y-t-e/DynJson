@@ -47,12 +47,16 @@ namespace DynJson.Executor
 
         public Object Result { get; private set; }
 
-        public TagValidator TagValidator { get; set; }
+        public List<TagValidator> TagValidators { get; set; }
+
+        private Dictionary<string, Object> globalVariables;
 
         public S4JExecutor(S4JStateBag StateBag)
         {
+            this.globalVariables = new Dictionary<string, object>();
             this.StateBag = StateBag;
             this.Sources = new Sources();
+            this.TagValidators = new List<TagValidator>();
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(String MethodDefinitionAsJson, Dictionary<string, string> ParametersAsJson)
@@ -154,26 +158,36 @@ namespace DynJson.Executor
             IDictionary<string, object> variables = GetExecutingVariables(token);
 
             bool canBeEvaluated = true;
-            if (token.Tags.Count > 0 && TagValidator != null)
+            if (token.Tags.Count > 0 && TagValidators?.Count > 0)
             {
-                using (ExecutorContext context = new ExecutorContext(token, variables))
-                    canBeEvaluated = TagValidator(context);
+                foreach (var tagValidator in TagValidators)
+                {
+                    using (ExecutorContext context = new ExecutorContext(token, variables))
+                    {
+                        canBeEvaluated = tagValidator(context);
+                        if (!canBeEvaluated)
+                            break;
+                    }
+                }
             }
 
             token.IsVisible = canBeEvaluated;
-            if (!canBeEvaluated)
-                return;
+            //if (!canBeEvaluated)
+            //    return;
 
             if (token is S4JTokenFunction function) // .State.StateType == EStateType.FUNCTION)
             {
                 await EvaluateFunction(function);
+                AfterEvaluateToken(function);
             }
-            if (token is S4JTokenTextValue textValue && textValue.VariablePath != null)
+            else if (token is S4JTokenTextValue textValue && textValue.VariablePath != null)
             {
                 await EvaluateTokenVariable(textValue, variables);
+                AfterEvaluateToken(textValue);
             }
             else
             {
+                AfterEvaluateToken(token);
                 var children = token.Children.ToArray();
                 for (var i = 0; i < children.Length; i++)
                 {
@@ -183,13 +197,21 @@ namespace DynJson.Executor
             }
         }
 
+        void AfterEvaluateToken(S4JToken token)
+        {
+            if (token.OutputVariableName == null)
+                return;
+
+            globalVariables[token.OutputVariableName] = token.Result;
+        }
+
         async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
         {
             Object value = MyReflectionHelper.GetValueFromPath(variables, token.VariablePath);
 
             // object value = null;
             //variables.TryGetValue(token.VariablePath, out value);
-            token.Value = value;
+            token.Result = value;
         }
 
         async private Task EvaluateFunction(S4JTokenFunction function)
@@ -201,16 +223,22 @@ namespace DynJson.Executor
 
             object result = null;
 
-            bool canBeEvaluated = true;
-            if (function.Tags.Count > 0 && TagValidator != null)
+            /*bool canBeEvaluated = true;
+            if (function.Tags.Count > 0 && TagValidators?.Count > 0)
             {
-                using (ExecutorContext context = new ExecutorContext(function, variables))
-                    canBeEvaluated = TagValidator(context);
+                foreach (var tagValidator in TagValidators)
+                {
+                    using (ExecutorContext context = new ExecutorContext(function, variables))
+                    {
+                        canBeEvaluated = tagValidator(context);
+                        if (!canBeEvaluated)
+                            break;
+                    }
+                }
             }
+            function.IsVisible = canBeEvaluated;*/
+            //if (canBeEvaluated)
 
-
-            function.IsVisible = canBeEvaluated;
-            if (canBeEvaluated)
             {
                 if (function.State is S4JStateFunction stateFunction &&
                     stateFunction.FunctionTagExecutor != null)
@@ -277,23 +305,24 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
+            var list = GetManyObjectsFromResult(result);
+
             if (objectParent.Children.Count == 1)
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
-
-                IList<S4JToken> tokensFromResult = ConvertToToken(
-                    GetManyObjectsFromResult(result)).ToArray();
+                
+                IList<S4JToken> tokensFromResult = ConvertToToken(list, function.IsVisible).ToArray();
 
                 objectParent.Parent.RemoveChild(
                     objectParent,
                     tokensFromResult);
+
             }
             else
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
-
-                IList<S4JToken> tokensFromResult = ConvertToManyTokens(
-                    GetManyObjectsFromResult(result)).ToArray();
+                
+                IList<S4JToken> tokensFromResult = ConvertToManyTokens(list, function.IsVisible).ToArray();
 
                 List<S4JToken> newTokens = new List<S4JToken>();
                 foreach (S4JToken tokenFromResult in tokensFromResult)
@@ -312,6 +341,8 @@ namespace DynJson.Executor
                     objectParent,
                     newTokens);
             }
+
+            function.Result = list;
         }
 
         private void EvaluateFunctionInsideObjectInsideAnyOther(
@@ -319,12 +350,15 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            IList<S4JToken> tokens = ConvertToTokens(
-                GetSingleObjectFromResult(result)).ToArray();
+            var item = GetSingleObjectFromResult(result);
+
+            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible).ToArray();
 
             objectParent.RemoveChild(
                 function,
                 tokens);
+
+            function.Result = item;
         }
 
         private void EvaluateFunctionInsideArray(
@@ -332,24 +366,30 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            IList<S4JToken> tokens = ConvertToToken(
-                GetListOfSingleObjectsFromResult(result)).ToArray();
+            var list = GetListOfSingleObjectsFromResult(result);
+
+            IList<S4JToken> tokens = ConvertToToken(list, function.IsVisible).ToArray();
 
             function.Parent.RemoveChild(
                 function,
                 tokens);
+
+            function.Result = list;
         }
 
         private void EvaluateFunctionInsideAnyOther(
             S4JTokenFunction function,
             object result)
         {
-            IList<S4JToken> tokens = ConvertToTokens(
-                GetSingleAndFirstValueFromResult(result)).ToArray();
+            var item = GetSingleAndFirstValueFromResult(result);
+
+            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible).ToArray();
 
             String text = JsonSerializer.SerializeJson(result);
             function.Children.Clear();
             function.Children.AddRange(tokens);
+
+            function.Result = item;
         }
 
         private IDictionary<String, object> GetExecutingVariables(S4JToken token)
@@ -373,17 +413,22 @@ namespace DynJson.Executor
                     parentToken = parentToken.Parent;
                 }
             }
+
+            foreach (var variable in globalVariables)
+                variables[variable.Key] = variable.Value;
+
             return variables;
         }
 
-        private IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary)
+        private IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary, Boolean IsVisible)
         {
             if (Dictionary == null)
                 yield break;
 
             yield return new S4JTokenObjectContent()
             {
-                Value = Dictionary,
+                IsVisible = IsVisible,
+                Result = Dictionary,
                 Text = Dictionary.SerializeJsonNoBrackets(),
                 //IsKey = true,
                 IsObjectSingleKey = true,
@@ -392,14 +437,15 @@ namespace DynJson.Executor
             };
         }
 
-        private IEnumerable<S4JToken> ConvertToToken(IList<Object> List)
+        private IEnumerable<S4JToken> ConvertToToken(IList<Object> List, Boolean IsVisible)
         {
             if (List == null || List.Count == 0)
                 yield break;
 
             yield return new S4JTokenObjectContent()
             {
-                Value = List,
+                IsVisible = IsVisible,
+                Result = List,
                 Text = List.SerializeJsonNoBrackets(),
                 //IsKey = true,
                 IsObjectSingleKey = true,
@@ -408,7 +454,7 @@ namespace DynJson.Executor
             };
         }
 
-        private IEnumerable<S4JToken> ConvertToManyTokens(IList<Object> List)
+        private IEnumerable<S4JToken> ConvertToManyTokens(IList<Object> List, Boolean IsVisible)
         {
             if (List == null)
                 yield break;
@@ -416,7 +462,8 @@ namespace DynJson.Executor
             foreach (Object item in List)
                 yield return new S4JTokenObjectContent()
                 {
-                    Value = item,
+                    Result = item,
+                    IsVisible = IsVisible,
                     Text = item.SerializeJsonNoBrackets(),
                     //IsKey = true,
                     IsObjectSingleKey = true,
@@ -425,13 +472,14 @@ namespace DynJson.Executor
                 };
         }
 
-        private IEnumerable<S4JToken> ConvertToTokens(Object Value)
+        private IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible)
         {
             //if (Value == null)
             //    yield break;
 
             yield return new S4JTokenTextValue()
             {
+                IsVisible = IsVisible,
                 Text = Value.SerializeJson(),
                 IsObjectSingleKey = true,
                 IsCommited = true,

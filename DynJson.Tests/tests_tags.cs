@@ -141,7 +141,7 @@ method ( a : int, b : string!, c: any )
             var script1 = @" 
 [
     1,
-    #notvisible
+    #hidden
     2,
     3,
     4
@@ -149,11 +149,7 @@ method ( a : int, b : string!, c: any )
 ";
 
             var executor = new S4JExecutorForTests();
-            executor.TagValidator = (context) =>
-            {
-                return false;
-            };
-
+       
             var result = await executor.
                 ExecuteWithParameters(script1);
             
@@ -166,7 +162,7 @@ method ( a : int, b : string!, c: any )
             var script1 = @" 
 {
     a: 1,
-    #notvisible
+    #hidden
     b: 2,
     c: 3,
     d: 4
@@ -174,11 +170,7 @@ method ( a : int, b : string!, c: any )
 ";
 
             var executor = new S4JExecutorForTests();
-            executor.TagValidator = (context) =>
-            {
-                return false;
-            };
-
+           
             var result = await executor.
                 ExecuteWithParameters(script1);
 
@@ -191,7 +183,7 @@ method ( a : int, b : string!, c: any )
             var script1 = @" 
 {
     a: 1,
-    #notvisible
+    #hidden
     b,
     c: 3,
     d: 4
@@ -199,11 +191,7 @@ method ( a : int, b : string!, c: any )
 ";
 
             var executor = new S4JExecutorForTests();
-            executor.TagValidator = (context) =>
-            {
-                return false;
-            };
-
+           
             var result = await executor.
                 ExecuteWithParameters(script1);
 

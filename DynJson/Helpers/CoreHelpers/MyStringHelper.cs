@@ -307,6 +307,35 @@ namespace DynJson.Helpers.CoreHelpers
             }
         }
 
+        private static char[] variableOutputString = "as".ToCharArray();
+        public static Boolean IsVariableOutput(this String Text)
+        {
+            Text = (Text ?? "").Trim();
+            if (Text.Length <= 3)
+                return false;
+            
+            if (Text[0] == variableOutputString[0] && 
+                Text[1] == variableOutputString[1] &&
+                Char.IsWhiteSpace(Text[2]))
+            {
+                String variableName = Text.Substring(3).Trim();
+                if (Char.IsNumber(variableName[0]))
+                {
+                    return false;
+                }
+                else
+                {
+                    if (IsQuotedText(variableName))
+                        return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static Boolean IsNumber(this String Text)
         {
             Text = (Text ?? "").Trim();

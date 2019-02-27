@@ -8,8 +8,6 @@ namespace DynJson.Tokens
 {
     public class S4JTokenFunction : S4JToken
     {
-        public Object Result { get; set; }
-
         public IEvaluator Evaluator { get; set; }
 
         public Boolean IsEvaluated { get; set; }
@@ -27,19 +25,19 @@ namespace DynJson.Tokens
             // throw new NotImplementedException();
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             if (IsEvaluated)
             {
                 foreach (var child in Children)
-                    child.BuildJson(Builder);
+                    child.BuildJson(Builder, Force);
             }
             else
             {
-                base.BuildJson(Builder);
+                base.BuildJson(Builder, Force);
             }
 
             return true;

@@ -11,9 +11,9 @@ namespace DynJson.Tokens
             Children = new List<S4JToken>();
         }
 
-        public override bool BuildJson(StringBuilder Builder)
+        public override bool BuildJson(StringBuilder Builder, Boolean Force)
         {
-            if (!IsVisible)
+            if (!IsVisible && !Force)
                 return false;
 
             Builder.Append("[");
@@ -21,7 +21,7 @@ namespace DynJson.Tokens
             foreach (var child in Children)
             {
                 if (prevWasAdded) Builder.Append(",");
-                prevWasAdded = child.BuildJson(Builder);
+                prevWasAdded = child.BuildJson(Builder, Force);
             }
             Builder.Append("]");
 
