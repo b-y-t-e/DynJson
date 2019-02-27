@@ -96,6 +96,7 @@ namespace DynJson.Tokens
             if (MyStringHelper.IsVariable(this.Text))
             {
                 this.VariableName = this.Text.Trim().Substring(1);
+                this.Value = null;
             }
         }
 

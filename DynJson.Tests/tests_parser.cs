@@ -419,13 +419,13 @@ namespace DynJson.tests
         [Test]
         public void parser_should_understand_inner_object_and_arrays1()
         {
-            var script1 = @"{  d: [ {@f : 6} ] , c: 'aaa' }";
+            var script1 = @"{  d: [ {f : 6} ] , c: 'aaa' }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{d:[{@f:6}],c:'aaa'}",
+                @"{d:[{f:6}],c:'aaa'}",
                 result.ToJson());
         }
 
@@ -435,7 +435,7 @@ namespace DynJson.tests
             var script1 = @"
 #tag1 #tag2
 {  
-    d: [ {@f : 6} ] , 
+    d: [ {f : 6} ] , 
     c: 'aaa' }
 ";
 
@@ -443,7 +443,7 @@ namespace DynJson.tests
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{d:[{@f:6}],c:'aaa'}",
+                @"{d:[{f:6}],c:'aaa'}",
                 result.ToJson());
         }
 
@@ -453,7 +453,7 @@ namespace DynJson.tests
             var script1 = @"
 {  
     #permission:admin
-    d: [ {@f : 6} ] , 
+    d: [ {f : 6} ] , 
     c: 'aaa' 
 }
 ";
@@ -462,7 +462,7 @@ namespace DynJson.tests
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{d:[{@f:6}],c:'aaa'}",
+                @"{d:[{f:6}],c:'aaa'}",
                 result.ToJson());
         }
 
@@ -474,7 +474,7 @@ namespace DynJson.tests
 #tag1 #tag2
 {  
     #permission:admin
-    d: [ {@f : 6} ] , 
+    d: [ {f : 6} ] , 
     c: 'aaa' }
 ";
 
@@ -482,7 +482,7 @@ namespace DynJson.tests
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{d:[{@f:6}],c:'aaa'}",
+                @"{d:[{f:6}],c:'aaa'}",
                 result.ToJson());
         }
 
@@ -497,7 +497,7 @@ namespace DynJson.tests
                 a : 1, 
                 b : 2, 
                 c : 'abc', 
-                d: [1,2,3, {g: 8, @f : 6} ]  
+                d: [1,2,3, {g: 8, f : 6} ]  
             }, 
             c: 'aaa' 
         }
@@ -507,27 +507,27 @@ namespace DynJson.tests
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{a:'cos',d:{a:1,b:2,c:'abc',d:[1,2,3,{g:8,@f:6}]},c:'aaa'}",
+                @"{a:'cos',d:{a:1,b:2,c:'abc',d:[1,2,3,{g:8,f:6}]},c:'aaa'}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_inner_object_and_arrays3()
         {
-            var script1 = @"{d:[{@f:6}],c:'aaa'}";
+            var script1 = @"{d:[{f:6}],c:'aaa'}";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{d:[{@f:6}],c:'aaa'}",
+                @"{d:[{f:6}],c:'aaa'}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_inner_object_and_arrays4()
         {
-            var script1 = @"{d:[{@f:6}],c:'aaa',d:[{a:['gg']}],e:'b'}";
+            var script1 = @"{d:[{f:6}],c:'aaa',d:[{a:['gg']}],e:'b'}";
 
             var result = new S4JParserForTests().
                 Parse(script1);
