@@ -202,11 +202,13 @@ namespace DynJson.Executor
             if (token.OutputVariableName == null)
                 return;
 
-            var obj = token.Result;
+            object obj = token.Result;
             if (obj == null)
             {
-                var json = token.ToJson(true);
-                obj = JsonToDynamicDeserializer.Deserialize(json);
+                string json = token.ToJson(true);
+
+                obj = JsonToDynamicDeserializer.
+                    Deserialize(json);
             }
 
             globalVariables[token.OutputVariableName] = obj;
@@ -214,7 +216,8 @@ namespace DynJson.Executor
 
         async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
         {
-            Object value = MyReflectionHelper.GetValueFromPath(variables, token.VariablePath);
+            Object value = MyReflectionHelper.
+                GetValueFromPath(variables, token.VariablePath);
 
             // object value = null;
             //variables.TryGetValue(token.VariablePath, out value);
