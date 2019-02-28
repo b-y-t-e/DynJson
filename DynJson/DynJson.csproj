@@ -7,9 +7,10 @@
     <Product>DynJson.NetCore</Product>
     <Description>Dynamic API library</Description>
     <Copyright>Andrzej Ból</Copyright>
-    <PackageReleaseNotes>dynlan python c# dynamic language expressions</PackageReleaseNotes>
+    <PackageReleaseNotes>dynjson dynamic api language</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Platforms>AnyCPU;x86</Platforms>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
