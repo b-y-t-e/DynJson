@@ -121,5 +121,27 @@ method ( numer : string )
             Assert.AreEqual(@"{""numer"":""numer1"",""rodzaj"":0}", result.ToString());
         }
 
+
+        [Test]
+        async public Task test_variable_from_inner_objects()
+        {
+            var script1 = @" 
+
+method ( numer : string ) 
+
+    #hidden
+    sql( select numer, rodzaj from dokument where numer = @numer ) as documents,
+
+    @(documents[0])
+
+
+";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1, "numer1");
+
+            Assert.AreEqual(@"{""numer"":""numer1"",""rodzaj"":0}", result.ToString());
+        }
+
     }
 }
