@@ -45,7 +45,7 @@ namespace DynJson.Parser
                             currentVal.Commit();
                         }
 
-                        currentVal.OnPop();
+                        //currentVal.OnPop();
                         valueStack.Pop();
                     }
 
@@ -101,7 +101,7 @@ namespace DynJson.Parser
                 S4JToken currentVal = valueStack.Peek();
                 if (currentVal != null)
                     currentVal.Commit();
-                currentVal.OnPop();
+                //currentVal.OnPop();
                 valueStack.Pop();
             }
 

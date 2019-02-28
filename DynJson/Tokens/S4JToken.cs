@@ -222,17 +222,7 @@ namespace DynJson.Tokens
 
             return true;
         }
-
-        public virtual void OnPop()
-        {
-            // CalculateIsSingleKey(this.Parent, this);
-
-            S4JToken lastChild = this.Children.LastOrDefault();
-            if (lastChild is S4JTokenTextValue txtVal)
-                txtVal.Commit();
-
-        }
-
+        
         private void CalculateIsSingleKey(S4JToken ParentToken, S4JToken ChildToken)
         {
             if (ChildToken == null)
