@@ -282,7 +282,7 @@ namespace DynJson.Helpers.CoreHelpers
                 }
         }
 
-        public static Boolean IsVariable(this String Text)
+        /*public static Boolean IsVariable(this String Text)
         {
             Text = (Text ?? "").Trim();
             if (Text.Length < 2)
@@ -305,7 +305,7 @@ namespace DynJson.Helpers.CoreHelpers
             {
                 return false;
             }
-        }
+        }*/
 
         private static char[] variableOutputString = "as".ToCharArray();
         public static Boolean IsVariableOutput(this String Text)

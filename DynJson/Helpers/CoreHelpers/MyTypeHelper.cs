@@ -181,6 +181,11 @@ namespace DynJson.Helpers.CoreHelpers
 
         ////////////////////
 
+        public static Boolean IsEnumerable(this Object Obj)
+        {
+            return IsEnumerable(Obj.GetType());
+        }
+
         public static Boolean IsEnumerable(this Type Type)
         {
             return Type.Is(typeof(IEnumerable));

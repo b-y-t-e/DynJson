@@ -16,6 +16,11 @@ namespace DynJson.Functions
 {
     public class TSqlFunction : S4JStateFunction
     {
+        public TSqlFunction() :
+            this("sql")
+        {
+        }
+
         public TSqlFunction(string aliasName) :
             base(aliasName)
         {
@@ -107,7 +112,7 @@ namespace DynJson.Functions
     {
         public async Task<Object> Evaluate(
             S4JExecutor Executor,
-            S4JToken token, 
+            S4JToken token,
             IDictionary<String, object> variables)
         {
             S4JTokenFunction functionToken = token as S4JTokenFunction;
@@ -122,7 +127,7 @@ namespace DynJson.Functions
 
             query.Append(functionToken.ToJsonWithoutGate());
 
-            String connectionString = Executor.Sources.Get(functionState.FunctionName);
+            String connectionString = Executor.Sources.Get(functionState.FunctionNames.First());
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 var result = con.SelectItems(query.ToString());
@@ -132,8 +137,8 @@ namespace DynJson.Functions
 
         void BuildScriptForVariable(
             MyQuery Query,
-            String Name, 
-            Object Value, 
+            String Name,
+            Object Value,
             String ParentName = null)
         {
             string name = string.IsNullOrEmpty(ParentName) ? Name : (ParentName + "_" + Name);
@@ -187,10 +192,10 @@ namespace DynJson.Functions
                 }
             }
         }
-        
+
         void BuildCreateTableScriptForVariable(
             MyQuery Query,
-            String TableName, 
+            String TableName,
             Object Value)
         {
             if (MyTypeHelper.IsPrimitive(Value))

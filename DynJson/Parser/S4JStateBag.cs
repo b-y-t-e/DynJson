@@ -82,52 +82,6 @@ namespace DynJson.Parser
 
             ////////////////////////////////
 
-            /*AddBase( new S4JState()
-            {
-                StateType = EStateType.SQL,
-                IsValue = true,
-                AllowedStatesNames = new [] 
-                {
-                    EStateType.SQL_COMMENT
-                },
-                Gates = new List<S4JStateGate>()
-                {
-                    new S4JStateGate()
-                    {
-                        Start = "{{".ToCharArray(),
-                        End = "}}".ToCharArray(),
-                        Inner = "\\".ToCharArray()
-                    }
-                }
-            });*/
-
-            ////////////////////////////////
-
-            //AddBase(new S4JState()
-            //{
-            //    StateType = EStateType.SQL_COMMENT,
-            //    AllowedStatesNames = new [] 
-            //    {
-            //        EStateType.SQL_COMMENT
-            //    },
-            //    IsComment = true,
-            //    Gates = new List<S4JStateGate>()
-            //    {
-            //        new S4JStateGate()
-            //        {
-            //            Start = "/*".ToCharArray(),
-            //            End = "*/".ToCharArray()
-            //        },
-            //        new S4JStateGate()
-            //        {
-            //            Start = "--".ToCharArray(),
-            //            End = "\n".ToCharArray()
-            //        }
-            //    }
-            //});
-
-            ////////////////////////////////
-
             AddState(new S4JState()
             {
                 Priority = -998,
@@ -334,11 +288,23 @@ namespace DynJson.Parser
                 {
                     new S4JStateGate()
                     {
-                        End = ",".ToCharArray()
+                        End = ",".ToCharArray(),
+                        OmitEnd = true
                     },
                     new S4JStateGate()
                     {
-                        End = ":".ToCharArray()
+                        End = ":".ToCharArray(),
+                        OmitEnd = true
+                    },
+                    new S4JStateGate()
+                    {
+                        End = "}".ToCharArray(),
+                        OmitEnd = true
+                    },
+                    new S4JStateGate()
+                    {
+                        End = "]".ToCharArray(),
+                        OmitEnd = true
                     }
                 }
             });
@@ -366,7 +332,10 @@ namespace DynJson.Parser
             if (State == null)
                 return new S4JState[0];
 
-            return this.stateID_allowed_states[State.ID];
+            if (stateID_allowed_states.ContainsKey(State.ID))
+                return this.stateID_allowed_states[State.ID];
+
+            return new S4JState[0];
 
         }
 

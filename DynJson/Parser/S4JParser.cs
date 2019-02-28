@@ -47,6 +47,8 @@ namespace DynJson.Parser
 
                         //currentVal.OnPop();
                         valueStack.Pop();
+
+                        continue;
                     }
 
                     else
@@ -70,28 +72,52 @@ namespace DynJson.Parser
 
                         else
                         {
+                            /*if(stackEvent.Pushed &&
+                                stackEvent.State.IsSimpleValue == true
+                                )
+                            {
 
-                            if (stackEvent.Pushed &&
-                                stackEvent.State.IsSimpleValue == false)
+                            }*/
+
+
+                            if (stackEvent.Pushed /*&&
+                                stackEvent.State.IsSimpleValue == false*/)
                             {
                                 S4JToken prevVal = valueStack.Peek();
                                 S4JToken newToken = new S4JTokenFactory().To_token(stackEvent.State);
-
-                                valueStack.Push(newToken);
-
                                 newToken.Parent = prevVal;
-
                                 if (!stackEvent.State.IsComment)
                                     prevVal.AddChildToToken(newToken);
+                                valueStack.Push(newToken);
+                            }
+                            else
+                            {
+                                if (stackEvent.Chars != null)
+                                {
+                                    S4JToken currentVal = valueStack.Peek();
+                                    currentVal.AppendCharsToToken(stackEvent.Chars);
+                                }
+                                /* S4JToken currentVal = valueStack.Peek();
+                                 if(!(currentVal is S4JTokenTextValue))
+                                 {
+                                     S4JTokenTextValue textToken = new S4JTokenTextValue();
+                                     textToken.Parent = currentVal;
+                                     currentVal.AddChildToToken(textToken);
+                                     valueStack.Push(textToken);
+                                 }
+                                 currentVal = valueStack.Peek();
+                                 currentVal.AppendCharsToToken(stackEvent.Chars);*/
                             }
 
-                            if (stackEvent.Chars != null)
+                           /* if (stackEvent.Chars != null)
                             {
                                 S4JToken currentVal = valueStack.Peek();
                                 currentVal.AppendCharsToToken(stackEvent.Chars);
-                            }
+                            }*/
 
                         }
+
+                        continue;
                     }
                 }
             }
@@ -119,7 +145,12 @@ namespace DynJson.Parser
             S4JToken prevToken = stateStack.Peek();
             if (GetStateEnd(code, index, StateBag, prevToken) != null)
             {
-                Int32 nextIndex = index + (prevToken.State.FoundGates.First().End == null ? 0 : (prevToken.State.FoundGates.First().End.Length - 1)) + 1;
+                Int32 nextIndex =
+                    index +
+                    (prevToken.State.FoundGates.First().End == null ||
+                     prevToken.State.FoundGates.First().OmitEnd ? 
+                        0 :
+                        (prevToken.State.FoundGates.First().End.Length - 1)) + 1;
 
                 yield return new S4JStateStackEvent()
                 {

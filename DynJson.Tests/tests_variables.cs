@@ -21,12 +21,12 @@ namespace DynJson.tests
         }
 
         [Test]
-        async public Task test_simple_variable_as_parameter()
+        async public Task test_simple_variable_from_parameter()
         {
             var script1 = @" 
 method ( a : any ) 
 {
-    @a
+    @(a)
 }";
 
             var result = await new S4JExecutorForTests().
@@ -36,12 +36,28 @@ method ( a : any )
         }
 
         [Test]
+        async public Task test_simple_variables_from_parameter()
+        {
+            var script1 = @" 
+method ( a : any ) 
+[
+    @(a) as b,
+    @(b+1)
+]";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1, 1);
+
+            Assert.AreEqual("[1,2.0]", result.ToString());
+        }
+
+        [Test]
         async public Task test_simple_object_value_variable_as_parameter()
         {
             var script1 = @" 
 method ( a : any ) 
 {
-    variable : @a
+    variable : @(a)
 }";
 
             var result = await new S4JExecutorForTests().
@@ -56,7 +72,7 @@ method ( a : any )
             var script1 = @" 
 method ( a : any ) 
 {
-    @a.imie
+    @(a.imie)
 }";
 
             var result = await new S4JExecutorForTests().
@@ -93,8 +109,8 @@ method ( numer : string )
 method ( numer : string ) 
 
     #hidden
-    {sql( select numer, rodzaj from dokument where numer = @numer )} as @dokument,
-    @dokument
+    {sql( select numer, rodzaj from dokument where numer = @numer )} as dokument,
+    @(dokument)
 
 
 ";

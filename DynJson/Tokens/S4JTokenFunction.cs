@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using DynJson.Executor;
+using DynJson.Helpers.CoreHelpers;
 
 namespace DynJson.Tokens
 {
@@ -11,7 +12,9 @@ namespace DynJson.Tokens
         public IEvaluator Evaluator { get; set; }
 
         public Boolean IsEvaluated { get; set; }
-        
+
+        public Boolean JsonFromResult { get; set; }
+
         ////////////////////////////////////////////
 
         public S4JTokenFunction()
@@ -32,8 +35,15 @@ namespace DynJson.Tokens
 
             if (IsEvaluated)
             {
-                foreach (var child in Children)
-                    child.BuildJson(Builder, Force);
+                if (JsonFromResult)
+                {
+                    Builder.Append(Result.SerializeJson());
+                }
+                else
+                {
+                    foreach (var child in Children)
+                        child.BuildJson(Builder, Force);
+                }
             }
             else
             {

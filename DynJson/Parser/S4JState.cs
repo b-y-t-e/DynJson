@@ -92,6 +92,8 @@ namespace DynJson.Parser
 
         public char[] Inner { get; set; }
 
+        public Boolean OmitEnd { get; set; }
+
         public S4JStateGate Clone()
         {
             S4JStateGate item = (S4JStateGate)this.MemberwiseClone();

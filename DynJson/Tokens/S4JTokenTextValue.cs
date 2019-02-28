@@ -10,7 +10,7 @@ namespace DynJson.Tokens
     public enum TokenTextType
     {
         TEXT = 0,
-        VARIABLE_REFERENCE = 1,
+        // VARIABLE_REFERENCE = 1,
         VARIABLE_OUTPUT = 2
     }
 
@@ -22,7 +22,7 @@ namespace DynJson.Tokens
         
         ////////////////////////////////////
 
-        public String VariablePath { get; set; }
+        public String VariableName { get; set; }
 
         // public String OutputVariableName { get; set; }
 
@@ -33,14 +33,14 @@ namespace DynJson.Tokens
             WorkType = TokenTextType.TEXT;
             Text = "";
             IsObjectKey = false;
-            VariablePath = null;
+            VariableName = null;
             //IsVariableReference = false;
             Children = new List<S4JToken>();
-            State = new S4JState()
+            State = S4JDefaultStateBag.Get().ValueState /* new S4JState()
             {
                 StateType = EStateType.S4J_TEXT_VALUE,
                 IsValue = true,
-            };
+            }*/;
         }
 
         public override Dictionary<String, Object> GetParameters()
@@ -66,7 +66,7 @@ namespace DynJson.Tokens
             if (!IsVisible && !Force)
                 return false;
 
-            if (VariablePath != null)
+            if (VariableName != null)
             {
                 Builder.Append(Result.SerializeJson());
             }
@@ -88,7 +88,7 @@ namespace DynJson.Tokens
 
             if (this.WorkType == TokenTextType.VARIABLE_OUTPUT)
             {
-                this.PrevToken.OutputVariableName = VariablePath;
+                this.PrevToken.OutputVariableName = VariableName;
                 this.Parent.RemoveChild(this);
                 return false;
             }
@@ -110,19 +110,21 @@ namespace DynJson.Tokens
 
         private void CheckVariable()
         {
-            if (MyStringHelper.IsVariable(this.Text))
+            /*if (MyStringHelper.IsVariable(this.Text))
             {
                 this.WorkType = TokenTextType.VARIABLE_REFERENCE;
                 this.VariablePath = this.Text.Trim().Substring(1).Trim();
                 this.Result = null;
             }
-            else if (MyStringHelper.IsVariableOutput(this.Text))
+            else*/
+
+            if (MyStringHelper.IsVariableOutput(this.Text))
             {
                 this.WorkType = TokenTextType.VARIABLE_OUTPUT;
-                this.VariablePath = this.Text.Trim().Substring(3).Trim();
-                if (MyStringHelper.IsVariable(this.VariablePath))
+                this.VariableName = this.Text.Trim().Substring(3).Trim();
+                //if (MyStringHelper.IsVariable(this.VariablePath))
                 {
-                    this.VariablePath = this.VariablePath.Substring(1).Trim();
+                    this.VariableName = this.VariableName.Trim();
                 }
                 this.Result = null;
             }

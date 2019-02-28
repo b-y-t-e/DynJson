@@ -180,7 +180,7 @@ namespace DynJson.Executor
                 await EvaluateFunction(function);
                 AfterEvaluateToken(function);
             }
-            else if (token is S4JTokenTextValue textValue && textValue.VariablePath != null)
+            else if (token is S4JTokenTextValue textValue && textValue.VariableName != null)
             {
                 await EvaluateTokenVariable(textValue, variables);
                 AfterEvaluateToken(textValue);
@@ -217,7 +217,7 @@ namespace DynJson.Executor
         async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
         {
             Object value = MyReflectionHelper.
-                GetValueFromPath(variables, token.VariablePath);
+                GetValueFromPath(variables, token.VariableName);
 
             // object value = null;
             //variables.TryGetValue(token.VariablePath, out value);
@@ -229,42 +229,26 @@ namespace DynJson.Executor
             if (function == null)
                 return;
 
+            S4JStateFunction stateFunction = function.State as S4JStateFunction;
             IDictionary<String, object> variables = GetExecutingVariables(function);
 
-            object result = null;
-
-            /*bool canBeEvaluated = true;
-            if (function.Tags.Count > 0 && TagValidators?.Count > 0)
+            if (stateFunction.FunctionTagExecutor != null)
             {
-                foreach (var tagValidator in TagValidators)
-                {
-                    using (ExecutorContext context = new ExecutorContext(function, variables))
-                    {
-                        canBeEvaluated = tagValidator(context);
-                        if (!canBeEvaluated)
-                            break;
-                    }
-                }
+                using (ExecutorContext context = new ExecutorContext(function, variables))
+                    stateFunction.FunctionTagExecutor(context);
             }
-            function.IsVisible = canBeEvaluated;*/
-            //if (canBeEvaluated)
 
-            {
-                if (function.State is S4JStateFunction stateFunction &&
-                    stateFunction.FunctionTagExecutor != null)
-                {
-                    using (ExecutorContext context = new ExecutorContext(function, variables))
-                        stateFunction.FunctionTagExecutor(context);
-                }
-
-                result = await function.Evaluator?.Evaluate(this, function, variables);
-            }
+            object result = await function.Evaluator?.Evaluate(this, function, variables);
 
             function.IsEvaluated = true;
             function.Result = result;
 
-            if (function.Parent is S4JTokenObject objectParent &&
-                function.IsObjectSingleKey)
+            if (stateFunction.ReturnExactValue)
+            {
+                function.JsonFromResult = true;
+            }
+            else if (function.Parent is S4JTokenObject objectParent &&
+                     function.IsObjectSingleKey)
             {
                 EvaluateFunctionInsideObject(
                     objectParent,
@@ -320,18 +304,17 @@ namespace DynJson.Executor
             if (objectParent.Children.Count == 1)
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
-                
+
                 IList<S4JToken> tokensFromResult = ConvertToToken(list, function.IsVisible).ToArray();
 
                 objectParent.Parent.RemoveChild(
                     objectParent,
                     tokensFromResult);
-
             }
             else
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
-                
+
                 IList<S4JToken> tokensFromResult = ConvertToManyTokens(list, function.IsVisible).ToArray();
 
                 List<S4JToken> newTokens = new List<S4JToken>();
@@ -383,8 +366,6 @@ namespace DynJson.Executor
             function.Parent.RemoveChild(
                 function,
                 tokens);
-
-            // function.Result = list;
         }
 
         private void EvaluateFunctionInsideAnyOther(
@@ -493,7 +474,7 @@ namespace DynJson.Executor
                 Text = Value.SerializeJson(),
                 IsObjectSingleKey = true,
                 IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_TEXT_VALUE, IsValue = true, IsSimpleValue = true }
+                State = S4JDefaultStateBag.Get().ValueState // new S4JState() { StateType = EStateType.S4J_TEXT_VALUE, IsValue = true, IsSimpleValue = true }
             };
         }
 

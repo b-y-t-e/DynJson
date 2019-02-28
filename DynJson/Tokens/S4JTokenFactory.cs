@@ -21,10 +21,7 @@ namespace DynJson.Tokens
 
                 if (State.StateType == EStateType.S4J_COMMENT)
                     result = new S4JTokenComment();
-
-                //if (State.StateType == EStateType.S4J_VARIABLE_OUTPUT)
-                 //   result = new S4JTokenVariableOutput();
-
+                
                 if (State.StateType == EStateType.S4J_OBJECT)
                     result = new S4JTokenObject();
 
@@ -37,23 +34,9 @@ namespace DynJson.Tokens
                 if (State.StateType == EStateType.S4J_QUOTATION)
                     result = new S4JTokenQuotation();
                 
-                if (State.StateType == EStateType.S4J_TEXT_VALUE)
-                    result = new S4JTokenTextValue();
-
-                //if (State.StateType == EStateType.S4J_SEPARATOR)
-                //    result = new JsArray();
-
-                //if (State.StateType == EStateType.S4J_SIMPLE_VALUE)
-                //    result = new S4JTokenSimpleValue();
-
                 if (State.StateType == EStateType.S4J_OBJECT_CONTENT)
                     result = new S4JTokenObjectContent();
-
-                //if (State.StateType == EStateType.S4J_VARIABLE)
-                //    result = new S4JTokenVariable();
-
-                //if (State.StateType == EStateType.S4J_VALUE_DELIMITER)
-                //    result = new JsArray();
+                
 
                 if (State.StateType == EStateType.FUNCTION)
                     result = new S4JTokenFunction()
@@ -69,6 +52,11 @@ namespace DynJson.Tokens
 
                 if (State.StateType == EStateType.FUNCTION_QUOTATION)
                     result = new S4JTokenFunctionQuotation();
+
+                // nigdy tego stanu nie powinien utworzyć tutaj
+                if (State.StateType == EStateType.S4J_TEXT_VALUE)
+                    result = new S4JTokenTextValue();
+
             }
 
             if (result != null)

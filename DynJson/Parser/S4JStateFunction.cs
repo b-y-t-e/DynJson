@@ -7,7 +7,7 @@ namespace DynJson.Parser
 {
     public class S4JStateFunction : S4JState
     {
-        public String FunctionName { get; set; }
+        public String[] FunctionNames { get; set; }
 
         // public String Source { get; set; }
 
@@ -23,11 +23,16 @@ namespace DynJson.Parser
 
         public IEvaluator Evaluator { get; set; }
 
+        public Boolean ReturnExactValue { get; set; }
+
         ////////////////////////////////////////
 
-        public S4JStateFunction(String FunctionName/*, String Source*/)
+        public S4JStateFunction(params String[] FunctionNames/*, String Source*/)
         {
-            this.FunctionName = FunctionName;
+            if (FunctionNames == null || FunctionNames.Length == 0)
+                throw new Exception("Function state should have at least one alias!");
+
+            this.FunctionNames = FunctionNames;
             // this.Source = Source;
             this.IsValue = true;
             this.IsFunction = true;
@@ -38,14 +43,14 @@ namespace DynJson.Parser
                     EStateType.FUNCTION_COMMENT,
                     EStateType.FUNCTION_BRACKETS,
                 };
-            this.Gates = new List<S4JStateGate>()
+            foreach (string FunctionName in FunctionNames)
+            {
+                this.Gates.Add(new S4JStateGate()
                 {
-                    new S4JStateGate()
-                    {
-                        Start = (FunctionName + "(").ToCharArray(),
-                        End = ")".ToCharArray()
-                    }
-                };
+                    Start = (FunctionName + "(").ToCharArray(),
+                    End = ")".ToCharArray()
+                });
+            }
         }
     }
 }

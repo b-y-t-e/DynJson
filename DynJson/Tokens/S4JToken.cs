@@ -141,16 +141,7 @@ namespace DynJson.Tokens
             }
             lastChild.AppendCharsToToken(Chars);
         }
-
-        /*public virtual void MarkLastChildAsObjectValue()
-        {
-            S4JToken lastChild = this.Children.LastOrDefault();
-            if (lastChild == null)
-                return;
-
-            lastChild.MarkAsObjectValue();
-        }*/
-
+        
         public virtual void MarkAsObjectValue()
         {
             this.IsObjectValue = true;
@@ -286,10 +277,10 @@ namespace DynJson.Tokens
 
             ////////////////////////////////////
 
-            if (State.FoundGates != null)
+            if (State.FoundGates != null && !State.FoundGates.First().OmitEnd)
                 foreach (var ch in State.FoundGates.First().End)
                     Builder.Append(ch);
-            else if (State.Gates.Count > 0)
+            else if (State.Gates.Count > 0 && !State.Gates[0].OmitEnd)
                 foreach (var ch in State.Gates[0].End)
                     Builder.Append(ch);
 
@@ -306,7 +297,8 @@ namespace DynJson.Tokens
                 {
                     builder.Remove(0, State.FoundGates.First().Start.Length);
                 }
-                if (builder.ToString().EndsWith(new string(State.FoundGates.First().End.ToArray())))
+                if (!State.FoundGates.First().OmitEnd && 
+                    builder.ToString().EndsWith(new string(State.FoundGates.First().End.ToArray())))
                 {
                     builder.Remove(builder.Length - State.FoundGates.First().End.Length, State.FoundGates.First().End.Length);
                 }

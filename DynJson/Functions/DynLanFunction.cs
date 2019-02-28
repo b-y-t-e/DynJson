@@ -23,8 +23,8 @@ namespace DynJson.Functions
 
         }
 
-        public DynLanFunction(string aliasName) :
-            base(aliasName)
+        public DynLanFunction(params string [] aliases) :
+            base(aliases)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();
