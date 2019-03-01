@@ -11,6 +11,13 @@ namespace DynJson.Helpers.CoreHelpers
 {
     public static class ObjectExtensions
     {
+        public static T GetOrDefault<T>(this IList<T> Items, Int32 Index)
+        {
+            if (Index >= 0 && Index < Items.Count)
+                return Items[Index];
+            return default(T);
+        }
+
         public static bool Equals2(this object Obj1, object Obj2)
         {
             return (Obj1 == null && Obj2 == null) || (Obj1 != null && Obj2 != null && Obj1.Equals(Obj2));

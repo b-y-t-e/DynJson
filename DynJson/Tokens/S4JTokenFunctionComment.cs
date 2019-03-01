@@ -8,6 +8,7 @@ namespace DynJson.Tokens
     {
         public S4JTokenFunctionComment()
         {
+            IsVisible = false;
             Children = new List<S4JToken>();
         }
 

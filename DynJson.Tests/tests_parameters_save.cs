@@ -26,9 +26,12 @@ namespace DynJson.tests
 
             var script1 = @" 
 
-method ( osoba : any ) 
+method ( osoba : any )  {
+/*
 sql( insert into osoba(imie) select @osoba_imie; ),
+*/
 sql( select imie from osoba where imie = 'test_sql' )
+}
 ";
 
             var result = await new S4JExecutorForTests().
@@ -42,11 +45,13 @@ sql( select imie from osoba where imie = 'test_sql' )
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" 
-method ( osoba : any ) 
+            var script1  = @" 
+method ( osoba : any )  {
+/*
 dynlan( item = dictionary(); item.imie = osoba.imie; db.sql.save('osoba', item)  ),
+*/
 sql( select imie from osoba where imie = 'test_dynlan' )
-
+}
 ";
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan' }");
@@ -60,10 +65,12 @@ sql( select imie from osoba where imie = 'test_dynlan' )
             // await new DbForTest().PrepareDb();
 
             var script1 = @" 
-method ( osoba : any ) 
+method ( osoba : any )  {
+/*
 dynlan( db.sql.save('osoba', osoba)  ),
+*/
 sql( select imie from osoba where imie = 'test_dynlan2' )
-
+}
 ";
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan2' }");
@@ -77,10 +84,12 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
             // await new DbForTest().PrepareDb();
 
             var script1 = @" 
-method ( osoba : any ) 
+method ( osoba : any )  {
+/*
 c#( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.sql.save(""osoba"", item);  ),
+*/
 sql( select imie from osoba where imie = 'test_dynlan_cs' )
-
+}
 ";
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan_cs' }");
@@ -94,10 +103,12 @@ sql( select imie from osoba where imie = 'test_dynlan_cs' )
             // await new DbForTest().PrepareDb();
 
             var script1 = @" 
-method ( osoba : any ) 
+method ( osoba : any )  {
+/*
 c#( db.sql.save(""osoba"", osoba)  ),
+*/
 sql( select imie from osoba where imie = 'test_dynlan2' )
-
+}
 ";
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan2' }");

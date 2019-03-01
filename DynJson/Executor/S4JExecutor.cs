@@ -104,7 +104,7 @@ namespace DynJson.Executor
                 if (Parameters != null)
                 {
                     int index = 0;
-                    foreach (string parameterName in root.Parameters.Keys.ToArray())
+                    foreach (string parameterName in root.ParametersValues.Keys.ToArray())
                     {
                         object parameterValue = null;
                         if (index < Parameters.Length)
@@ -129,10 +129,10 @@ namespace DynJson.Executor
             {
                 if (Parameters != null)
                     foreach (string parameterName in Parameters.Keys)
-                        root.Parameters[parameterName] = Parameters[parameterName];
+                        root.ParametersValues[parameterName] = Parameters[parameterName];
 
                 // validate parameters
-                foreach (var parameter in root.Parameters)
+                foreach (var parameter in root.ParametersValues)
                 {
                     S4JFieldDescription fieldDescription = null;
                     root.ParametersDefinitions.TryGetValue(parameter.Key, out fieldDescription);
@@ -145,7 +145,19 @@ namespace DynJson.Executor
             await Evaluate(MethodDefinition);
 
             if (MethodDefinition is S4JTokenRoot)
-                return MethodDefinition.Children.LastOrDefault();
+            {
+                S4JToken resultToken = MethodDefinition.
+                    GetLastVisibleChild<S4JTokenRootObject>()?.
+                    GetLastVisibleChild();
+
+                if (resultToken != null)
+                    return resultToken;
+
+                resultToken = MethodDefinition.
+                    GetLastVisibleChild();
+
+                return resultToken;
+            }
 
             return MethodDefinition;
         }
@@ -157,21 +169,22 @@ namespace DynJson.Executor
 
             IDictionary<string, object> variables = GetExecutingVariables(token);
 
-            bool canBeEvaluated = true;
+            bool isVisible = true;
             if (token.Tags.Count > 0 && TagValidators?.Count > 0)
             {
                 foreach (var tagValidator in TagValidators)
                 {
                     using (ExecutorContext context = new ExecutorContext(token, variables))
                     {
-                        canBeEvaluated = tagValidator(context);
-                        if (!canBeEvaluated)
+                        isVisible = tagValidator(context);
+                        if (!isVisible)
                             break;
                     }
                 }
             }
 
-            token.IsVisible = canBeEvaluated;
+            if (token.IsVisible && !isVisible)
+                token.IsVisible = false;
             //if (!canBeEvaluated)
             //    return;
 
@@ -424,7 +437,7 @@ namespace DynJson.Executor
                 //IsKey = true,
                 IsObjectSingleKey = true,
                 IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT, IsValue = true, IsSimpleValue = true }
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
             };
         }
 
@@ -441,7 +454,7 @@ namespace DynJson.Executor
                 //IsKey = true,
                 IsObjectSingleKey = true,
                 IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT, IsValue = true, IsSimpleValue = true }
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
             };
         }
 
@@ -459,7 +472,7 @@ namespace DynJson.Executor
                     //IsKey = true,
                     IsObjectSingleKey = true,
                     IsCommited = true,
-                    State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT, IsValue = true, IsSimpleValue = true }
+                    State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
                 };
         }
 

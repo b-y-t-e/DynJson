@@ -34,10 +34,11 @@ namespace DynJson.Parser
             RootState = AddState(new S4JState()
             {
                 Priority = -1000,
-                StateType = EStateType.S4J,
+                StateType = EStateType.S4J_ROOT,
                 AllowedStateTypes = new[]
                 {
                     EStateType.S4J_COMMENT,
+                    EStateType.S4J_ROOTOBJECT,
                     EStateType.S4J_QUOTATION,
                     EStateType.S4J_OBJECT,
                     EStateType.S4J_ARRAY,
@@ -62,9 +63,18 @@ namespace DynJson.Parser
                 StateType = EStateType.S4J_COMMENT,
                 AllowedStateTypes = new[]
                 {
-                    EStateType.S4J_COMMENT
+                    EStateType.S4J_COMMENT,
+
+                    EStateType.S4J_QUOTATION,
+                    EStateType.S4J_OBJECT,
+                    EStateType.S4J_ARRAY,
+                    EStateType.S4J_VALUE_DELIMITER,
+                    EStateType.S4J_COMA,
+                    EStateType.S4J_TEXT_VALUE,
+                    EStateType.FUNCTION,
+                    EStateType.S4J_TAG
                 },
-                IsComment = true,
+                //IsComment = true,
                 Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -86,8 +96,8 @@ namespace DynJson.Parser
             {
                 Priority = -998,
                 StateType = EStateType.S4J_QUOTATION,
-                IsValue = true,
-                IsQuotation = true,
+                //IsValue = true,
+                //IsQuotation = true,
                 Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -111,7 +121,7 @@ namespace DynJson.Parser
             {
                 Priority = 1000,
                 StateType = EStateType.S4J_ARRAY,
-                IsCollection = true,
+                //IsValueContainer = true,
                 AllowedStateTypes = new[]
                 {
                     EStateType.S4J_COMMENT,
@@ -139,7 +149,7 @@ namespace DynJson.Parser
             {
                 Priority = 2000,
                 StateType = EStateType.S4J_OBJECT,
-                IsCollection = true,
+                //IsValueContainer = true,
                 AllowedStateTypes = new[]
                 {
                     EStateType.S4J_COMMENT,
@@ -168,7 +178,7 @@ namespace DynJson.Parser
             {
                 Priority = 2500,
                 StateType = EStateType.S4J_PARAMETERS,
-                IsCollection = true,
+                //IsValueContainer = true,
                 AllowedStateTypes = new[]
                 {
                     EStateType.S4J_COMMENT,
@@ -195,8 +205,42 @@ namespace DynJson.Parser
             AddState(new S4JState()
             {
                 Priority = 2600,
+                StateType = EStateType.S4J_ROOTOBJECT,
+                //IsValueContainer = true,
+                RequiredPrevStatesNames = new[]
+                {
+                    new [] { EStateType.S4J_PARAMETERS },
+                    new [] { EStateType.S4J_TEXT_VALUE }
+                },
+                AllowedStateTypes = new[]
+                {
+                    EStateType.S4J_COMMENT,
+                    EStateType.S4J_QUOTATION,
+                    EStateType.S4J_OBJECT,
+                    EStateType.S4J_ARRAY,
+                    EStateType.S4J_VALUE_DELIMITER,
+                    EStateType.S4J_COMA,
+                    EStateType.S4J_TEXT_VALUE,
+                    EStateType.FUNCTION,
+                    EStateType.S4J_TAG
+                },
+                Gates = new List<S4JStateGate>()
+                {
+                    new S4JStateGate()
+                    {
+                        Start = "{".ToCharArray(),
+                        End = "}".ToCharArray()
+                    }
+                }
+            });
+
+            ////////////////////////////////
+
+            AddState(new S4JState()
+            {
+                Priority = 2700,
                 StateType = EStateType.S4J_TAG,
-                IsCollection = true,
+                //IsValueContainer = true,
                 AllowedStateTypes = new[]
                 {
                     //EStateType.S4J_COMMENT,
@@ -242,7 +286,7 @@ namespace DynJson.Parser
                 {
                     EStateType.ANY
                 },
-                IsDelimiter = true,
+                //IsDelimiter = true,
                 Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -262,7 +306,7 @@ namespace DynJson.Parser
                 {
                     EStateType.ANY
                 },
-                IsComa = true,
+                //IsComa = true,
                 Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -282,8 +326,6 @@ namespace DynJson.Parser
                 {
                     EStateType.ANY
                 },
-                IsValue = true,
-                IsSimpleValue = true,
                 Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()

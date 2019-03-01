@@ -20,6 +20,7 @@ namespace DynJson.Tokens
             String lastKey = null;
             foreach (S4JToken child in Children)
             {
+                // pobranie wartości dla pojedycznego klucza
                 if (child.IsObjectSingleKey)
                 {
                     lastKey = null;
@@ -46,6 +47,7 @@ namespace DynJson.Tokens
                             result[lastKey] = null;*/
                     }
                 }
+                // pobranie wartości dla klucza
                 else if (child.IsObjectKey)
                 {
                     lastKey = null;
@@ -65,6 +67,7 @@ namespace DynJson.Tokens
                             result[lastKey] = null;
                     }
                 }
+                // pobranie wartości dla wartości
                 else if (lastKey != null)
                 {
                     if (child is S4JTokenFunction fun)
@@ -97,8 +100,9 @@ namespace DynJson.Tokens
         {
             if (!IsVisible && !Force)
                 return false;
+            
+                Builder.Append("{");
 
-            Builder.Append("{");
             Int32 i = 0;
             Boolean prevWasKey = true;
             Boolean keyWasAdded = false;
@@ -134,7 +138,8 @@ namespace DynJson.Tokens
 
                 i++;
             }
-            Builder.Append("}");
+            
+                Builder.Append("}");
 
             return true;
         }

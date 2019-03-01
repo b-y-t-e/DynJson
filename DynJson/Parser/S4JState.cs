@@ -7,17 +7,31 @@ namespace DynJson.Parser
 {
     public class S4JState
     {
+        public Guid ID
+        {
+            get;
+            set;
+        }
+
+        //////////////////////////////////////////
+
         private HashSet<EStateType> allowedStatesNames;
         public ICollection<EStateType> AllowedStateTypes
         {
             get { return allowedStatesNames; }
-            set
-            {
-                allowedStatesNames = value == null ? null : new HashSet<EStateType>(value);
-            }
+            set { allowedStatesNames = value == null ? null : new HashSet<EStateType>(value); }
         }
 
-        //public IList<S4JState> AllowedStates { get; set; }
+        //////////////////////////////////////////
+
+        private HashSet<EStateType[]> requiredPrevStatesNames;
+        public ICollection<EStateType[]> RequiredPrevStatesNames
+        {
+            get { return requiredPrevStatesNames; }
+            set { requiredPrevStatesNames = value == null ? null : new HashSet<EStateType[]>(value); }
+        }
+
+        //////////////////////////////////////////
 
         public List<S4JStateGate> Gates { get; set; }
 
@@ -29,23 +43,20 @@ namespace DynJson.Parser
 
         //////////////////////////////////////////
 
-        public Boolean IsCollection { get; set; }
+        public Boolean IsValue
+        {
+            get { return StateType == EStateType.S4J_TEXT_VALUE || StateType == EStateType.S4J_OBJECT_CONTENT; }
+        }
 
-        public Boolean IsValue { get; set; }
+        public Boolean IsQuotation
+        {
+            get { return StateType == EStateType.FUNCTION_QUOTATION || StateType == EStateType.S4J_QUOTATION; }
+        }
 
-        public Boolean IsSimpleValue { get; set; }
-
-        public Boolean IsFunction { get; set; }
-
-        public Boolean IsQuotation { get; set; }
-
-        public Boolean IsComment { get; set; }
-
-        public Boolean IsDelimiter { get; set; }
-
-        public Boolean IsComa { get; set; }
-
-        public Guid ID { get; set; }
+        public Boolean IsComment
+        {
+            get { return StateType == EStateType.FUNCTION_COMMENT || StateType == EStateType.S4J_COMMENT; }
+        }
 
         ////////////////////////////////
 
@@ -143,26 +154,26 @@ namespace DynJson.Parser
     {
         ANY = 0,
 
-        S4J = 1,
-        S4J_COMMENT = 2,
-        S4J_QUOTATION = 3,
-        S4J_ARRAY = 4,
+        S4J_ROOT = 1,
+        S4J_ROOTOBJECT = 2,
 
-        S4J_TEXT_VALUE = 5,
-        S4J_OBJECT_CONTENT = 6,
-        S4J_OBJECT = 7,
-        S4J_PARAMETERS = 8,
-        //S4J_VARIABLE = 16,
-        //S4J_VARIABLE_OUTPUT = 17,
+        S4J_COMMENT = 102,
+        S4J_QUOTATION = 103,
+        S4J_ARRAY = 104,
 
-        FUNCTION = 9,
-        FUNCTION_COMMENT = 10,
-        FUNCTION_BRACKETS = 11,
-        FUNCTION_QUOTATION = 12,
+        S4J_TEXT_VALUE = 105,
+        S4J_OBJECT_CONTENT = 106,
+        S4J_OBJECT = 107,
+        S4J_PARAMETERS = 108,
 
-        S4J_VALUE_DELIMITER = 13,
-        S4J_COMA = 14,
-        S4J_TAG = 15
+        FUNCTION = 109,
+        FUNCTION_COMMENT = 110,
+        FUNCTION_BRACKETS = 111,
+        FUNCTION_QUOTATION = 112,
+
+        S4J_VALUE_DELIMITER = 113,
+        S4J_COMA = 114,
+        S4J_TAG = 115
     }
 
 }

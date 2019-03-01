@@ -13,14 +13,16 @@ namespace DynJson.Tokens
 
         public Dictionary<String, S4JFieldDescription> ParametersDefinitions { get; set; }
 
-        public Dictionary<String, Object> Parameters { get; set; }
+        public Dictionary<String, Object> ParametersValues { get; set; }
+
+        public Boolean IsFullSpecificationProvided { get; set; }
 
         //////////////////////////////////////////////////
 
         public S4JTokenRoot()
         {
             Children = new List<S4JToken>();
-            Parameters = new Dictionary<string, object>();
+            ParametersValues = new Dictionary<string, object>();
             ParametersDefinitions = new Dictionary<string, S4JFieldDescription>();
         }
 
@@ -28,7 +30,7 @@ namespace DynJson.Tokens
         {
             S4JTokenRoot token = base.Clone() as S4JTokenRoot;
             token.ParametersDefinitions = new Dictionary<string, S4JFieldDescription>(this.ParametersDefinitions);
-            token.Parameters = new Dictionary<string, object>(this.Parameters);
+            token.ParametersValues = new Dictionary<string, object>(this.ParametersValues);
             return token;
         }
 
@@ -39,7 +41,7 @@ namespace DynJson.Tokens
 
         public override Dictionary<String, Object> GetParameters()
         {
-            return Parameters;
+            return ParametersValues;
         }
 
         public override bool BuildJson(StringBuilder Builder, Boolean Force)
@@ -53,7 +55,7 @@ namespace DynJson.Tokens
 
                 Builder.Append("(");
                 Int32 index = 0;
-                if (Parameters != null)
+                if (ParametersValues != null)
                     foreach (var attr in ParametersDefinitions)
                     {
                         if (index > 0) Builder.Append(",");
@@ -81,52 +83,87 @@ namespace DynJson.Tokens
 
             S4JTokenRoot root = this;
 
-            // ustalenie root name
-            if (root.Children.Count > 1 && (root.Children.FirstOrDefault() is S4JTokenTextValue nameToken))
-            {
-                // dodanie tagów do root'a
-                foreach (var tagKV in nameToken.Tags)
-                    this.Tags[tagKV.Key] = tagKV.Value;
+            IList<S4JToken> visibleChildren = root.GetVisibleChildren().ToArray();
 
-                root.Name = UniConvert.ToString(nameToken.ToJson().ParseJsonOrText());
-                root.RemoveChild(nameToken, null);
+            S4JToken firstChild = visibleChildren.GetOrDefault(0);
+            S4JToken secondChild = visibleChildren.GetOrDefault(1);
+            S4JToken thirdChild = visibleChildren.GetOrDefault(2);
+            // S4JToken lastChild = visibleChildren.LastOrDefault();
+            
+            if ((firstChild is S4JTokenTextValue && secondChild is S4JTokenParameters) &&
+               !(thirdChild is S4JTokenRootObject))
+            {
+                throw new Exception("Method definition should have object container!");
             }
 
+            // ustalenie root name
             // ustalenie parameters
-            if ((root.Children.FirstOrDefault() is S4JTokenParameters parametersToken))
+            else if ((firstChild is S4JTokenTextValue || secondChild is S4JTokenParameters) &&
+            thirdChild is S4JTokenRootObject rootObject)
             {
-                // dodanie tagów do root'a
-                foreach (var tagKV in parametersToken.Tags)
-                    this.Tags[tagKV.Key] = tagKV.Value;
+                if (rootObject.GetVisibleChildren().Count() > 1)
+                    throw new Exception("Root object should contains only one child!");
+
+                this.IsFullSpecificationProvided = true;
+
+                S4JTokenTextValue nameToken = firstChild as S4JTokenTextValue;
+                S4JTokenParameters parametersToken = secondChild as S4JTokenParameters;
+
+                root.Name = "";
+                if (nameToken != null)
+                {
+                    // dodanie tagów do root'a
+                    foreach (var tagKV in nameToken.Tags)
+                        this.Tags[tagKV.Key] = tagKV.Value;
+
+                    root.Name = UniConvert.ToString(nameToken.ToJson().ParseJsonOrText());
+                    root.RemoveChild(nameToken, null);
+                }
 
                 root.ParametersDefinitions = new Dictionary<string, S4JFieldDescription>();
-                root.Parameters = new Dictionary<string, object>();
-
-                string lastKey = null;
-                foreach (S4JToken child in parametersToken.Children)
+                root.ParametersValues = new Dictionary<string, object>();
+                if (parametersToken != null)
                 {
-                    Object val = child.ToJson().ParseJsonOrText();
+                    // dodanie tagów do root'a
+                    foreach (var tagKV in parametersToken.Tags)
+                        this.Tags[tagKV.Key] = tagKV.Value;
 
-                    if (child.IsObjectSingleKey)
+                    string lastKey = null;
+                    foreach (S4JToken child in parametersToken.Children)
                     {
-                        lastKey = null;
-                        root.ParametersDefinitions[UniConvert.ToString(val)] = null;
-                        root.Parameters[UniConvert.ToString(val)] = null;
+                        Object val = child.ToJson().ParseJsonOrText();
+
+                        if (child.IsObjectSingleKey)
+                        {
+                            lastKey = null;
+                            root.ParametersDefinitions[UniConvert.ToString(val)] = null;
+                            root.ParametersValues[UniConvert.ToString(val)] = null;
+                        }
+                        else if (child.IsObjectKey)
+                        {
+                            lastKey = null;
+                            lastKey = UniConvert.ToString(val);
+                            root.ParametersDefinitions[lastKey] = null;
+                            root.ParametersValues[lastKey] = null;
+                        }
+                        else if (child.IsObjectValue)
+                        {
+                            root.ParametersDefinitions[lastKey] = S4JFieldDescription.Parse(lastKey, UniConvert.ToString(val));
+                            root.ParametersValues[lastKey] = null;
+                        }
                     }
-                    else if (child.IsObjectKey)
-                    {
-                        lastKey = null;
-                        lastKey = UniConvert.ToString(val);
-                        root.ParametersDefinitions[lastKey] = null;
-                        root.Parameters[lastKey] = null;
-                    }
-                    else if (child.IsObjectValue)
-                    {
-                        root.ParametersDefinitions[lastKey] = S4JFieldDescription.Parse(lastKey, UniConvert.ToString(val));
-                        root.Parameters[lastKey] = null;
-                    }
+                    root.RemoveChild(parametersToken, null);
                 }
-                root.RemoveChild(parametersToken, null);
+            }
+
+            else if (visibleChildren.Any(i=>i is S4JTokenParameters))
+            {
+                throw new Exception("Invalid method definition");
+            }
+
+            else if (visibleChildren.Count > 1)
+            {
+                throw new Exception("Method should have only one visible child");
             }
 
             return true;

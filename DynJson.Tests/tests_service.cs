@@ -21,9 +21,12 @@ namespace DynJson.tests
             var script1 = @" 
 
 method ( osoba : any ) 
-sql( insert into osoba(imie) select @osoba_imie; ),
+{
+/*
+sql( insert into osoba(imie) select @osoba_imie; )
+*/
 sql( select imie from osoba where imie = 'test_sql' )
-
+}
 
 ";
 

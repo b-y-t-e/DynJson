@@ -42,7 +42,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) sql( select @param1 + 1  ) ";
+            var script1 = @" method(param1) {sql( select @param1 + 1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, 199);
@@ -59,7 +59,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) sql( select @param1_imie + '!' + @param1_nazwisko  ) ";
+            var script1 = @" method(param1){ sql( select @param1_imie + '!' + @param1_nazwisko  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new osoba() { imie = "IMIE", nazwisko = "NAZWISKO" });
@@ -76,7 +76,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) sql( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) ";
+            var script1 = @" method(param1) { sql( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new osobaWithList() { imie = "IMIE", nazwisko = "NAZWISKO", rodzice = new List<osoba>() { new osoba() { imie = "tata" }, new osoba() { imie = "mama" } } });
@@ -93,7 +93,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) sql( select count(*) from @param1  ) ";
+            var script1 = @" method(param1){ sql( select count(*) from @param1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(

@@ -86,8 +86,8 @@ namespace DynJson.Parser
                                 S4JToken prevVal = valueStack.Peek();
                                 S4JToken newToken = new S4JTokenFactory().To_token(stackEvent.State);
                                 newToken.Parent = prevVal;
-                                if (!stackEvent.State.IsComment)
-                                    prevVal.AddChildToToken(newToken);
+                                // if (!stackEvent.State.IsComment)
+                                prevVal.AddChildToToken(newToken);
                                 valueStack.Push(newToken);
                             }
                             else
@@ -109,11 +109,11 @@ namespace DynJson.Parser
                                  currentVal.AppendCharsToToken(stackEvent.Chars);*/
                             }
 
-                           /* if (stackEvent.Chars != null)
-                            {
-                                S4JToken currentVal = valueStack.Peek();
-                                currentVal.AppendCharsToToken(stackEvent.Chars);
-                            }*/
+                            /* if (stackEvent.Chars != null)
+                             {
+                                 S4JToken currentVal = valueStack.Peek();
+                                 currentVal.AppendCharsToToken(stackEvent.Chars);
+                             }*/
 
                         }
 
@@ -142,46 +142,41 @@ namespace DynJson.Parser
         private static IEnumerable<S4JStateStackEvent> Analyse(char[] code, int index, S4JStateBag StateBag, S4JTokenStack stateStack) // S4JStateStack stateStack)
         {
             // sprawdzamy zakończenie stanu
-            S4JToken prevToken = stateStack.Peek();
-            if (GetStateEnd(code, index, StateBag, prevToken) != null)
+            S4JToken parentToken = stateStack.Peek();
+            if (GetStateEnd(code, index, StateBag, parentToken) != null)
             {
                 Int32 nextIndex =
                     index +
-                    (prevToken.State.FoundGates.First().End == null ||
-                     prevToken.State.FoundGates.First().OmitEnd ? 
+                    (parentToken.State.FoundGates.First().End == null ||
+                     parentToken.State.FoundGates.First().OmitEnd ?
                         0 :
-                        (prevToken.State.FoundGates.First().End.Length - 1)) + 1;
+                        (parentToken.State.FoundGates.First().End.Length - 1)) + 1;
 
                 yield return new S4JStateStackEvent()
                 {
                     NewIndex = S4JParserHelper.SkipWhiteSpaces(code, nextIndex),
-                    State = prevToken.State,
+                    State = parentToken.State,
                     Popped = true,
-                    // Chars = end
                 };
 
                 yield break;
             }
 
-            prevToken = stateStack.Peek();
-            S4JState state = GetStateBegin(code, index, StateBag, prevToken);
-            if (state != null)
+            parentToken = stateStack.Peek();
+            S4JState newState = GetStateBegin(code, index, StateBag, parentToken);
+            if (newState != null)
             {
-                Int32 nextIndex = index + (state.FoundGates?.FirstOrDefault()?.Start == null ?
+                Int32 nextIndex = index + (newState.FoundGates?.FirstOrDefault()?.Start == null ?
                     0 :
-                    (state.FoundGates.First().Start.Length - 1)) + 1;
+                    (newState.FoundGates.First().Start.Length - 1)) + 1;
 
                 yield return new S4JStateStackEvent()
                 {
-                    // NewIndex = null,
-                    NewIndex = state.IsQuotation ?
+                    NewIndex = newState.IsQuotation ?
                             nextIndex :
-                            // state.IsCollection ?
                             S4JParserHelper.SkipWhiteSpaces(code, nextIndex),
-                    //   index + (matchedGate?.Start == null ? 0 : (matchedGate.Start.Count - 1)) + 1,
-                    State = state,
-                    Pushed = true,
-                    // Chars = matchedGate?.Start ?? new[] { code[index] }
+                    State = newState,
+                    Pushed = true
                 };
             }
             else
@@ -190,20 +185,16 @@ namespace DynJson.Parser
 
                 // pominiecie białych znaków do nastepnego 'stanu'
                 // tylko jesli nie nie jestesmy w cytacie
-                if (!prevToken.State.IsQuotation &&
-                    !prevToken.State.IsComment)
+                if (!parentToken.State.IsQuotation/* &&
+                    !prevToken.State.IsComment*/)
                 {
                     newIndex = S4JParserHelper.SkipWhiteSpaces(code, index + 1);
                     if (newIndex != null)
                     {
-                        S4JState stateBegin = GetStateBegin(code, newIndex.Value, StateBag, prevToken);
-                        S4JState stateEnd = GetStateEnd(code, newIndex.Value, StateBag, prevToken);
+                        S4JState stateBegin = GetStateBegin(code, newIndex.Value, StateBag, parentToken);
+                        S4JState stateEnd = GetStateEnd(code, newIndex.Value, StateBag, parentToken);
 
-                        if (stateBegin != null || stateEnd != null)
-                        {
-                            newIndex = newIndex;
-                        }
-                        else
+                        if (stateBegin == null && stateEnd == null)
                         {
                             newIndex = null;
                         }
@@ -246,87 +237,81 @@ namespace DynJson.Parser
             return null;
         }
 
-        private static S4JState GetStateBegin(char[] code, Int32 index, S4JStateBag StateBag, S4JToken prevToken)
+        private static S4JState GetStateBegin(char[] code, Int32 index, S4JStateBag StateBag, S4JToken ParentToken)
         {
-            if (prevToken == null)
+            if (ParentToken == null)
                 return null;
 
-            //foreach (S4JState state in StateBag.GetStates(prevToken.State.AllowedStatesNames))
+            Boolean isAllowed = false;
+            List<S4JStateGate> matchedGates = new List<S4JStateGate>();
+
+            S4JState foundState = null;
+
+            // pobszukiwanie rozpoczecia stanu
+            S4JState[] allowedStates = StateBag.GetAllowedStates(ParentToken?.State);
+            for (var i = 0; i < allowedStates.Length; i++)
             {
-                // sprawdzamy rozpoczecie stanu
-                // if (prevToken == null /*||
-                //    prevToken.State.IsAllowed(state)*///)
+                var state = allowedStates[i];
+
+                Int32 gateStartCount = 0;
+                foreach (S4JStateGate gate in state.Gates)
                 {
-                    Boolean isAllowed = false;
-                    List<S4JStateGate> matchedGates = new List<S4JStateGate>();
-
-                    S4JState foundState = null;
-
-                    // pobszukiwanie rozpoczecia stanu
-                    var allowedStates = StateBag.GetAllowedStates(prevToken?.State);
-                    //foreach (S4JState state in )
-                    for (var i = 0; i < allowedStates.Length; i++)
+                    if (S4JParserHelper.Is(code, index, gate.Start))
                     {
-                        var state = allowedStates[i];
-
-                        Int32 gateStartCount = 0;
-                        foreach (S4JStateGate gate in state.Gates)
+                        if (CheckPrevTokens(state, ParentToken))
                         {
-                            if (S4JParserHelper.Is(code, index, gate.Start))
-                            {
-                                // jesli znaleziony ciag jest wiekszy od ostatniego
-                                if (gateStartCount < gate.Start.Length && matchedGates.Count > 0)
-                                    matchedGates.Clear();
-                                matchedGates.Add(gate.Clone());
-                                isAllowed = true;
-                                foundState = state;
-                                gateStartCount = gate.Start.Length;
-                                //break;
-                            }
+                            // jesli znaleziony ciag jest wiekszy od ostatniego
+                            if (gateStartCount < gate.Start.Length && matchedGates.Count > 0)
+                                matchedGates.Clear();
+
+                            matchedGates.Add(gate.Clone());
+                            isAllowed = true;
+                            foundState = state;
+                            gateStartCount = gate.Start.Length;
                         }
-
-                        //if (isAllowed)
-                        //    break;
-                    }
-
-                    if (isAllowed)
-                    {
-                        S4JState newState = foundState.Clone();
-                        newState.FoundGates = matchedGates;
-                        return newState;
                     }
                 }
             }
 
-            /*foreach (S4JState state in StateBag)
+            if (isAllowed)
             {
-                // sprawdzamy rozpoczecie stanu
-                if (prevToken == null ||
-                    prevToken.State.IsAllowed(state))
-                {
-                    Boolean isAllowed = false;
-                    List<S4JStateGate> matchedGates = new List<S4JStateGate>();
-
-                    // pobszukiwanie rozpoczecia stanu
-                    foreach (S4JStateGate gate in state.Gates)
-                    {
-                        if (S4JParserHelper.Is(code, index, gate.Start))
-                        {
-                            matchedGates.Add(gate.Clone());
-                            isAllowed = true;
-                        }
-                    }
-
-                    if (isAllowed)
-                    {
-                        S4JState newState = state.Clone();
-                        newState.FoundGates = matchedGates;
-                        return newState;
-                    }
-                }
-            }*/
+                S4JState newState = foundState.Clone();
+                newState.FoundGates = matchedGates;
+                return newState;
+            }
 
             return null;
+        }
+
+        private static bool CheckPrevTokens(S4JState StateToCheck, S4JToken ParentToken)
+        {
+            if (StateToCheck.RequiredPrevStatesNames == null ||
+                StateToCheck.RequiredPrevStatesNames.Count == 0)
+                return true;
+
+            foreach (EStateType[] stateTypes in StateToCheck.RequiredPrevStatesNames)
+            {
+                Boolean result = false;
+                S4JToken currentTokenToCheck = ParentToken.GetLastVisibleChild();
+                for (var i = stateTypes.Length - 1; i >= 0; i--)
+                {
+                    EStateType stateType = stateTypes[i];
+                    if (currentTokenToCheck == null ||
+                        currentTokenToCheck.State.StateType != stateType)
+                    {
+                        result = false;
+                        break;
+                    }
+
+                    result = true;
+                    ParentToken = ParentToken.PrevToken;
+                }
+
+                if (result)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

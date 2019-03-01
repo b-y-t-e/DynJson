@@ -21,7 +21,9 @@ namespace DynJson.tests
             var script1 = @" 
 #post #get
 method ( a : int, b : string!, c: any ) 
+{
 'ok'
+}
 ";
 
             var result = new S4JParserForTests().
@@ -42,7 +44,9 @@ method ( a : int, b : string!, c: any )
             var script1 = @" 
 (#post)(#get)
 method ( a : int, b : string!, c: any ) 
+{
 'ok'
+}
 ";
 
             var result = new S4JParserForTests().
@@ -63,7 +67,9 @@ method ( a : int, b : string!, c: any )
             var script1 = @" 
 #permission:admin
 method ( a : int, b : string!, c: any ) 
+{
 'ok'
+}
 ";
 
             var result = new S4JParserForTests().

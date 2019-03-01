@@ -44,7 +44,7 @@ namespace DynJson.Functions
                 {
                     EStateType.FUNCTION_COMMENT
                 };
-            IsComment = true;
+            //IsComment = true;
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -67,8 +67,8 @@ namespace DynJson.Functions
         {
             Priority = 2;
             StateType = EStateType.FUNCTION_QUOTATION;
-            IsValue = true;
-            IsQuotation = true;
+            //IsValue = true;
+            //IsQuotation = true;
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -98,7 +98,7 @@ namespace DynJson.Functions
                     EStateType.FUNCTION_BRACKETS,
                     EStateType.FUNCTION_COMMENT
                 };
-            IsValue = true;
+            //IsValue = true;
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()

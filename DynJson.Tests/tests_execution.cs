@@ -31,7 +31,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_empty_arguments()
         {
-            var script1 = @"  method1 (param1) { ""a"": c#(param1) }";
+            var script1 = @"  method1 (param1) { { ""a"": c#(param1)}  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -46,7 +46,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_one_argument()
         {
-            var script1 = @"  method1 (param1) { ""a"": c#(param1) }";
+            var script1 = @"  method1 (param1) { { ""a"": c#(param1) }}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, 999);
@@ -61,7 +61,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_many_arguments()
         {
-            var script1 = @"  method1 (param1, param2, param3, param4) { ""a"": c#(param1+param2+param3+param4) }";
+            var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": c#(param1+param2+param3+param4) }}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, 1, 10, 100, 1000.0);

@@ -13,8 +13,11 @@ namespace DynJson.Tokens
 
             if (State != null)
             {
-                if (State.StateType == EStateType.S4J)
+                if (State.StateType == EStateType.S4J_ROOT)
                     result = new S4JTokenRoot();
+
+                if (State.StateType == EStateType.S4J_ROOTOBJECT)
+                    result = new S4JTokenRootObject();
 
                 if (State.StateType == EStateType.S4J_ARRAY)
                     result = new S4JTokenArray();

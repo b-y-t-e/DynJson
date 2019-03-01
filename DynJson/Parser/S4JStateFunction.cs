@@ -34,8 +34,8 @@ namespace DynJson.Parser
 
             this.FunctionNames = FunctionNames;
             // this.Source = Source;
-            this.IsValue = true;
-            this.IsFunction = true;
+            //this.IsValue = true;
+            //this.IsFunction = true;
             this.Priority = 0;
             this.StateType = EStateType.FUNCTION;
             this.AllowedStateTypes = new[]

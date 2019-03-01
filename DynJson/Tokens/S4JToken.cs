@@ -59,6 +59,36 @@ namespace DynJson.Tokens
 
         //////////////////////////////////////////////////
 
+        public IEnumerable<S4JToken> GetVisibleChildren()
+        {
+            foreach (S4JToken child in Children)
+                if (child.IsVisible)
+                    yield return child;
+        }
+
+        public S4JToken GetLastVisibleChild()
+        {
+            for (var i = Children.Count - 1; i >= 0; i--)
+            {
+                S4JToken child = Children[i];
+                if (child.IsVisible)
+                    return child;
+            }
+            return null;
+        }
+
+        public S4JToken GetLastVisibleChild<T>() where T : class
+
+        {
+            for (var i = Children.Count - 1; i >= 0; i--)
+            {
+                S4JToken child = Children[i];
+                if (child is T && child.IsVisible)
+                    return child;
+            }
+            return null;
+        }
+
         public virtual Dictionary<String, Object> GetParameters()
         {
             return null;
@@ -67,10 +97,10 @@ namespace DynJson.Tokens
         public virtual void InsertChildToToken(Int32 Index, S4JToken Child)
         {
             S4JToken prevChild = Index > 0 ? Children[Index - 1] : null;
-            S4JToken nextChild = Index + 1 < Children.Count  ? Children[Index + 1] : null;
+            S4JToken nextChild = Index + 1 < Children.Count ? Children[Index + 1] : null;
 
             Children.Insert(Index, Child);
-            
+
             if (prevChild != null)
                 prevChild.NextToken = Child;
 
@@ -116,7 +146,7 @@ namespace DynJson.Tokens
 
             if (prevChild != null)
                 prevChild.NextToken = nextChild;
-            
+
             if (nextChild != null)
                 nextChild.PrevToken = prevChild;
 
@@ -141,7 +171,7 @@ namespace DynJson.Tokens
             }
             lastChild.AppendCharsToToken(Chars);
         }
-        
+
         public virtual void MarkAsObjectValue()
         {
             this.IsObjectValue = true;
@@ -213,7 +243,7 @@ namespace DynJson.Tokens
 
             return true;
         }
-        
+
         private void CalculateIsSingleKey(S4JToken ParentToken, S4JToken ChildToken)
         {
             if (ChildToken == null)
@@ -297,7 +327,7 @@ namespace DynJson.Tokens
                 {
                     builder.Remove(0, State.FoundGates.First().Start.Length);
                 }
-                if (!State.FoundGates.First().OmitEnd && 
+                if (!State.FoundGates.First().OmitEnd &&
                     builder.ToString().EndsWith(new string(State.FoundGates.First().End.ToArray())))
                 {
                     builder.Remove(builder.Length - State.FoundGates.First().End.Length, State.FoundGates.First().End.Length);
