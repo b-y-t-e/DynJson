@@ -3,7 +3,6 @@ TODO:
 
 umozliwienie wykonania kodu (teraz musi byc 'sql(' ):
 	sql ( select 1 )
-umozliwienie wyko
 
 
 temat wydajnosciowy dla emtody AfterEvaluateToken -> dodanie metody BuildObject (zamiast BuildJson)

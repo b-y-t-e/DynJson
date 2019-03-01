@@ -90,10 +90,17 @@ namespace DynJson.Executor
 
         async public Task<S4JToken> ExecuteWithParameters(String MethodDefinitionAsJson, params Object[] Parameters)
         {
-            S4JTokenRoot methodDefinition = new S4JParser().
-                Parse(MethodDefinitionAsJson, StateBag);
+            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsJson);
 
             return await ExecuteWithParameters(methodDefinition, Parameters);
+        }
+
+        public S4JTokenRoot Parse(String MethodDefiniton)
+        {
+            S4JTokenRoot methodDefinition = new S4JParser().
+                Parse(MethodDefiniton, StateBag);
+
+            return methodDefinition;
         }
 
         async public Task<S4JToken> ExecuteWithParameters(S4JToken MethodDefinition, params Object[] Parameters)
