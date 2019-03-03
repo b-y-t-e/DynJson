@@ -89,6 +89,22 @@ namespace DynJson.Executor
             return await ExecuteWithParameters(MethodDefinition, parameters);
         }
 
+        async public Task<S4JToken> ExecuteWithJsonParameters(S4JToken MethodDefinition, params String[] ParametersAsJson)
+        {
+            IList<object> parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    Select(p => JsonToDynamicDeserializer.Deserialize(p)).
+                    ToArray();
+            }
+
+            return await ExecuteWithParameters(
+                MethodDefinition,
+                parameters);
+        }
+
         async public Task<S4JToken> ExecuteWithJsonParameters(String MethodDefinitionAsJson, params String[] ParametersAsJson)
         {
             Object[] parameters = null;
