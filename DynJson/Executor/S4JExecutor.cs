@@ -74,6 +74,21 @@ namespace DynJson.Executor
             return await ExecuteWithParameters(MethodDefinitionAsJson, parameters);
         }
 
+        async public Task<S4JToken> ExecuteWithJsonParameters(S4JTokenRoot MethodDefinition, Dictionary<string, string> ParametersAsJson)
+        {
+            Dictionary<string, object> parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    ToDictionary(
+                        p => p.Key,
+                        p => JsonToDynamicDeserializer.Deserialize(p.Value));
+            }
+
+            return await ExecuteWithParameters(MethodDefinition, parameters);
+        }
+
         async public Task<S4JToken> ExecuteWithJsonParameters(String MethodDefinitionAsJson, params String[] ParametersAsJson)
         {
             Object[] parameters = null;
@@ -250,7 +265,7 @@ namespace DynJson.Executor
                 return;
 
             S4JStateFunction stateFunction = function.State as S4JStateFunction;
-            IDictionary<String, object> variables = GetExecutingVariables(function);
+            IDictionary<String, object> variables = GetExecutingVariables(function?.Parent);
 
             if (stateFunction.FunctionTagExecutor != null)
             {

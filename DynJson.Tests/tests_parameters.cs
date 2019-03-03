@@ -97,6 +97,26 @@ namespace DynJson.tests
         }
 
         [Test]
+        async public Task test_parameter_same_names()
+        {
+            var script1 = @" 
+        method(a:int, b:int, c:int)
+        {
+            {
+            a: @(a),
+			b: @(a + b),
+			c: @(a + b + c)
+                }
+        }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1, 1, 2, 3);
+
+            Assert.AreEqual("{a:null,b:null,c:null}", result.ToJson());
+        }
+
+        
+        [Test]
         async public Task test_object_parameter_json()
         {
             var script1 = @" method ( c: object ) {c#( c.g  ) }";
