@@ -10,7 +10,7 @@
     <PackageReleaseNotes>dynjson dynamic api language</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Platforms>AnyCPU;x86</Platforms>
-    <Version>1.1.5</Version>
+    <Version>1.1.6</Version>
   </PropertyGroup>
 
   <ItemGroup>

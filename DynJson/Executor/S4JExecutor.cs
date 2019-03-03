@@ -91,7 +91,7 @@ namespace DynJson.Executor
 
         async public Task<S4JToken> ExecuteWithJsonParameters(S4JToken MethodDefinition, params String[] ParametersAsJson)
         {
-            IList<object> parameters = null;
+            object[] parameters = null;
 
             if (ParametersAsJson != null)
             {
