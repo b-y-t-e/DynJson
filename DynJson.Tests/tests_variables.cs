@@ -50,7 +50,7 @@ method ( a : any )
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, 1);
 
-            Assert.AreEqual("[1,2.0]", result.ToString());
+            Assert.AreEqual("[1,2]", result.ToString());
         }
 
         [Test]

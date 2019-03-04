@@ -69,7 +69,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{""a"":11110.0}",
+                @"{""a"":1111.0}",
                 result.ToJson());
         }
 
