@@ -24,7 +24,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{""a"":1,""bb"":999.0}",
+                @"{""a"":1,""bb"":999}",
                 result.ToJson());
         }
 
@@ -69,7 +69,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{""a"":1111.0}",
+                @"{""a"":11110.0}",
                 result.ToJson());
         }
 
@@ -101,7 +101,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{a:1,""bb"":999.0}",
+                @"{a:1,""bb"":999}",
                 result.ToJson());
         }
 
@@ -157,7 +157,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{a:1,b:2.0}",
+                @"{a:1,b:2}",
                 result.ToJson());
         }
 
@@ -170,7 +170,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{a:1,b:2.0,c:3.0}",
+                @"{a:1,b:2,c:3}",
                 result.ToJson());
         }
 
@@ -183,7 +183,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{a:1,b:2.0,c:3.0,d:{a:10,b:13.0}}",
+                @"{a:1,b:2,c:3,d:{a:10,b:13}}",
                 result.ToJson());
         }
 
@@ -196,7 +196,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{a:1,""b"":2.0,""c"":3.0}",
+                @"{a:1,""b"":2,""c"":3}",
                 result.ToJson());
         }
 
@@ -222,7 +222,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0,3.0]",
+                @"[1,2,3]",
                 result.ToJson());
         }
 
@@ -265,7 +265,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0]",
+                @"[1,2]",
                 result.ToJson());
         }
 
@@ -292,7 +292,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0,22.0]",
+                @"[1,2,22]",
                 result.ToJson());
         }
 
@@ -319,7 +319,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,{""b"":2.0,""c"":3.0},{""b"":22.0,""c"":33.0}]",
+                @"[1,{""b"":2,""c"":3},{""b"":22,""c"":33}]",
                 result.ToJson());
         }
 
@@ -346,7 +346,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,{""b"":2.0,""c"":3.0,d:100},{""b"":22.0,""c"":33.0,d:100}]",
+                @"[1,{""b"":2,""c"":3,d:100},{""b"":22,""c"":33,d:100}]",
                 result.ToJson());
         }
 
@@ -363,7 +363,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,{""b"":2.0,""c"":3.0}]",
+                @"[1,{""b"":2,""c"":3}]",
                 result.ToJson());
         }
         
@@ -390,7 +390,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{a:1,b:22.0}",
+                @"{a:1,b:22}",
                 result.ToJson());
         }
 
@@ -425,7 +425,7 @@ return abc()
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"{b:3.0}",
+                @"{b:3}",
                 result.ToJson());
         }
     }
