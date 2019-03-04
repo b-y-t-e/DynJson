@@ -385,6 +385,8 @@ namespace DynJson.Tokens
 
         public S4JFieldType Type { get; set; }
 
+        public S4JToken Token { get; set; }
+
         public Boolean IsRequired { get; set; }
 
         public static S4JFieldDescription Parse(String Name, String Type)
@@ -404,51 +406,19 @@ namespace DynJson.Tokens
             };
         }
 
-        public Object Validate(Object Value)
+        public static S4JFieldDescription Parse(String Name, S4JToken Token)
         {
-            if (Type == S4JFieldType.ANY)
-                return Value;
+            Name = (Name ?? "").Trim();
+            if (string.IsNullOrEmpty(Name))
+                throw new Exception("Field name should not be empty!");
 
-            if (IsRequired && Value == null)
-                throw new S4JNullParameterException("Parameter " + Name + " cannot be null");
-
-            if (Value != null && Type == S4JFieldType.BOOL)
-                if (!MyTypeHelper.IsBoolean(Value.GetType()))
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type boolean");
-
-            if (Value != null && Type == S4JFieldType.DATETIME)
-                if (!MyTypeHelper.IsDateTime(Value.GetType()))
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type datetime");
-
-            if (Value != null && Type == S4JFieldType.FLOAT)
-                if (!MyTypeHelper.IsNumeric(Value.GetType()))
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type float");
-
-            if (Value != null && Type == S4JFieldType.INT)
-                if (!MyTypeHelper.IsInteger(Value.GetType()))
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type integer");
-
-            if (Value != null && Type == S4JFieldType.STRING)
-                if (!MyTypeHelper.IsString(Value.GetType()))
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type string");
-
-            if (Type == S4JFieldType.ARRAY)
-                if (Value == null)
-                {
-                    return new List<Object>();
-                }
-                else if (!(Value is IList))
-                {
-                    //if (MyTypeHelper.IsClass(Value.GetType()) || Value is IDictionary<String, Object>)
-                    //    return new List<Object>() { Value };
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type array");
-                }
-
-            if (Value != null && Type == S4JFieldType.OBJECT)
-                if (!(MyTypeHelper.IsClass(Value.GetType()) || Value is IDictionary<String, Object>) || Value is IList)
-                    throw new S4JInvalidParameterTypeException("Parameter " + Name + " should be of type object");
-
-            return Value;
+            return new S4JFieldDescription()
+            {
+                Name = Name,
+                IsRequired = false,
+                Type = S4JFieldType.TOKEN,
+                Token = Token
+            };
         }
 
         internal object ToJson()
@@ -483,6 +453,7 @@ namespace DynJson.Tokens
     public enum S4JFieldType
     {
         ANY,
+        TOKEN,
         STRING,
         //TIMESPAN,
         INT,

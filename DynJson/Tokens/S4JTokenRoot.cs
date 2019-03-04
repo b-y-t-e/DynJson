@@ -56,16 +56,16 @@ namespace DynJson.Tokens
                 Builder.Append("(");
                 Int32 index = 0;
                 if (ParametersValues != null)
-                    foreach (var attr in ParametersDefinitions)
+                    foreach (var parameterDefinition in ParametersDefinitions)
                     {
                         if (index > 0) Builder.Append(",");
-                        if (attr.Value == null)
+                        if (parameterDefinition.Value == null)
                         {
-                            Builder.Append($"{attr.Key}");
+                            Builder.Append($"{parameterDefinition.Key}");
                         }
                         else
                         {
-                            Builder.Append($"{attr.Key}:{attr.Value.ToJson()}");
+                            Builder.Append($"{parameterDefinition.Key}:{parameterDefinition.Value.ToJson()}");
                         }
                         index++;
                     }
@@ -89,7 +89,7 @@ namespace DynJson.Tokens
             S4JToken secondChild = visibleChildren.GetOrDefault(1);
             S4JToken thirdChild = visibleChildren.GetOrDefault(2);
             // S4JToken lastChild = visibleChildren.LastOrDefault();
-            
+
             if ((firstChild is S4JTokenTextValue && secondChild is S4JTokenParameters) &&
                !(thirdChild is S4JTokenRootObject))
             {
@@ -148,7 +148,14 @@ namespace DynJson.Tokens
                         }
                         else if (child.IsObjectValue)
                         {
-                            root.ParametersDefinitions[lastKey] = S4JFieldDescription.Parse(lastKey, UniConvert.ToString(val));
+                            if (child is S4JTokenFunction fun)
+                            {
+                                root.ParametersDefinitions[lastKey] = S4JFieldDescription.Parse(lastKey, fun);
+                            }
+                            else
+                            {
+                                root.ParametersDefinitions[lastKey] = S4JFieldDescription.Parse(lastKey, UniConvert.ToString(val));
+                            }
                             root.ParametersValues[lastKey] = null;
                         }
                     }
@@ -156,7 +163,7 @@ namespace DynJson.Tokens
                 }
             }
 
-            else if (visibleChildren.Any(i=>i is S4JTokenParameters))
+            else if (visibleChildren.Any(i => i is S4JTokenParameters))
             {
                 throw new Exception("Invalid method definition");
             }

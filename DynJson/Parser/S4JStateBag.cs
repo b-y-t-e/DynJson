@@ -184,6 +184,7 @@ namespace DynJson.Parser
                     EStateType.S4J_COMMENT,
                     EStateType.S4J_QUOTATION,
                     EStateType.S4J_OBJECT,
+                    EStateType.FUNCTION,
                     EStateType.S4J_ARRAY,
                     EStateType.S4J_VALUE_DELIMITER,
                     EStateType.S4J_COMA,

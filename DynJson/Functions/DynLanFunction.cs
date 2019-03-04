@@ -23,7 +23,7 @@ namespace DynJson.Functions
 
         }
 
-        public DynLanFunction(params string [] aliases) :
+        public DynLanFunction(params string[] aliases) :
             base(aliases)
         {
             Priority = 0;
@@ -40,7 +40,7 @@ namespace DynJson.Functions
         {
             Priority = 1;
             StateType = EStateType.FUNCTION_COMMENT;
-            AllowedStateTypes = new [] 
+            AllowedStateTypes = new[]
                 {
                     EStateType.FUNCTION_COMMENT
                 };
@@ -93,7 +93,7 @@ namespace DynJson.Functions
         {
             Priority = 3;
             StateType = EStateType.FUNCTION_BRACKETS;
-            AllowedStateTypes = new [] 
+            AllowedStateTypes = new[]
                 {
                     EStateType.FUNCTION_BRACKETS,
                     EStateType.FUNCTION_COMMENT
@@ -120,8 +120,31 @@ namespace DynJson.Functions
         }
     }
 
+    public class DynLanProgramCache
+    {
+        Dictionary<string, DynLanProgram> cache =
+            new Dictionary<string, DynLanProgram>();
+
+        public void Save(string code, DynLanProgram program)
+        {
+            lock (cache)
+                cache[code] = program;
+        }
+
+        public DynLanProgram Get(string code)
+        {
+            DynLanProgram program = null;
+            lock (cache)
+                cache.TryGetValue(code, out program);
+            return program;
+        }
+    }
+
     public class DynLanEvaluator : IEvaluator
     {
+        static DynLanProgramCache cache =
+            new DynLanProgramCache();
+
         public async Task<Object> Evaluate(S4JExecutor Executor, S4JToken token, IDictionary<String, object> variables)
         {
             S4JTokenFunction function = token as S4JTokenFunction;
@@ -153,8 +176,16 @@ namespace DynJson.Functions
 
             // string finalCode = MyStringHelper.AddReturnStatement(code.ToString());
 
-            Object result = new Compiler().
-                Compile(code.ToString()).
+            DynLanProgram program = cache.Get(code.ToString());
+            if (program == null)
+            {
+                program = new Compiler().
+                    Compile(code.ToString());
+
+                cache.Save(code.ToString(), program);
+            }
+
+            Object result = program.
                 Eval(globaVariables);
 
             return result;

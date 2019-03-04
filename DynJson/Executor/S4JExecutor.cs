@@ -59,7 +59,9 @@ namespace DynJson.Executor
             this.TagValidators = new List<TagValidator>();
         }
 
-        async public Task<S4JToken> ExecuteWithJsonParameters(String MethodDefinitionAsJson, Dictionary<string, string> ParametersAsJson)
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            String MethodDefinitionAsJson,
+            Dictionary<string, object> ParametersAsJson)
         {
             Dictionary<string, object> parameters = null;
 
@@ -68,13 +70,17 @@ namespace DynJson.Executor
                 parameters = ParametersAsJson.
                     ToDictionary(
                         p => p.Key,
-                        p => JsonToDynamicDeserializer.Deserialize(p.Value));
+                        p => DeserializeJsonParameter(p.Value));
             }
 
-            return await ExecuteWithParameters(MethodDefinitionAsJson, parameters);
+            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsJson);
+
+            return await ExecuteWithParameters(methodDefinition, parameters);
         }
 
-        async public Task<S4JToken> ExecuteWithJsonParameters(S4JTokenRoot MethodDefinition, Dictionary<string, string> ParametersAsJson)
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            S4JTokenRoot MethodDefinition,
+            Dictionary<string, object> ParametersAsJson)
         {
             Dictionary<string, object> parameters = null;
 
@@ -83,20 +89,22 @@ namespace DynJson.Executor
                 parameters = ParametersAsJson.
                     ToDictionary(
                         p => p.Key,
-                        p => JsonToDynamicDeserializer.Deserialize(p.Value));
+                        p => DeserializeJsonParameter(p.Value));
             }
 
             return await ExecuteWithParameters(MethodDefinition, parameters);
         }
 
-        async public Task<S4JToken> ExecuteWithJsonParameters(S4JToken MethodDefinition, params String[] ParametersAsJson)
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            S4JToken MethodDefinition,
+            params object[] ParametersAsJson)
         {
             object[] parameters = null;
 
             if (ParametersAsJson != null)
             {
                 parameters = ParametersAsJson.
-                    Select(p => JsonToDynamicDeserializer.Deserialize(p)).
+                    Select(p => DeserializeJsonParameter(p)).
                     ToArray();
             }
 
@@ -105,28 +113,33 @@ namespace DynJson.Executor
                 parameters);
         }
 
-        async public Task<S4JToken> ExecuteWithJsonParameters(String MethodDefinitionAsJson, params String[] ParametersAsJson)
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            String MethodDefinitionAsJson,
+            params object[] ParametersAsJson)
         {
             Object[] parameters = null;
 
             if (ParametersAsJson != null)
             {
                 parameters = ParametersAsJson.
-                    Select(p => JsonToDynamicDeserializer.Deserialize(p)).
+                    Select(p => DeserializeJsonParameter(p)).
                     ToArray();
             }
 
             return await ExecuteWithParameters(MethodDefinitionAsJson, parameters);
         }
 
-        async public Task<S4JToken> ExecuteWithParameters(String MethodDefinitionAsJson, params Object[] Parameters)
+        async public Task<S4JToken> ExecuteWithParameters(
+            String MethodDefinitionAsJson,
+            params Object[] Parameters)
         {
             S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsJson);
 
             return await ExecuteWithParameters(methodDefinition, Parameters);
         }
 
-        public S4JTokenRoot Parse(String MethodDefiniton)
+        public S4JTokenRoot Parse(
+            String MethodDefiniton)
         {
             S4JTokenRoot methodDefinition = new S4JParser().
                 Parse(MethodDefiniton, StateBag);
@@ -134,14 +147,36 @@ namespace DynJson.Executor
             return methodDefinition;
         }
 
-        async public Task<S4JToken> ExecuteWithParameters(S4JToken MethodDefinition, params Object[] Parameters)
+        async public Task<S4JToken> ExecuteWithParameters(
+            S4JToken MethodDefinition,
+            params Object[] Parameters)
         {
             Dictionary<string, object> parametersAsDict = new Dictionary<string, object>();
             if (MethodDefinition is S4JTokenRoot root)
             {
                 if (Parameters != null)
                 {
-                    int index = 0;
+                    string[] rootParameters = root.ParametersValues.Keys.ToArray();
+                    var rootIndex = 0;
+                    for (var i = 0; i < Parameters.Length; i++)
+                    {
+                        object parameterValue = Parameters[i];
+                        if (parameterValue is S4JExecutorParameter dynParam)
+                        {
+                            parametersAsDict[dynParam.Name] = DeserializeJsonParameter(dynParam.Value);
+                        }
+                        else
+                        {
+                            if (rootIndex < rootParameters.Length)
+                            {
+                                string parameterName = rootParameters[rootIndex];
+                                parametersAsDict[parameterName] = parameterValue;
+                                rootIndex++;
+                            }
+                        }
+                    }
+
+                    /*int index = 0;
                     foreach (string parameterName in root.ParametersValues.Keys.ToArray())
                     {
                         object parameterValue = null;
@@ -152,7 +187,7 @@ namespace DynJson.Executor
                             parametersAsDict[parameterName] = parameterValue;
 
                         index++;
-                    }
+                    }*/
                 }
             }
 
@@ -161,7 +196,9 @@ namespace DynJson.Executor
                 parametersAsDict);
         }
 
-        async public Task<S4JToken> ExecuteWithParameters(S4JToken MethodDefinition, Dictionary<string, object> Parameters)
+        async public Task<S4JToken> ExecuteWithParameters(
+            S4JToken MethodDefinition,
+            Dictionary<string, object> Parameters)
         {
             if (MethodDefinition is S4JTokenRoot root)
             {
@@ -170,13 +207,30 @@ namespace DynJson.Executor
                         root.ParametersValues[parameterName] = Parameters[parameterName];
 
                 // validate parameters
-                foreach (var parameter in root.ParametersValues)
+                foreach (var rootParameter in root.ParametersValues.ToArray())
                 {
-                    S4JFieldDescription fieldDescription = null;
-                    root.ParametersDefinitions.TryGetValue(parameter.Key, out fieldDescription);
+                    string rootParameterName = rootParameter.Key;
 
-                    if (fieldDescription != null)
-                        fieldDescription.Validate(parameter.Value);
+                    S4JFieldDescription fieldDescription = null;
+                    root.ParametersDefinitions.TryGetValue(rootParameterName, out fieldDescription);
+
+                    if (fieldDescription == null)
+                        continue;
+
+                    if (fieldDescription.Type == S4JFieldType.TOKEN)
+                    {
+                        foreach (var parameter in Parameters)
+                            globalVariables[parameter.Key] = parameter.Value;
+
+                        await Evaluate(fieldDescription.Token);
+                        root.ParametersValues[rootParameterName] = fieldDescription.Token.Result;
+
+                        globalVariables.Clear();
+                    }
+                    else
+                    {
+                        ValidateFieldDescription(fieldDescription, rootParameter.Value);
+                    }
                 }
             }
 
@@ -661,6 +715,66 @@ namespace DynJson.Executor
 
             return null;
         }
+
+        Object ValidateFieldDescription(S4JFieldDescription FieldDescription, Object Value)
+        {
+            if (FieldDescription.Type == S4JFieldType.ANY)
+                return Value;
+
+            if (FieldDescription.IsRequired && Value == null)
+                throw new S4JNullParameterException("Parameter " + FieldDescription.Name + " cannot be null");
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.BOOL)
+                if (!MyTypeHelper.IsBoolean(Value.GetType()))
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type boolean");
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.DATETIME)
+                if (!MyTypeHelper.IsDateTime(Value.GetType()))
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type datetime");
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.FLOAT)
+                if (!MyTypeHelper.IsNumeric(Value.GetType()))
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type float");
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.INT)
+                if (!MyTypeHelper.IsInteger(Value.GetType()))
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type integer");
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.STRING)
+                if (!MyTypeHelper.IsString(Value.GetType()))
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type string");
+
+            if (FieldDescription.Type == S4JFieldType.ARRAY)
+                if (Value == null)
+                {
+                    return new List<Object>();
+                }
+                else if (!(Value is IList))
+                {
+                    //if (MyTypeHelper.IsClass(Value.GetType()) || Value is IDictionary<String, Object>)
+                    //    return new List<Object>() { Value };
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type array");
+                }
+
+            if (Value != null && FieldDescription.Type == S4JFieldType.OBJECT)
+                if (!(MyTypeHelper.IsClass(Value.GetType()) || Value is IDictionary<String, Object>) || Value is IList)
+                    throw new S4JInvalidParameterTypeException("Parameter " + FieldDescription.Name + " should be of type object");
+
+            return Value;
+        }
+
+        object DeserializeJsonParameter(Object value)
+        {
+            if (value is S4JExecutorParameter)
+            {
+                return value;
+            }
+            else
+            {
+                return JsonToDynamicDeserializer.Deserialize((string)value);
+            }
+        }
+
     }
 
     public interface IEvaluator
@@ -692,6 +806,17 @@ namespace DynJson.Executor
         {
             Variables = new Dictionary<string, object>();
             Dependencies = new List<S4JToken>();
+        }
+    }
+
+    public class S4JExecutorParameter
+    {
+        public String Name;
+        public Object Value;
+        public S4JExecutorParameter(String Name, Object Value)
+        {
+            this.Name = Name;
+            this.Value = Value;
         }
     }
 }
