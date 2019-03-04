@@ -765,6 +765,9 @@ namespace DynJson.Executor
 
         object DeserializeJsonParameter(Object value)
         {
+            if (value == null)
+                return null;
+
             if (value is S4JExecutorParameter)
             {
                 return value;
