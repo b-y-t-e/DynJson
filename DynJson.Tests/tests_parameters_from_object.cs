@@ -20,7 +20,7 @@ namespace DynJson.tests
             var script1 = @" method ( anyParam: any, a : @(body) ){ @(a) } ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "123", new S4JExecutorParameter("body", "{a:1,b:2}"));
+                ExecuteWithJsonParameters(script1, new[] { new S4JExecutorParam("anyParam", "123"), new S4JExecutorParam("body", "{a:1,b:2}") });
 
             Assert.AreEqual(@"{""a"":1,""b"":2}", result.ToJson());
         }
@@ -31,7 +31,7 @@ namespace DynJson.tests
             var script1 = @" method ( anyParam: any, a : @(body.b) ){ @(a) } ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "123", new S4JExecutorParameter("body", "{a:1,b:2}"));
+                ExecuteWithJsonParameters(script1, new [] { new S4JExecutorParam("anyParam", "123"), new S4JExecutorParam("body", "{a:1,b:2}")});
 
             Assert.AreEqual(@"2", result.ToJson());
         }

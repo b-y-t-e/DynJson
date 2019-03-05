@@ -34,7 +34,7 @@ namespace DynJson.tests
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
                 var result = await new S4JExecutorForTests().
-                    ExecuteWithParameters(script1, 4.1, "", 4.1);
+                    ExecuteWithParameters(script1, new object[] { 4.1, "", 4.1 });
             });
         }
 
@@ -46,7 +46,7 @@ namespace DynJson.tests
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
                 var result = await new S4JExecutorForTests().
-                    ExecuteWithParameters(script1, "{a:1}");
+                    ExecuteWithParameters(script1, new object[] { "{a:1}" });
             });
         }
 
@@ -58,7 +58,7 @@ namespace DynJson.tests
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
                 var result = await new S4JExecutorForTests().
-                    ExecuteWithJsonParameters(script1, "[1,2,3,4,5]");
+                    ExecuteWithJsonParameters(script1, new string[] { "[1,2,3,4,5]" });
             });
         }
 
@@ -80,7 +80,7 @@ namespace DynJson.tests
             var script1 = @" method ( c: array ){ c#( c.Count  )} ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "[1,2,3,4]");
+                ExecuteWithJsonParameters(script1, new string[] { "[1,2,3,4]" });
 
             Assert.AreEqual("4", result.ToJson());
         }
@@ -91,7 +91,7 @@ namespace DynJson.tests
             var script1 = @" method ( c: int ){ c#( c ) } ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 12);
+                ExecuteWithParameters(script1, new object[] { 12 });
 
             Assert.AreEqual("12", result.ToJson());
         }
@@ -110,19 +110,19 @@ namespace DynJson.tests
         }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 1, 2, 3);
+                ExecuteWithParameters(script1, new object[] { 1, 2, 3 });
 
             Assert.AreEqual("{a:null,b:null,c:null}", result.ToJson());
         }
 
-        
+
         [Test]
         async public Task test_object_parameter_json()
         {
             var script1 = @" method ( c: object ) {c#( c.g  ) }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{g:123}");
+                ExecuteWithJsonParameters(script1, new string[] { "{g:123}" });
 
             Assert.AreEqual("123", result.ToJson());
         }
@@ -133,7 +133,7 @@ namespace DynJson.tests
             var script1 = @" method ( a : any, b : string!, c: int ){ sql( select @c  ) }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "4.1", "''", "4");
+                ExecuteWithJsonParameters(script1, new string[] { "4.1", "''", "4" });
 
             Assert.AreEqual("4", result.ToJson());
         }
@@ -144,7 +144,7 @@ namespace DynJson.tests
             var script1 = @" method ( a : any, b : string!, c: int ) {sql( select @c + @a_f2  ) }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ f1: 1, f2 : 2, f3: 'c' }", "''", "4");
+                ExecuteWithJsonParameters(script1, new string[] { "{ f1: 1, f2 : 2, f3: 'c' }", "''", "4" });
 
             Assert.AreEqual("6", result.ToJson());
         }

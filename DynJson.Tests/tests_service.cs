@@ -31,7 +31,7 @@ sql( select imie from osoba where imie = 'test_sql' )
 ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_sql' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_sql' }" });
 
             Assert.AreEqual("\"test_sql\"", result.ToJson());
         }

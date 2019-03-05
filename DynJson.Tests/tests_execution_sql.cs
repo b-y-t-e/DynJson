@@ -45,7 +45,7 @@ namespace DynJson.tests
             var script1 = @" method(param1) {sql( select @param1 + 1  )} ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 199);
+                ExecuteWithParameters(script1, new[] { 199 });
 
             var txt = result.ToJson();
 
@@ -62,7 +62,7 @@ namespace DynJson.tests
             var script1 = @" method(param1){ sql( select @param1_imie + '!' + @param1_nazwisko  ) }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, new osoba() { imie = "IMIE", nazwisko = "NAZWISKO" });
+                ExecuteWithParameters(script1, new[] { new osoba() { imie = "IMIE", nazwisko = "NAZWISKO" } });
 
             var txt = result.ToJson();
 
@@ -79,7 +79,7 @@ namespace DynJson.tests
             var script1 = @" method(param1) { sql( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, new osobaWithList() { imie = "IMIE", nazwisko = "NAZWISKO", rodzice = new List<osoba>() { new osoba() { imie = "tata" }, new osoba() { imie = "mama" } } });
+                ExecuteWithParameters(script1, new[] { new osobaWithList() { imie = "IMIE", nazwisko = "NAZWISKO", rodzice = new List<osoba>() { new osoba() { imie = "tata" }, new osoba() { imie = "mama" } } } });
 
             var txt = result.ToJson();
 
@@ -98,9 +98,11 @@ namespace DynJson.tests
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(
                     script1,
-                    new List<osoba>() {
-                        new osoba() { imie = "IMIE1", nazwisko = "NAZWISKO2" },
-                        new osoba() { imie = "IMIE1", nazwisko = "NAZWISKO2" }
+                    new[] {
+                        new List<osoba>() {
+                            new osoba() { imie = "IMIE1", nazwisko = "NAZWISKO2" },
+                            new osoba() { imie = "IMIE1", nazwisko = "NAZWISKO2" }
+                        }
                     });
 
             var txt = result.ToJson();

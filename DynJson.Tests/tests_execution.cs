@@ -49,7 +49,7 @@ namespace DynJson.tests
             var script1 = @"  method1 (param1) { { ""a"": c#(param1) }}";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 999);
+                ExecuteWithParameters(script1, new object[] { 999 });
 
             var txt = result.ToJson();
 
@@ -64,7 +64,7 @@ namespace DynJson.tests
             var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": c#(param1+param2+param3+param4) }}";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 1, 10, 100, 1000.0);
+                ExecuteWithParameters(script1, new object [] { 1, 10, 100, 1000.0 });
 
             var txt = result.ToJson();
 

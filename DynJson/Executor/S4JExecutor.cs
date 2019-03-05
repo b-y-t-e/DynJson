@@ -60,46 +60,26 @@ namespace DynJson.Executor
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(
-            String MethodDefinitionAsJson,
-            Dictionary<string, object> ParametersAsJson)
+            S4JToken MethodDefinition)
         {
-            Dictionary<string, object> parameters = null;
-
-            if (ParametersAsJson != null)
-            {
-                parameters = ParametersAsJson.
-                    ToDictionary(
-                        p => p.Key,
-                        p => DeserializeJsonParameter(p.Value));
-            }
-
-            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsJson);
-
-            return await ExecuteWithParameters(methodDefinition, parameters);
+            return await ExecuteWithParameters(
+                MethodDefinition,
+                (IList)null);
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(
-            S4JTokenRoot MethodDefinition,
-            Dictionary<string, object> ParametersAsJson)
+            String MethodDefinitionAsString)
         {
-            Dictionary<string, object> parameters = null;
-
-            if (ParametersAsJson != null)
-            {
-                parameters = ParametersAsJson.
-                    ToDictionary(
-                        p => p.Key,
-                        p => DeserializeJsonParameter(p.Value));
-            }
-
-            return await ExecuteWithParameters(MethodDefinition, parameters);
+            return await ExecuteWithParameters(
+                MethodDefinitionAsString,
+                (IList)null);
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(
             S4JToken MethodDefinition,
-            params object[] ParametersAsJson)
+            IEnumerable<string> ParametersAsJson)
         {
-            object[] parameters = null;
+            IList parameters = null;
 
             if (ParametersAsJson != null)
             {
@@ -114,10 +94,10 @@ namespace DynJson.Executor
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(
-            String MethodDefinitionAsJson,
-            params object[] ParametersAsJson)
+            String MethodDefinitionAsString,
+            IEnumerable<string> ParametersAsJson)
         {
-            Object[] parameters = null;
+            IList parameters = null;
 
             if (ParametersAsJson != null)
             {
@@ -126,16 +106,94 @@ namespace DynJson.Executor
                     ToArray();
             }
 
-            return await ExecuteWithParameters(MethodDefinitionAsJson, parameters);
+            return await ExecuteWithParameters(MethodDefinitionAsString, parameters);
+        }
+
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            S4JToken MethodDefinition,
+            IEnumerable<S4JExecutorParam> ParametersAsJson)
+        {
+            IList parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    Select(p => DeserializeJsonParameter(p)).
+                    ToArray();
+            }
+
+            return await ExecuteWithParameters(
+                MethodDefinition,
+                parameters);
+        }
+
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            String MethodDefinitionAsString,
+            IEnumerable<S4JExecutorParam> ParametersAsJson)
+        {
+            IList parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    Select(p => DeserializeJsonParameter(p)).
+                    ToArray();
+            }
+
+            return await ExecuteWithParameters(MethodDefinitionAsString, parameters);
+        }
+
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            String MethodDefinitionAsString,
+            Dictionary<string, string> ParametersAsJson)
+        {
+            Dictionary<string, object> parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    ToDictionary(
+                        p => p.Key,
+                        p => DeserializeJsonParameter(p.Value));
+            }
+
+            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsString);
+
+            return await ExecuteWithParameters(methodDefinition, parameters);
+        }
+
+        async public Task<S4JToken> ExecuteWithJsonParameters(
+            S4JTokenRoot MethodDefinition,
+            Dictionary<string, string> ParametersAsJson)
+        {
+            Dictionary<string, object> parameters = null;
+
+            if (ParametersAsJson != null)
+            {
+                parameters = ParametersAsJson.
+                    ToDictionary(
+                        p => p.Key,
+                        p => DeserializeJsonParameter(p.Value));
+            }
+
+            return await ExecuteWithParameters(MethodDefinition, parameters);
         }
 
         async public Task<S4JToken> ExecuteWithParameters(
-            String MethodDefinitionAsJson,
-            params Object[] Parameters)
+            String MethodDefinitionAsString,
+            IList Parameters)
         {
-            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsJson);
+            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsString);
 
             return await ExecuteWithParameters(methodDefinition, Parameters);
+        }
+
+        async public Task<S4JToken> ExecuteWithParameters(
+            String MethodDefinitionAsString)
+        {
+            S4JTokenRoot methodDefinition = Parse(MethodDefinitionAsString);
+
+            return await ExecuteWithParameters(methodDefinition, (IList)null);
         }
 
         public S4JTokenRoot Parse(
@@ -149,7 +207,7 @@ namespace DynJson.Executor
 
         async public Task<S4JToken> ExecuteWithParameters(
             S4JToken MethodDefinition,
-            params Object[] Parameters)
+            IList Parameters)
         {
             Dictionary<string, object> parametersAsDict = new Dictionary<string, object>();
             if (MethodDefinition is S4JTokenRoot root)
@@ -158,10 +216,10 @@ namespace DynJson.Executor
                 {
                     string[] rootParameters = root.ParametersValues.Keys.ToArray();
                     var rootIndex = 0;
-                    for (var i = 0; i < Parameters.Length; i++)
+                    for (var i = 0; i < Parameters.Count; i++)
                     {
                         object parameterValue = Parameters[i];
-                        if (parameterValue is S4JExecutorParameter dynParam)
+                        if (parameterValue is S4JExecutorParam dynParam)
                         {
                             parametersAsDict[dynParam.Name] = DeserializeJsonParameter(dynParam.Value);
                         }
@@ -175,19 +233,6 @@ namespace DynJson.Executor
                             }
                         }
                     }
-
-                    /*int index = 0;
-                    foreach (string parameterName in root.ParametersValues.Keys.ToArray())
-                    {
-                        object parameterValue = null;
-                        if (index < Parameters.Length)
-                            parameterValue = Parameters[index];
-
-                        if (index < Parameters.Length)
-                            parametersAsDict[parameterName] = parameterValue;
-
-                        index++;
-                    }*/
                 }
             }
 
@@ -768,7 +813,7 @@ namespace DynJson.Executor
             if (value == null)
                 return null;
 
-            if (value is S4JExecutorParameter)
+            if (value is S4JExecutorParam)
             {
                 return value;
             }
@@ -812,11 +857,11 @@ namespace DynJson.Executor
         }
     }
 
-    public class S4JExecutorParameter
+    public class S4JExecutorParam
     {
         public String Name;
         public Object Value;
-        public S4JExecutorParameter(String Name, Object Value)
+        public S4JExecutorParam(String Name, Object Value)
         {
             this.Name = Name;
             this.Value = Value;

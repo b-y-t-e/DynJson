@@ -35,7 +35,7 @@ sql( select imie from osoba where imie = 'test_sql' )
 ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_sql' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_sql' }" });
 
             Assert.AreEqual("\"test_sql\"", result.ToJson());
         }
@@ -54,7 +54,7 @@ sql( select imie from osoba where imie = 'test_dynlan' )
 }
 ";
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan' }" });
 
             Assert.AreEqual("\"test_dynlan\"", result.ToJson());
         }
@@ -73,7 +73,7 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan2' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan2' }" });
 
             Assert.AreEqual("\"test_dynlan2\"", result.ToJson());
         }
@@ -92,7 +92,7 @@ sql( select imie from osoba where imie = 'test_dynlan_cs' )
 }
 ";
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan_cs' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan_cs' }" });
 
             Assert.AreEqual("\"test_dynlan_cs\"", result.ToJson());
         }
@@ -111,7 +111,7 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
-                ExecuteWithJsonParameters(script1, "{ imie: 'test_dynlan2' }");
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan2' }" });
 
             Assert.AreEqual("\"test_dynlan2\"", result.ToJson());
         }

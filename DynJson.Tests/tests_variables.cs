@@ -30,7 +30,7 @@ method ( a : any )
 }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 1);
+                ExecuteWithParameters(script1, new[] { 1 });
 
             Assert.AreEqual("{1}", result.ToString());
         }
@@ -48,7 +48,7 @@ method ( a : any )
 }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 1);
+                ExecuteWithParameters(script1, new[] { 1 });
 
             Assert.AreEqual("[1,2]", result.ToString());
         }
@@ -63,7 +63,7 @@ method ( a : any )
 }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, 1);
+                ExecuteWithParameters(script1, new[] { 1 });
 
             Assert.AreEqual("{variable:1}", result.ToString());
         }
@@ -78,7 +78,7 @@ method ( a : any )
 }";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, new osoba() { imie = "andrzej" });
+                ExecuteWithParameters(script1, new[] { new osoba() { imie = "andrzej" } });
 
             Assert.AreEqual(@"""andrzej""", result.ToString());
         }
@@ -119,7 +119,7 @@ method ( numer : string )
 ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, "numer1");
+                ExecuteWithParameters(script1, new[] { "numer1" });
 
             Assert.AreEqual(@"{""numer"":""numer1"",""rodzaj"":0}", result.ToString());
         }
@@ -141,7 +141,7 @@ method ( numer : string )
 ";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, "numer1");
+                ExecuteWithParameters(script1, new[] { "numer1" });
 
             Assert.AreEqual(@"{""numer"":""numer1"",""rodzaj"":0}", result.ToString());
         }
