@@ -10,11 +10,10 @@ Allows rapid API (JSON) prototyping using languages / technologies:
 It is possible to use almost any language / technology compatible with .net environment via a plugin mechanism.
 
 ## Examples
-
- + Basic usage:
+ + Simplest API (plain JSON):
 ```
-// result = 4
-Object result = new Compiler().
-  Compile(" return 1 + 3 ").
-  Eval();
+{
+   "Field1" : 1,
+   "Field2" : "abc"
+}
 ```
