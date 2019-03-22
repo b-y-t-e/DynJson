@@ -67,3 +67,15 @@ method(text: string)
    }
 }
 ```
+
+ + JSON + mixed technologies:
+```
+method(text0: string)
+{
+   {
+      "newCsValue" : c#( text0 + "!" ) as text1,
+      "newSqlValue" : sql( select @text1 + '!' ) as text2,
+      "newDynlanValue" : @( text2 + '!' )
+   }
+}
+```
