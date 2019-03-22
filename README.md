@@ -1,4 +1,4 @@
-# [DYNJSON] | Dynamic API (JSON) | in .NET
+# [DYNJSON] | Dynamic API (JSON) prototyping library | in .NET
 
 ## Description
 Allows rapid API (JSON) prototyping using languages / technologies:
