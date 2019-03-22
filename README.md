@@ -25,3 +25,34 @@ It is possible to use almost any language / technology compatible with .net envi
    "DateField" : @(getdatetime())
 }
 ```
+
+ + JSON + parameters:
+```
+method(param1, param2: string)
+{
+   "AnyField" : @(param1),
+   "TextField" : @(param2)
+}
+```
+
+ + JSON + parameters + sql:
+```
+method(personID: int)
+{
+   {
+      sql(select * from person where id = @personID)
+   }
+}
+```
+
+ + JSON + parameters + sql (array or objects):
+```
+method(filter: string)
+{
+   [
+      {
+         sql(select * from person where description like '%' + @filter + '%')
+      }
+   ]
+}
+```
