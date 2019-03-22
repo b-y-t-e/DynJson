@@ -56,3 +56,14 @@ method(filter: string)
    ]
 }
 ```
+
+ + JSON + parameters + c#:
+```
+method(text: string)
+{
+   {
+      "textLength" : c#(text.Length),
+      "newTextValue" : c#( string newText = "prefix_" + text; return newText; )
+   }
+}
+```
