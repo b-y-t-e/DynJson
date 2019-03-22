@@ -13,7 +13,15 @@ It is possible to use almost any language / technology compatible with .net envi
  + Simplest API (plain JSON):
 ```
 {
-   "Field1" : 1,
-   "Field2" : "abc"
+   "IntField" : 1,
+   "TextField" : "abc"
+}
+```
+
+ + JSON + dynamic datetime value:
+```
+{
+   "IntField" : 1,
+   "DateField" : @(getdate())
 }
 ```
