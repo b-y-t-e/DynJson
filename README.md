@@ -18,10 +18,10 @@ It is possible to use almost any language / technology compatible with .net envi
 }
 ```
 
- + JSON + dynamic datetime value:
+ + JSON + dynamic field (current datetime):
 ```
 {
    "IntField" : 1,
-   "DateField" : @(getdate())
+   "DateField" : @(getdatetime())
 }
 ```
