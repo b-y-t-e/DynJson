@@ -10,7 +10,7 @@ DynJson is a .net library that allows to rapid API (JSON) prototyping using tech
 It is possible to use almost any technology compatible with .net environment via a plugin mechanism.
 
 ## Examples
- + Simplest API (plain JSON):
+ + Simple API (plain JSON):
 ```
 {
    "IntField" : 1,
