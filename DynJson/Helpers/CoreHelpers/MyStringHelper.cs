@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 using System.IO;
+using DynLan.Helpers;
+using System.Collections;
 
 namespace DynJson.Helpers.CoreHelpers
 {
@@ -213,7 +215,12 @@ namespace DynJson.Helpers.CoreHelpers
             return lTxt.ToString();
         }
 
-        public static String JoinSql<T>(this IEnumerable<T> Elements, Boolean WrapWithComas, Boolean ToLower = false, String Separator = ",")
+        public static String JoinSql(this IEnumerable Elements, String Separator = ",")
+        {
+            return JoinSql(Elements, true, false, Separator);
+        }
+
+        public static String JoinSql(this IEnumerable Elements, Boolean WrapWithComas, Boolean ToLower = false, String Separator = ",")
         {
             StringBuilder lTxt = new StringBuilder();
             if (Elements != null)
@@ -223,7 +230,7 @@ namespace DynJson.Helpers.CoreHelpers
 
                     if (lItem != null)
                     {
-                        if (WrapWithComas)
+                        if (WrapWithComas && !lItem.IsNumeric())
                         {
                             lTxt.
                                 Append("'").
@@ -246,7 +253,7 @@ namespace DynJson.Helpers.CoreHelpers
             return lTxt.ToString();
         }
 
-        public static String Join<T>(this IEnumerable<T> Elements, String Separator)
+        public static String Join(this IEnumerable Elements, String Separator)
         {
             StringBuilder lTxt = new StringBuilder();
             if (Elements != null)
@@ -313,8 +320,8 @@ namespace DynJson.Helpers.CoreHelpers
             Text = (Text ?? "").Trim();
             if (Text.Length <= 3)
                 return false;
-            
-            if (Text[0] == variableOutputString[0] && 
+
+            if (Text[0] == variableOutputString[0] &&
                 Text[1] == variableOutputString[1] &&
                 Char.IsWhiteSpace(Text[2]))
             {

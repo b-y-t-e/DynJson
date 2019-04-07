@@ -725,7 +725,7 @@ namespace DynJson.Executor
 
             else if (value.GetType().IsClass)
             {
-                var dictForValue = ReflectionHelper.ToDictionary(value);
+                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
                 if (dictForValue.Count > 0)
                     list.Add(dictForValue.First().Value);
             }
@@ -754,7 +754,7 @@ namespace DynJson.Executor
 
             else if (value.GetType().IsClass)
             {
-                var dictForValue = ReflectionHelper.ToDictionary(value);
+                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
                 return dictForValue.Count > 0 ? dictForValue.FirstOrDefault().Value : null;
             }
 

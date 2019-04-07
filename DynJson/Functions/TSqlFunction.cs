@@ -169,15 +169,25 @@ namespace DynJson.Functions
 
             else if (Value is IList list)
             {
-                var firstValue = ReflectionHelper.ToDictionary(list.Count > 0 ? list[0] : null);
-                BuildCreateTableScriptForVariable(Query, name, firstValue);
-                foreach (var item in list)
-                    BuildInsertIntoTableScriptForVariable(Query, name, item);
+                Dictionary<string, object> firstValue = null;
+                foreach (object item in list)
+                {
+                    firstValue = ReflectionHelper.ToDictionary(item);
+                    if (firstValue?.Count > 0)
+                        break;
+                }
+
+                if (firstValue?.Count > 0)
+                {
+                    BuildCreateTableScriptForVariable(Query, name, firstValue);
+                    foreach (var item in list)
+                        BuildInsertIntoTableScriptForVariable(Query, name, item);
+                }
             }
 
             else if (Value.GetType().IsClass)
             {
-                var classAsDict = ReflectionHelper.ToDictionary(Value);
+                Dictionary<string, object> classAsDict = ReflectionHelper.ToDictionary(Value);
                 if (string.IsNullOrEmpty(ParentName))
                 {
                     foreach (var keyAndValue in classAsDict)

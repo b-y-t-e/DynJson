@@ -8,7 +8,6 @@ using System.Data.Common;
 using System.Threading;
 using System.Data.SqlClient;
 using DynJson.Helpers;
-using DynJson.Helpers;
 using System.Data.SqlClient;
 using DynJson.Helpers.CoreHelpers;
 using System.Collections;
@@ -343,7 +342,7 @@ namespace DynJson.Helpers.DatabaseHelpers
         /// <summary>
         /// wykonuje update
         /// </summary>
-        public static void UpdateDb(
+        public static void Update(
             this DbConnection Connection,
             String TableName,
             Object Item,
@@ -421,37 +420,11 @@ namespace DynJson.Helpers.DatabaseHelpers
             }
         }
 
-        private static Object GetPrimaryKeyValue(Object Item, String PrimaryKey)
-        {
-            Object primaryKeyValue = null;
-            if (Item is IDictionary<string, object> dictKeyValue)
-            {
-                if (dictKeyValue.ContainsKey(PrimaryKey))
-                    primaryKeyValue = dictKeyValue[PrimaryKey];                
-            }
-            else if (Item is IDictionary dict)
-            {
-                if (dict.Contains(PrimaryKey))
-                    primaryKeyValue = dict[PrimaryKey];
-            }
-            else
-            {
-                var lPrimaryKeyProperty = PrimaryKey != null ?
-                    ReflectionHelper.GetProperty(Item, PrimaryKey) :
-                    null;
-
-                primaryKeyValue = lPrimaryKeyProperty != null ?
-                    lPrimaryKeyProperty.GetValue(Item, null) :
-                    null;
-            }
-            return primaryKeyValue;
-        }
-
         private static IEnumerable<DbDataColumnValue> GetItemValuesForDbFields(Object Item, DbDataColumns DbFields)
         {
             if (Item is IDictionary<string, object> dictKeyValue)
             {
-                foreach( var val in dictKeyValue)
+                foreach (var val in dictKeyValue)
                 {
                     DbDataColumn dataColumn = null;
                     DbFields.TryGetValue(val.Key, out dataColumn);
@@ -485,15 +458,14 @@ namespace DynJson.Helpers.DatabaseHelpers
             {
                 foreach (DbDataColumn databaseColumn in DbFields.Values)
                 {
-                    PropertyInfo itemProperty = ReflectionHelper.GetProperty(Item, databaseColumn.Name);
-                    if (itemProperty != null)
+                    if (null == DynLan.Helpers.RefUnsensitiveHelper.I.GetProperty(Item, databaseColumn.Name))
+                        continue;
+
+                    yield return new DbDataColumnValue()
                     {
-                        yield return new DbDataColumnValue()
-                        {
-                            Name = databaseColumn.Name,
-                            Value = itemProperty.GetValue(Item, null)
-                        };
-                    }
+                        Name = databaseColumn.Name,
+                        Value = DynLan.Helpers.RefUnsensitiveHelper.I.GetValue(Item, databaseColumn.Name)
+                    };
                 }
             }
         }
@@ -519,7 +491,7 @@ namespace DynJson.Helpers.DatabaseHelpers
                 DbDataColumns databaseColumns = DatabaseCache.GetColumns(Connection, TableName);
                 MyQuery saveQuery = new MyQuery();
 
-                Object primaryKeyValue = GetPrimaryKeyValue(Item, PrimaryKey);
+                Object primaryKeyValue = ReflectionHelper. GetItemValue(Item, PrimaryKey);
                 IList<DbDataColumnValue> valuesToSave = GetItemValuesForDbFields(Item, databaseColumns).ToArray();
 
                 if (valuesToSave.Count > 0)

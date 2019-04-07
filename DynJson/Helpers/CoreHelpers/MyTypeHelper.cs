@@ -181,6 +181,29 @@ namespace DynJson.Helpers.CoreHelpers
 
         ////////////////////
 
+        public static Boolean IsListOrArray(this Object Obj)
+        {
+            return IsListOrArray(Obj?.GetType());
+        }
+
+        public static Boolean IsListOrArray(this Type Type)
+        {
+            if (Type == null)
+                return false;
+
+            else if (Type == typeof(string))
+                return false;
+
+            else if (Type.IsArray)
+                return true;
+
+            else if (Type.Is(typeof(IList)))
+                return true;
+
+            else
+                return false;
+        }
+
         public static Boolean IsEnumerable(this Object Obj)
         {
             return IsEnumerable(Obj.GetType());
@@ -216,16 +239,12 @@ namespace DynJson.Helpers.CoreHelpers
                         var args = seqType.GetGenericArguments();
                         Type itemType = args.Length > 0 ? args[0] : typeof(Object);
                         return itemType;
-                        // do something...
-                        break;
                     }
                     else if (interfaceType.IsGenericType &&
                         interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                     {
                         Type itemType = seqType.GetGenericArguments()[0];
                         return itemType;
-                        // do something...
-                        break;
                     }
                 }
             }

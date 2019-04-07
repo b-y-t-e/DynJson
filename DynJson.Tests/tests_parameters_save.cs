@@ -7,6 +7,7 @@ using NUnit;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DynJson.Helpers.CoreHelpers;
 
 namespace DynJson.tests
 {
@@ -114,6 +115,67 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
                 ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan2' }" });
 
             Assert.AreEqual("\"test_dynlan2\"", result.ToJson());
+        }
+
+        [Test]
+        async public Task test_identity_generation()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" 
+method ( osoba : any )  {
+/*
+c#( db.sql.save(""osoba"", osoba)  ),
+*/
+@(osoba.ID)
+}
+";
+            var result = await new S4JExecutorForTests().
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan2' }" });
+
+            //var id = UniConvert.ToInt64N(result.ToJson());
+
+            Assert.AreNotEqual("null", result.ToJson());
+        }
+
+        [Test]
+        async public Task test_save_children_csharp()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" 
+method ( dokument : any )  {
+/*
+c#( db.sql.save(""dokument"", dokument)  ),
+c#( db.sql.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
+*/
+sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+}
+";
+            var result = await new S4JExecutorForTests().
+                ExecuteWithJsonParameters(script1, new[] { "{ Numer: 'test', Pozycje: [ {lp : 1}, {lp : 2} ] }" });
+
+            Assert.AreEqual("2", result.ToJson());
+        }
+
+        [Test]
+        async public Task test_save_children_dynlan()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" 
+method ( dokument : any )  {
+/*
+@( db.sql.save('dokument', dokument)  ),
+@( db.sql.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
+*/
+sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+}
+";
+            var result = await new S4JExecutorForTests().
+                ExecuteWithJsonParameters(script1, new[] { "{ Numer: 'test', Pozycje: [ {lp : 1}, {lp : 2} ] }" });
+
+            Assert.AreEqual("2", result.ToJson());
         }
     }
 }

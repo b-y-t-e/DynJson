@@ -200,6 +200,13 @@ namespace DynJson.tests
                 rodzaj int
             )
 
+        if object_id('dbo.pozycjaDokumentu') is null  
+            create table dbo.pozycjaDokumentu(
+                id int identity(1,1), 
+                idDokumentu int,
+                lp int 
+            )
+
         commit
 
     ),
