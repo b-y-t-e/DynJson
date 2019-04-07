@@ -1,6 +1,8 @@
 ﻿
 TODO:  
 
+możliwośc zawołania metody w metodzie..
+
 umozliwienie wykonania kodu (teraz musi byc 'sql(' ):
 	sql ( select 1 )
 
