@@ -21,7 +21,7 @@ namespace DynJson.Service
                 foundMethod = FindMethodDelegate(args);
             
             if (foundMethod == null)
-                throw new MethodNotFoundException($"Method {MethodName} was not found");
+                throw new MethodNotFoundException(MethodName, $"Method {MethodName} was not found");
 
             return null;
         }

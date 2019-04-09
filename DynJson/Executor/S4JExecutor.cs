@@ -49,6 +49,8 @@ namespace DynJson.Executor
 
         public List<TagValidator> TagValidators { get; set; }
 
+        public Methods Methods { get; set; }
+
         private Dictionary<string, Object> globalVariables;
 
         public S4JExecutor(S4JStateBag StateBag)
@@ -57,6 +59,7 @@ namespace DynJson.Executor
             this.StateBag = StateBag;
             this.Sources = new Sources();
             this.TagValidators = new List<TagValidator>();
+            this.Methods = new Methods(this);
         }
 
         async public Task<S4JToken> ExecuteWithJsonParameters(

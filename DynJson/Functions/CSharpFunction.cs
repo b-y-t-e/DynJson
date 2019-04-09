@@ -141,6 +141,7 @@ namespace DynJson.Functions
             foreach (var source in Executor.Sources)
                 (dbProxy as IDictionary<string, object>)[source.Key] = new DbApi(source.Value);
             globaVariables["db"] = dbProxy;
+            globaVariables["api"] = new DynJsonApi(Executor);
             code.Append("var ").Append("db").Append(" = ").Append("Globals.").Append("db").Append(";");
 
             code.Append(function.ToJsonWithoutGate());

@@ -3,6 +3,7 @@ using DynJson.Parser;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DynJson.Executor
 {
@@ -17,6 +18,13 @@ namespace DynJson.Executor
                     return false;
 
                 return true;
+            });
+
+            this.Methods.Add(async (name) =>
+            {
+                if (name == "test_method_2")
+                    return "@(1+1)";
+                return null;
             });
         }
     }
