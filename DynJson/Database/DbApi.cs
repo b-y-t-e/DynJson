@@ -26,6 +26,81 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
+        public Dictionary<string, object> select(MyQueryDyn sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                Dictionary<string, object> item = con.SelectAsDict(sqlquery.ToString());
+                return item;
+            }
+        }
+
+        public List<Dictionary<string, object>> selectmany(MyQueryDyn sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                List<Dictionary<string, object>> items = con.SelectManyAsDict(sqlquery.ToString());
+                return items;
+            }
+        }
+
+        public object selectscalar(MyQueryDyn sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                object value = con.SelectScalar(sqlquery.ToString());
+                return value;
+            }
+        }
+
+        public IList<object> selectscalars(MyQueryDyn sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                IList<object> values = con.SelectScalars<object>(sqlquery.ToString());
+                return values;
+            }
+        }
+        //////////////////////////////////////////////
+
+        public Dictionary<string, object> select(string sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                Dictionary<string, object> item = con.SelectAsDict(sqlquery);
+                return item;
+            }
+        }
+
+        public List<Dictionary<string, object>> selectmany(string sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                List<Dictionary<string, object>> items = con.SelectManyAsDict(sqlquery);
+                return items;
+            }
+        }
+
+        public object selectscalar(string sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                object value = con.SelectScalar(sqlquery);
+                return value;
+            }
+        }
+
+        public IList<object> selectscalars(string sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                IList<object> values = con.SelectScalars<object>(sqlquery);
+                return values;
+            }
+        }
+
+        //////////////////////////////////////////////
+
         public Object save(String TableName, Object ItemOrItems)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))

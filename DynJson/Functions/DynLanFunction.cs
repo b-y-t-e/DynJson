@@ -13,6 +13,7 @@ using DynLan.Classes;
 using DynJson.Helpers.CoreHelpers;
 using DynJson.Database;
 using DynLan.Exceptions;
+using DynJson.Helpers.DatabaseHelpers;
 
 namespace DynJson.Functions
 {
@@ -173,6 +174,10 @@ namespace DynJson.Functions
                 dbProxy[source.Key] = new DbApi(source.Value);
             globaVariables["db"] = dbProxy;
             globaVariables["api"] = new DynJsonApi(Executor);
+
+            Func<MyQueryDyn> getQueryDyn = ()=> new MyQueryDyn();
+            globaVariables["query"] = getQueryDyn;
+            globaVariables["myquery"] = getQueryDyn;
 
             code.Append(function.ToJsonWithoutGate());
 

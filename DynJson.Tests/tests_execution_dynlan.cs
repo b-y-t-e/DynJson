@@ -428,5 +428,41 @@ return abc()
                 @"{b:3}",
                 result.ToJson());
         }
+
+        [Test]
+        async public Task executor_simple_db_query()
+        {
+            var script1 = @"{ b : @( 
+
+                db.sql.selectscalar('select 1')
+
+        )   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            Assert.AreEqual(
+                @"{b:1}",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_simple_db_querydyn()
+        {
+            var script1 = @"{ b : @( 
+
+                q = query();
+                q.append('select 1');
+                db.sql.selectscalar(q);
+
+        )   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            Assert.AreEqual(
+                @"{b:1}",
+                result.ToJson());
+        }
     }
 }
