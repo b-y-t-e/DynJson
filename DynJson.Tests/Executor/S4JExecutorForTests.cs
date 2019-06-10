@@ -10,7 +10,7 @@ namespace DynJson.Executor
     {
         public S4JExecutorForTests() 
         {
-            Sources.Register("sql", "Data Source=.;uid=??????;pwd=?????;initial catalog==?????;;");
+            Sources.Register("sql", "Data Source=.;uid=??????;pwd=?????;initial catalog==?????;");
         }
     }
 }
