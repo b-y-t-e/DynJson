@@ -35,10 +35,12 @@ namespace DynJson.Tokens
                     }
                     else if (child is S4JTokenObjectContent obj)
                     {
-                        foreach (var keyAndVal in obj.GetParameters())
-                        {
-                            result[keyAndVal.Key] = keyAndVal.Value;
-                        }
+                        var parameters = obj.GetParameters();
+                        if (parameters != null)
+                            foreach (var keyAndVal in parameters)
+                            {
+                                result[keyAndVal.Key] = keyAndVal.Value;
+                            }
                     }
                     else
                     {
@@ -100,8 +102,8 @@ namespace DynJson.Tokens
         {
             if (!IsVisible && !Force)
                 return false;
-            
-                Builder.Append("{");
+
+            Builder.Append("{");
 
             Int32 i = 0;
             Boolean prevWasKey = true;
@@ -138,8 +140,8 @@ namespace DynJson.Tokens
 
                 i++;
             }
-            
-                Builder.Append("}");
+
+            Builder.Append("}");
 
             return true;
         }

@@ -396,18 +396,57 @@ namespace DynJson.Executor
             function.IsEvaluated = true;
             function.Result = result;
 
+            /*Boolean isResultNull = result == null;
+            Boolean isResultPrimitive = result != null && MyTypeHelper.IsPrimitive(result.GetType());
+                       
+            // { a : 1, b: { @@(null) } } -> { a : 1, b: null }
+            if (function.Parent is S4JTokenObject objectParent1 &&
+                function.IsObjectSingleKey &&
+                isResultNull && objectParent1.Children.Count == 1)
+            {
+                TurnParentIntoNull(objectParent1);
+            }
+            // { a : 1, @@(null) } -> { a : 1 }
+            else if (function.Parent is S4JTokenObject objectParent2 &&
+                function.IsObjectSingleKey &&
+                isResultNull && objectParent2.Children.Count > 1)
+            {
+                RemoveChildInParent(
+                    objectParent2,
+                    function);
+            }
+            // { a : 1, @sql(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
+            else if (function.Parent is S4JTokenObject objectParent3 &&
+                function.IsObjectSingleKey &&
+                !isResultPrimitive)
+            {
+                EvaluateFunctionInsideObject(
+                    objectParent3,
+                    function,
+                    result);
+            }
+            // { @@(1) } -> { 1 }
+            // { a : @@(1) } -> { a : 1 }
+            else if (stateFunction.ReturnExactValue)
+            {
+                function.JsonFromResult = true;
+            }*/
+            // { @@(1) } -> { 1 }
+            // { a : @@(1) } -> { a : 1 }
             if (stateFunction.ReturnExactValue)
             {
                 function.JsonFromResult = true;
             }
-            else if (function.Parent is S4JTokenObject objectParent &&
-                     function.IsObjectSingleKey)
+            // { a : 1, @sql(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
+            else if (function.Parent is S4JTokenObject objectParent3 &&
+                function.IsObjectSingleKey)
             {
                 EvaluateFunctionInsideObject(
-                    objectParent,
+                    objectParent3,
                     function,
                     result);
             }
+            // [ @@(1), @@(null) ] -> [ 1, null ]
             else if (function.Parent is S4JTokenArray arrayParent)
             {
                 EvaluateFunctionInsideArray(
@@ -452,7 +491,7 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            var list = GetManyObjectsFromResult(result);
+            IList<Object> list = GetManyObjectsFromResult(result);
 
             if (objectParent.Children.Count == 1)
             {
@@ -496,15 +535,27 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            var item = GetSingleObjectFromResult(result);
+            IDictionary<string, object> item = GetSingleObjectFromResult(result);
 
             IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible).ToArray();
 
             objectParent.RemoveChild(
                 function,
                 tokens);
+        }
 
-            // function.Result = item;
+        private void TurnParentIntoNull(
+            S4JTokenObject objectParent)
+        {
+            S4JToken parentOfParent = objectParent.Parent;
+            parentOfParent.RemoveChild(objectParent, ConvertToTokens((object)null, true).ToArray());
+        }
+
+        private void RemoveChildInParent(
+            S4JTokenObject objectParent,
+            S4JTokenFunction function)
+        {
+            objectParent.RemoveChild(function);
         }
 
         private void EvaluateFunctionInsideArray(
@@ -564,23 +615,6 @@ namespace DynJson.Executor
             return variables;
         }
 
-        private IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary, Boolean IsVisible)
-        {
-            if (Dictionary == null)
-                yield break;
-
-            yield return new S4JTokenObjectContent()
-            {
-                IsVisible = IsVisible,
-                Result = Dictionary,
-                Text = Dictionary.SerializeJsonNoBrackets(),
-                //IsKey = true,
-                IsObjectSingleKey = true,
-                IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
-            };
-        }
-
         private IEnumerable<S4JToken> ConvertToToken(IList<Object> List, Boolean IsVisible)
         {
             if (List == null || List.Count == 0)
@@ -616,10 +650,27 @@ namespace DynJson.Executor
                 };
         }
 
+        private IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary, Boolean IsVisible)
+        {
+            if (Dictionary == null)
+                yield break;
+
+            yield return new S4JTokenObjectContent()
+            {
+                IsVisible = IsVisible,
+                Result = Dictionary,
+                Text = Dictionary.SerializeJsonNoBrackets(),
+                //IsKey = true,
+                IsObjectSingleKey = true,
+                IsCommited = true,
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+            };
+        }
+
         private IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible)
         {
-            //if (Value == null)
-            //    yield break;
+            if (Value == null)
+                yield break;
 
             yield return new S4JTokenTextValue()
             {
@@ -642,9 +693,7 @@ namespace DynJson.Executor
                 list.Add(value);
 
             else if (value is IDictionary<String, Object>)
-            {
                 list.Add(value);
-            }
 
             else if (value is ICollection)
             {
@@ -673,10 +722,12 @@ namespace DynJson.Executor
                 return null;
 
             if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
                 return new Dictionary<string, object>
                 {
                     { "value", value }
                 };
+            }
 
             else if (value is IDictionary<String, Object>)
             {
@@ -705,7 +756,9 @@ namespace DynJson.Executor
             List<Object> list = new List<object>();
 
             if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
                 list.Add(value);
+            }
 
             else if (value is IDictionary<String, Object> dict)
             {
@@ -742,7 +795,9 @@ namespace DynJson.Executor
                 return null;
 
             if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
                 return value;
+            }
 
             else if (value is IDictionary<String, Object> dict)
             {

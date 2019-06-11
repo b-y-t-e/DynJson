@@ -172,7 +172,7 @@ namespace DynJson.tests
         {
             var script = @"
 [
-    sql(
+    @sql(
 
         begin transaction
 
@@ -211,7 +211,7 @@ namespace DynJson.tests
 
     ),
 
-    sql(
+    @sql(
 
         begin transaction
 

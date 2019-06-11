@@ -27,7 +27,7 @@ namespace DynJson.tests
         [Test]
         public void dynlan_should_throw_exceptionn_if_method_is_not_avaiable()
         {
-            string code = "db.sql.exec('select 1') ";
+            string code = "db.primary.exec('select 1') ";
 
             Assert.Throws(typeof(DynLanExecuteException), () =>
             {
@@ -41,7 +41,7 @@ namespace DynJson.tests
         public async Task inner_dynlan_should_throw_exceptionn_if_method_is_not_avaiable()
         {
             var script1 = @" 
-dynlan( db.sql.exec('select 1')  )
+@@( db.primary.exec('select 1')  )
 
 ";          
             Assert.ThrowsAsync(typeof(DynLanExecuteException), async () =>
@@ -55,7 +55,7 @@ dynlan( db.sql.exec('select 1')  )
         public async Task inner_dynlan_should_throw_exceptionn_if_method_is_not_avaiable_version2()
         {
             var script1 = @" 
-dynlan( item = dictionary(); db.sql.save('osoba', item);  )
+@@( item = dictionary(); db.primary.save('osoba', item);  )
 
 ";
             Assert.ThrowsAsync(typeof(DynLanExecuteException), async () =>

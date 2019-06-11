@@ -17,12 +17,13 @@ namespace DynJson.Functions
     public class TSqlFunction : S4JStateFunction
     {
         public TSqlFunction() :
-            this("sql")
+            this("@sql", "primary")
         {
+            ReturnExactValue = true;
         }
 
-        public TSqlFunction(string aliasName) :
-            base(aliasName)
+        public TSqlFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
         {
             Priority = 0;
             BracketsDefinition = new TSqlBrackets();
@@ -31,10 +32,28 @@ namespace DynJson.Functions
             Evaluator = new TSqlEvaluator();
             FunctionTagExecutor = context =>
             {
-                /*if (context.Tags.ContainsKey("temporary"))
-                {
-                    
-                }*/
+            };
+        }
+    }
+
+    public class TSqlExpandedFunction : S4JStateFunction
+    {
+        public TSqlExpandedFunction() :
+            this("sql", "primary")
+        {
+            ReturnExactValue = false;
+        }
+
+        public TSqlExpandedFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new TSqlBrackets();
+            CommentDefinition = new TSqlComment();
+            QuotationDefinition = new TSqlQuotation();
+            Evaluator = new TSqlEvaluator();
+            FunctionTagExecutor = context =>
+            {
             };
         }
     }
@@ -127,7 +146,7 @@ namespace DynJson.Functions
 
             query.Append(functionToken.ToJsonWithoutGate());
 
-            String connectionString = Executor.Sources.Get(functionState.FunctionNames.First());
+            String connectionString = Executor.Sources.Get(functionState.SourceName);
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 var result = con.SelectItems(query.ToString());

@@ -17,7 +17,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_isrequired_parameter()
         {
-            var script1 = @" method ( a : int, b : string!, c: any ){ sql( select 1  )} ";
+            var script1 = @" method ( a : int, b : string!, c: any ){ @sql( select 1  )} ";
 
             Assert.ThrowsAsync<S4JNullParameterException>(async () =>
               {
@@ -29,7 +29,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_valid_int_parameter()
         {
-            var script1 = @" method ( a : any, b : string!, c: int ){ sql( select 1  )} ";
+            var script1 = @" method ( a : any, b : string!, c: int ){ @sql( select 1  )} ";
 
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
@@ -41,7 +41,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_valid_array_parameter()
         {
-            var script1 = @" method ( a : array ) {sql( select 1  ) }";
+            var script1 = @" method ( a : array ) {@sql( select 1  ) }";
 
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
@@ -53,7 +53,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_valid_object_parameter()
         {
-            var script1 = @" method ( a : object ) {sql( select 1  )} ";
+            var script1 = @" method ( a : object ) {@sql( select 1  )} ";
 
             Assert.ThrowsAsync<S4JInvalidParameterTypeException>(async () =>
             {
@@ -65,7 +65,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_isrequired_parameter_json()
         {
-            var script1 = @" method ( a : int, b : string!, c: any ){ sql( select 1  ) }";
+            var script1 = @" method ( a : int, b : string!, c: any ){ @sql( select 1  ) }";
 
             Assert.ThrowsAsync<S4JNullParameterException>(async () =>
             {
@@ -77,7 +77,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_array_parameter_json()
         {
-            var script1 = @" method ( c: array ){ c#( c.Count  )} ";
+            var script1 = @" method ( c: array ){ @c#( c.Count  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "[1,2,3,4]" });
@@ -88,7 +88,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_parameter_validcase()
         {
-            var script1 = @" method ( c: int ){ c#( c ) } ";
+            var script1 = @" method ( c: int ){ @c#( c ) } ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new object[] { 12 });
@@ -103,9 +103,9 @@ namespace DynJson.tests
         method(a:int, b:int, c:int)
         {
             {
-            a: @(a),
-			b: @(a + b),
-			c: @(a + b + c)
+            a: @@(a),
+			b: @@(a + b),
+			c: @@(a + b + c)
                 }
         }";
 
@@ -119,7 +119,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_object_parameter_json()
         {
-            var script1 = @" method ( c: object ) {c#( c.g  ) }";
+            var script1 = @" method ( c: object ) {@c#( c.g  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "{g:123}" });

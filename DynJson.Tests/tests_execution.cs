@@ -16,7 +16,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_dunamicl_fields_and_values()
         {
-            var script1 = @"{ ""a"": 1, c#(""bb"") : c#( 999 )  }";
+            var script1 = @"{ ""a"": 1, @c#(""bb"") : @c#( 999 )  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -31,7 +31,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_empty_arguments()
         {
-            var script1 = @"  method1 (param1) { { ""a"": c#(param1)}  }";
+            var script1 = @"  method1 (param1) { { ""a"": @c#(param1)}  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -46,7 +46,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_one_argument()
         {
-            var script1 = @"  method1 (param1) { { ""a"": c#(param1) }}";
+            var script1 = @"  method1 (param1) { { ""a"": @c#(param1) }}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new object[] { 999 });
@@ -61,7 +61,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_many_arguments()
         {
-            var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": c#(param1+param2+param3+param4) }}";
+            var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": @c#(param1+param2+param3+param4) }}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new object [] { 1, 10, 100, 1000.0 });
@@ -78,7 +78,7 @@ namespace DynJson.tests
         {
             var a = 1 + null;
 
-            var script1 = @"   { ""a"": null, ""b"" : c#(1+(int?)a)  }";
+            var script1 = @"   { ""a"": null, ""b"" : @c#(1+(int?)a)  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -93,7 +93,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_dunamicl_fields_and_values_no_quotes()
         {
-            var script1 = @"{ a: 1, c#(""bb"") : c#( 999 )  }";
+            var script1 = @"{ a: 1, @c#(""bb"") : @c#( 999 )  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -128,7 +128,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_simple_function_with_outer_comments()
         {
-            var script1 = @"{ b : c#( ""abc"" + 1 )   }";
+            var script1 = @"{ b : @c#( ""abc"" + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -141,7 +141,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_simple_function_with_outer_comments_2()
         {
-            var script1 = @"{ b : c#( ""abc"" + 1 )   }";
+            var script1 = @"{ b : @c#( ""abc"" + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -154,7 +154,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_parent_values()
         {
-            var script1 = @"{ a: 1, b : c#( a + 1 )   }";
+            var script1 = @"{ a: 1, b : @c#( a + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -167,7 +167,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_parent_values_version2()
         {
-            var script1 = @"{ a: 1, b : c#( a + 1 ), c : c#( a + b )   }";
+            var script1 = @"{ a: 1, b : @c#( a + 1 ), c : @c#( a + b )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -180,7 +180,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_parent_values_version3()
         {
-            var script1 = @"{ a: 1, b : c#( a + 1 ), c : c#( a + b ), d: {a:10, b:c#(a+c)}   }";
+            var script1 = @"{ a: 1, b : @c#( a + 1 ), c : @c#( a + b ), d: {a:10, b:@c#(a+c)}   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -369,18 +369,18 @@ namespace DynJson.tests
                 @"[1,{""b"":2,""c"":3}]",
                 result.ToJson());
         }
-        
+
         [Test]
         async public Task executor_should_understand_additional_null_objects_for_array()
         {
-            var script1 = @"[ 1, {c#(  
-                    null  )}   ]";
+            var script1 = @"[ 1, @c#(  
+                    null  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1]",
+                @"[1,null]",
                 result.ToJson());
         }
 
@@ -400,7 +400,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_null_field_for_object()
         {
-            var script1 = @"{ a: 1, b: c#(  null  )   }";
+            var script1 = @"{ a: 1, b: @c#(  null  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -415,7 +415,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_simple_csharp_function()
         {
-            var script1 = @"{ b : c#( 
+            var script1 = @"{ b : @c#( 
 
         int abc(){
         return 3;
@@ -432,5 +432,7 @@ namespace DynJson.tests
                 @"{b:3}",
                 result.ToJson());
         }
+
+
     }
 }

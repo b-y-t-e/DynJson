@@ -20,13 +20,32 @@ namespace DynJson.Functions
     public class DynLanFunction : S4JStateFunction
     {
         public DynLanFunction() :
-            this("dynlan")
+            this("@@", "")
         {
-
+            ReturnExactValue = true;
         }
 
-        public DynLanFunction(params string[] aliases) :
-            base(aliases)
+        public DynLanFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new DynLanBrackets();
+            CommentDefinition = new DynLanComment();
+            QuotationDefinition = new DynLanQuotation();
+            Evaluator = new DynLanEvaluator();
+        }
+    }
+
+    public class DynLanExpandedFunction : S4JStateFunction
+    {
+        public DynLanExpandedFunction() :
+            this("@", "")
+        {
+            ReturnExactValue = false;
+        }
+
+        public DynLanExpandedFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();

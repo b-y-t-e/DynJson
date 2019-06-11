@@ -10,15 +10,14 @@ namespace DynJson.Helpers.CoreHelpers
 {
     public static class JsonSerializer
     {
-        /*private static JsonSerializerSettings getSettings()
+        private static JsonSerializerSettings getSettings()
         {
-            JsonSerializerSettings customJsonSettings = new JsonSerializerSettings()
+            return new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Local
+                DateParseHandling = DateParseHandling.DateTime
             };
-            return customJsonSettings;
-        }*/
+        }
 
         //////////////////////////////////
 
@@ -30,7 +29,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                String result = JsonConvert.SerializeObject(Dictionary); // , getSettings());
+                String result = JsonConvert.SerializeObject(Dictionary , getSettings());
                 return result.Substring(1, result.Length - 2);
             }
         }
@@ -43,7 +42,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                String result = JsonConvert.SerializeObject(List); // , getSettings());
+                String result = JsonConvert.SerializeObject(List , getSettings());
                 return result.Substring(1, result.Length - 2);
             }
         }
@@ -56,7 +55,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                String result = JsonConvert.SerializeObject(Value); // , getSettings());
+                String result = JsonConvert.SerializeObject(Value , getSettings());
                 if (result.StartsWith("[") || result.StartsWith("{"))
                     return result.Substring(1, result.Length - 2);
                 return result;
@@ -71,7 +70,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                return JsonConvert.SerializeObject(Item); // , getSettings());
+                return JsonConvert.SerializeObject(Item, getSettings());
             }
         }
 
@@ -83,7 +82,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                return (T)JsonConvert.DeserializeObject<T>(String, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.IsoDateFormat, DateParseHandling = DateParseHandling.DateTime }); //, getSettings()); 
+                return (T)JsonConvert.DeserializeObject<T>(String, getSettings()); 
             }
         }
 
@@ -95,7 +94,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                return JsonConvert.DeserializeObject(String, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.IsoDateFormat, DateParseHandling = DateParseHandling.DateTime }); //, getSettings()); 
+                return JsonConvert.DeserializeObject(String, getSettings()); 
             }
         }
 
@@ -122,68 +121,4 @@ namespace DynJson.Helpers.CoreHelpers
             }
         }
     }
-
-
-
-
-
-
-   /* public static class CompressionHelper
-    {
-        public static Byte[] Compress(this byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return new Byte[0];
-
-            using (System.IO.MemoryStream wynik = new System.IO.MemoryStream())
-            {
-                using (ICSharpCode.SharpZipLib.GZip.GZipOutputStream zip = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(wynik))
-                {
-                    zip.Write(bytes, 0, bytes.Length);
-                    zip.Finish();
-                    return wynik.ToArray();
-                }
-            }
-        }
-
-        public static byte[] Dekompresja(this byte[] buffer)
-        {
-            if (buffer == null || buffer.Length == 0)
-                return null;
-
-            if (buffer != null)
-            {
-                using (MemoryStream memoryStream = new MemoryStream(buffer))
-                {
-                    return Dekompresja(memoryStream);
-                }
-            }
-            else
-            {
-                return new byte[0];
-            }
-        }
-
-        public static byte[] Dekompresja(this System.IO.MemoryStream input)
-        {
-            if (input == null || input.Length == 0)
-                return null;
-
-            var lBytes = new List<byte>();
-            using (var zip = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(input))
-            {
-                byte[] buffer = new byte[4096];
-                while (true)
-                {
-                    int read = zip.Read(buffer, 0, buffer.Length);
-                    for (int i = 0; i < read; i++)
-                        lBytes.Add(buffer[i]);
-                    if (read <= 0) break;
-                }
-            }
-
-            return lBytes.ToArray();
-        }
-
-    }*/
 }

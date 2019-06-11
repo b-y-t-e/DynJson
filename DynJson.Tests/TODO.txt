@@ -3,14 +3,14 @@ TODO:
 
 możliwośc zawołania metody w metodzie..
 
-umozliwienie wykonania kodu (teraz musi byc 'sql(' ):
-	sql ( select 1 )
+umozliwienie wykonania kodu (teraz musi byc '@sql(' ):
+	@sql ( select 1 )
 
 
 temat wydajnosciowy dla emtody AfterEvaluateToken -> dodanie metody BuildObject (zamiast BuildJson)
 
 dodanie obslugi dla tagow -> np. 
- + przekazujemy jakis dodatkowy parametr do funckji wewnatrz (np w sql tablice # zamiast @)
+ + przekazujemy jakis dodatkowy parametr do funckji wewnatrz (np w @sql tablice # zamiast @)
 
 refactoring dla Root'a -> de facto root to metoda s4j (czy zmiana nazwy) 
 refactoring dla Root'a -> oznaczenie stan'ów / token'ów które będą 'wystawiane' jako output (a nie ich usuwanie)
@@ -25,7 +25,7 @@ integration with self hosting environment
 support for http methods (get / post / put .. ) via tags
 
 support for storing tablename in data (is this safe?)
-support for global methods for data checking (c# / dynlan / sql)
+support for global methods for data checking (@sql / dynlan / @sql)
 support for add refenernces for executing project / custom namespaces / custom dll's
 support for complex types
 ? support for diffirent parameters parsing styles (dynamic / json / pure .net)
@@ -42,4 +42,4 @@ dodanie obslugi dla tagow -> np.
  + jesli mamy permission to wystawiamy wezel, 
  + albo sprawdzamy czy funkcje mozna zawolac np. post / get
 support for saving data through api (dynlan)
-support for saving data through api (c#)
+support for saving data through api (@sql)

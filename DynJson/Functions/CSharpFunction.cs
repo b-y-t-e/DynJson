@@ -18,13 +18,31 @@ namespace DynJson.Functions
     public class CSharpFunction : S4JStateFunction
     {
         public CSharpFunction() :
-            this("c#")
+            this("@c#", "")
         {
-
+            ReturnExactValue = true;
         }
 
-        public CSharpFunction(string aliasName) :
-            base(aliasName)
+        public CSharpFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new CSharpBrackets();
+            CommentDefinition = new CSharpComment();
+            QuotationDefinition = new CSharpQuotation();
+            Evaluator = new CSharpEvaluator();
+        }
+    }
+    public class CSharpExpandedFunction : S4JStateFunction
+    {
+        public CSharpExpandedFunction() :
+            this("c#", "")
+        {
+            ReturnExactValue = false;
+        }
+
+        public CSharpExpandedFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();

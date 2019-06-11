@@ -29,7 +29,7 @@ namespace DynJson.tests
 
 method ( osoba : any )  {
 /*
-sql( insert into osoba(imie) select @osoba_imie; ),
+@sql( insert into osoba(imie) select @osoba_imie; ),
 */
 sql( select imie from osoba where imie = 'test_sql' )
 }
@@ -49,7 +49,7 @@ sql( select imie from osoba where imie = 'test_sql' )
             var script1  = @" 
 method ( osoba : any )  {
 /*
-dynlan( item = dictionary(); item.imie = osoba.imie; db.sql.save('osoba', item)  ),
+@@( item = dictionary(); item.imie = osoba.imie; db.primary.save('osoba', item)  ),
 */
 sql( select imie from osoba where imie = 'test_dynlan' )
 }
@@ -68,7 +68,7 @@ sql( select imie from osoba where imie = 'test_dynlan' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-dynlan( db.sql.save('osoba', osoba)  ),
+@@( db.primary.save('osoba', osoba)  ),
 */
 sql( select imie from osoba where imie = 'test_dynlan2' )
 }
@@ -87,7 +87,7 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-c#( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.sql.save(""osoba"", item);  ),
+@c#( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
 */
 sql( select imie from osoba where imie = 'test_dynlan_cs' )
 }
@@ -106,7 +106,7 @@ sql( select imie from osoba where imie = 'test_dynlan_cs' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-c#( db.sql.save(""osoba"", osoba)  ),
+@c#( db.primary.save(""osoba"", osoba)  ),
 */
 sql( select imie from osoba where imie = 'test_dynlan2' )
 }
@@ -125,9 +125,9 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-c#( db.sql.save(""osoba"", osoba)  ),
+@c#( db.primary.save(""osoba"", osoba)  ),
 */
-@(osoba.ID)
+@@(osoba.ID)
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -146,8 +146,8 @@ c#( db.sql.save(""osoba"", osoba)  ),
             var script1 = @" 
 method ( dokument : any )  {
 /*
-c#( db.sql.save(""dokument"", dokument)  ),
-c#( db.sql.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
+@c#( db.primary.save(""dokument"", dokument)  ),
+@c#( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
 */
 sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
@@ -166,8 +166,8 @@ sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@( db.sql.save('dokument', dokument)  ),
-@( db.sql.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
+@@( db.primary.save('dokument', dokument)  ),
+@@( db.primary.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
 */
 sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }

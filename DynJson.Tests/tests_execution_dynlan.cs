@@ -16,7 +16,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_dunamicl_fields_and_values()
         {
-            var script1 = @"{ ""a"": 1, dynlan('bb') : dynlan( 999 )  }";
+            var script1 = @"{ ""a"": 1, @@('bb') : @@( 999 )  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -31,7 +31,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_empty_arguments()
         {
-            var script1 = @"  method1 (param1) { {""a"": dynlan(param1)} }";
+            var script1 = @"  method1 (param1) { {""a"": @@(param1)} }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -46,7 +46,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_one_argument()
         {
-            var script1 = @"  method1 (param1){ { ""a"": dynlan(param1) }}";
+            var script1 = @"  method1 (param1){ { ""a"": @@(param1) }}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 999 });
@@ -61,7 +61,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_many_arguments()
         {
-            var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": dynlan(param1+param2+param3+param4) } }";
+            var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": @@(param1+param2+param3+param4) } }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 1, 10, 100, 1000.0 });
@@ -78,7 +78,7 @@ namespace DynJson.tests
         {
             var a = 1 + null;
 
-            var script1 = @"   { ""a"": null, ""b"" : dynlan(1+a)  }";
+            var script1 = @"   { ""a"": null, ""b"" : @@(1+a)  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -93,7 +93,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_dunamicl_fields_and_values_no_quotes()
         {
-            var script1 = @"{ a: 1, dynlan('bb') : dynlan( 999 )  }";
+            var script1 = @"{ a: 1, @@('bb') : @@( 999 )  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -108,7 +108,7 @@ namespace DynJson.tests
         /*[Test]
         async public Task executor_should_understand_additional_class_fields_for_object()
         {
-            var script1 = @"{ a: 1, dynlan( 
+            var script1 = @"{ a: 1, @@( 
 class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwisko = 'adsafasg'; return o;
 )  }";
 
@@ -125,7 +125,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_simple_function_with_outer_comments()
         {
-            var script1 = @"{ b : dynlan( 'abc' + 1 )   }";
+            var script1 = @"{ b : @@( 'abc' + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -138,7 +138,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_simple_function_with_outer_comments_2()
         {
-            var script1 = @"{ b : dynlan( 'abc' + 1 )   }";
+            var script1 = @"{ b : @@( 'abc' + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -151,7 +151,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_parent_values()
         {
-            var script1 = @"{ a: 1, b : dynlan( a + 1 )   }";
+            var script1 = @"{ a: 1, b : @@( a + 1 )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -164,7 +164,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_parent_values_version2()
         {
-            var script1 = @"{ a: 1, b : dynlan( a + 1 ), c : dynlan( a + b )   }";
+            var script1 = @"{ a: 1, b : @@( a + 1 ), c : @@( a + b )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -177,7 +177,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_parent_values_version3()
         {
-            var script1 = @"{ a: 1, b : dynlan( a + 1 ), c : dynlan( a + b ), d: {a:10, b:dynlan(a+c)}   }";
+            var script1 = @"{ a: 1, b : @@( a + 1 ), c : @@( a + b ), d: {a:10, b:@@(a+c)}   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -190,7 +190,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object()
         {
-            var script1 = @"{ a: 1, dynlan(  dict = dictionary(); dict.b = 2; dict.c = 3; return dict;  )   }";
+            var script1 = @"{ a: 1, @(  dict = dictionary(); dict.b = 2; dict.c = 3; return dict;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -203,7 +203,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_fields_for_object()
         {
-            var script1 = @"{ a: 1, dynlan(  null  ), d: 3   }";
+            var script1 = @"{ a: 1, @(  null  ), d: 3   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -216,7 +216,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array()
         {
-            var script1 = @"[ 1, dynlan(  result = list(); result.Add(2); result.Add(3); return result;  )   ]";
+            var script1 = @"[ 1, @(  result = list(); result.Add(2); result.Add(3); return result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -229,7 +229,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array()
         {
-            var script1 = @"[ 1, dynlan(  result = list(); return result;  )   ]";
+            var script1 = @"[ 1, @@(  result = list(); return result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -237,14 +237,44 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
             var txt = result.ToJson();
 
             Assert.AreEqual(
+                @"[1,[]]",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_should_understand_additional_empty_items_for_array2()
+        {
+            var script1 = @"[ 1, @(  result = list(); return result;  )   ]";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
                 @"[1]",
                 result.ToJson());
         }
-        
+
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array()
         {
-            var script1 = @"[ 1, dynlan(  return null;  )   ]";
+            var script1 = @"[ 1, @@(  return null;  )   ]";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"[1,null]",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_should_understand_additional_null_items_for_array2()
+        {
+            var script1 = @"[ 1, @(  return null;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -259,7 +289,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version2()
         {
-            var script1 = @"[ 1, dynlan(  dict = dictionary(); dict['b'] = 2; dict['c'] = 3; return dict;  )   ]";
+            var script1 = @"[ 1, @(  dict = dictionary(); dict['b'] = 2; dict['c'] = 3; return dict;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -272,7 +302,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version3()
         {
-            var script1 = @"[ 1, dynlan(  
+            var script1 = @"[ 1, @(  
                 result = list();
                 {
                     dict = dictionary(); 
@@ -299,7 +329,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_for_array()
         {
-            var script1 = @"[ 1, {dynlan(  
+            var script1 = @"[ 1, {@(  
                 lista = list();
                 {
                     dict = dictionary(); 
@@ -326,7 +356,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_with_fields_for_array()
         {
-            var script1 = @"[ 1, {dynlan(  
+            var script1 = @"[ 1, {@(  
                 lista = list();
                 {
                     dict = dictionary(); 
@@ -353,7 +383,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_for_array_version2()
         {
-            var script1 = @"[ 1, {dynlan(  
+            var script1 = @"[ 1, {@(  
                     dict = dictionary(); 
                     dict['b'] = 2; 
                     dict['c'] = 3;                    
@@ -370,8 +400,22 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_objects_for_array()
         {
-            var script1 = @"[ 1, {dynlan(  
-                    null  )}   ]";
+            var script1 = @"[ 1, @@(  
+                    null  )   ]";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            Assert.AreEqual(
+                @"[1,null]",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_should_understand_additional_null_objects_for_array1()
+        {
+            var script1 = @"[ 1, @(  
+                    null  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -384,7 +428,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object_version2()
         {
-            var script1 = @"{ a: 1, b: dynlan(  dict = dictionary(); dict['bb'] = 22; dict['cc'] = 33; return dict;  )   }";
+            var script1 = @"{ a: 1, b: @(  dict = dictionary(); dict['bb'] = 22; dict['cc'] = 33; return dict;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -397,7 +441,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_field_for_object()
         {
-            var script1 = @"{ a: 1, b: dynlan(  null  )   }";
+            var script1 = @"{ a: 1, b: @@(  null  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -412,7 +456,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_simple_csharp_function()
         {
-            var script1 = @"{ b : dynlan( 
+            var script1 = @"{ b : @@( 
 
 def abc(){
   return 3
@@ -432,9 +476,9 @@ return abc()
         [Test]
         async public Task executor_simple_db_query()
         {
-            var script1 = @"{ b : @( 
+            var script1 = @"{ b : @@( 
 
-                db.sql.selectscalar('select 1')
+                db.primary.selectscalar('select 1')
 
         )   }";
 
@@ -449,11 +493,11 @@ return abc()
         [Test]
         async public Task executor_simple_db_querydyn()
         {
-            var script1 = @"{ b : @( 
+            var script1 = @"{ b : @@( 
 
                 q = query();
                 q.append('select 1');
-                db.sql.selectscalar(q);
+                db.primary.selectscalar(q);
 
         )   }";
 

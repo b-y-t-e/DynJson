@@ -805,7 +805,7 @@ namespace DynJson.Helpers.DatabaseHelpers
                         if (val is DBNull) val = null;
                         var name = r.GetName(i);
                         if (string.IsNullOrEmpty(name))
-                            name = "NonameColumn" + i;
+                            name = "Value" + i;
 
                         if (LowerNames) name = name.ToLower();
                         item[name] = val;

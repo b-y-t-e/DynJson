@@ -165,33 +165,33 @@ namespace DynJson.tests
         [Test]
         public void parser_should_understand_simple_function()
         {
-            var script1 = @"{ b : sql( select 1 )   }";
+            var script1 = @"{ b : @sql( select 1 )   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select 1)}",
+                @"{b:@sql(select 1)}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_simple_sql_function_wth_getdate()
         {
-            var script1 = @"{ b : sql( select getdate())   }";
+            var script1 = @"{ b : @sql( select getdate())   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select getdate())}",
+                @"{b:@sql(select getdate())}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_quotation_with_sql_function()
         {
-            var script1 = @"{ b : "" sql( select getdate()   )  "" }";
+            var script1 = @"{ b : "" @sql( select getdate()   )  "" }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
@@ -199,92 +199,92 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{b:"" sql( select getdate()   )  ""}",
+                @"{b:"" @sql( select getdate()   )  ""}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_function_with_quotation1()
         {
-            var script1 = @"{ b : sql(select abc('def'))   }";
+            var script1 = @"{ b : @sql(select abc('def'))   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select abc('def'))}",
+                @"{b:@sql(select abc('def'))}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_function_with_quotation1_inside_quotation1()
         {
-            var script1 = @"{ b : sql(select abc('d\'ef'))   }";
+            var script1 = @"{ b : @sql(select abc('d\'ef'))   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select abc('d\'ef'))}",
+                @"{b:@sql(select abc('d\'ef'))}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_function_with_quotation2_inside_quotation2()
         {
-            var script1 = @"{ b : sql(select abc(""d\""ef""))   }";
+            var script1 = @"{ b : @sql(select abc(""d\""ef""))   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select abc(""d\""ef""))}",
+                @"{b:@sql(select abc(""d\""ef""))}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_function_with_quotation2_inside_quotation2_version2()
         {
-            var script1 = @"{ b : sql(select abc(""d\""ff\""ef""))   }";
+            var script1 = @"{ b : @sql(select abc(""d\""ff\""ef""))   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select abc(""d\""ff\""ef""))}",
+                @"{b:@sql(select abc(""d\""ff\""ef""))}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_function_with_quotation1_inside_quotation2()
         {
-            var script1 = @"{ b : sql(select abc(""d'ff'ef""))   }";
+            var script1 = @"{ b : @sql(select abc(""d'ff'ef""))   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select abc(""d'ff'ef""))}",
+                @"{b:@sql(select abc(""d'ff'ef""))}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_simple_function_with_comments()
         {
-            var script1 = @"{ b : sql( select 1 /* abc */ )   }";
+            var script1 = @"{ b : @sql( select 1 /* abc */ )   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{b:sql(select 1)}",
+                @"{b:@sql(select 1)}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_simple_function_with_outer_comments()
         {
-            var script1 = @"{ b : /*sql( select 1 /* abc */ )*/   }";
+            var script1 = @"{ b : /*@sql( select 1 /* abc */ )*/   }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
@@ -297,26 +297,26 @@ namespace DynJson.tests
         [Test]
         public void parser_should_understand_simple_json_object_test1()
         {
-            var script1 = @"{    a : 'cos', b : sql(select 1 ), c: 'aaa' }";
+            var script1 = @"{    a : 'cos', b : @sql(select 1 ), c: 'aaa' }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{a:'cos',b:sql(select 1),c:'aaa'}",
+                @"{a:'cos',b:@sql(select 1),c:'aaa'}",
                 result.ToJson());
         }
 
         [Test]
         public void parser_should_understand_simple_json_object_test2()
         {
-            var script1 = @"{a : 'cos', sql( select 1 as val ), c: 'aaa' }";
+            var script1 = @"{a : 'cos', @sql( select 1 as val ), c: 'aaa' }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
 
             Assert.AreEqual(
-                @"{a:'cos',sql(select 1 as val),c:'aaa'}",
+                @"{a:'cos',@sql(select 1 as val),c:'aaa'}",
                 result.ToJson());
         }
 
@@ -391,7 +391,7 @@ namespace DynJson.tests
         [Test]
         public void parser_should_ignore_comment_inside_object()
         {
-            var script1 = @"{a : 'cos', /* abc*/  sql( select 1 as val ), c: 'aaa' }";
+            var script1 = @"{a : 'cos', /* abc*/  @sql( select 1 as val ), c: 'aaa' }";
 
             var result = new S4JParserForTests().
                 Parse(script1);
@@ -399,7 +399,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{a:'cos',sql(select 1 as val),c:'aaa'}",
+                @"{a:'cos',@sql(select 1 as val),c:'aaa'}",
                 result.ToJson());
         }
 

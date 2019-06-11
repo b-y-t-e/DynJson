@@ -17,7 +17,7 @@ namespace DynJson.tests
         [Test]
         async public Task should_understand_additional_parameter()
         {
-            var script1 = @" method ( anyParam: any, a : @(body) ){ @(a) } ";
+            var script1 = @" method ( anyParam: any, a : @@(body) ){ @@(a) } ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new[] { new S4JExecutorParam("anyParam", "123"), new S4JExecutorParam("body", "{a:1,b:2}") });
@@ -28,7 +28,7 @@ namespace DynJson.tests
         [Test]
         async public Task should_understand_parameter_from_body()
         {
-            var script1 = @" method ( anyParam: any, a : @(body.b) ){ @(a) } ";
+            var script1 = @" method ( anyParam: any, a : @@(body.b) ){ @@(a) } ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new [] { new S4JExecutorParam("anyParam", "123"), new S4JExecutorParam("body", "{a:1,b:2}")});

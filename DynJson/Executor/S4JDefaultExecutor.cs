@@ -23,7 +23,7 @@ namespace DynJson.Executor
             this.Methods.Add(async (name) =>
             {
                 if (name == "test_method_2")
-                    return "@(1+1)";
+                    return "@@(1+1)";
                 return null;
             });
         }

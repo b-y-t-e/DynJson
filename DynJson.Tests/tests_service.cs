@@ -23,7 +23,7 @@ namespace DynJson.tests
 method ( osoba : any ) 
 {
 /*
-sql( insert into osoba(imie) select @osoba_imie; )
+@sql( insert into osoba(imie) select @osoba_imie; )
 */
 sql( select imie from osoba where imie = 'test_sql' )
 }
