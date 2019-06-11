@@ -25,7 +25,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" sql( select 1  ) ";
+            var script1 = @" query( select 1  ) ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -42,7 +42,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) {sql( select @param1 + 1  )} ";
+            var script1 = @" method(param1) {query( select @param1 + 1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 199 });
@@ -55,11 +55,45 @@ namespace DynJson.tests
         }
 
         [Test]
+        async public Task if_no_object_found_then_null()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" method() { q-single( select top(1) * from osoba where id = 2138123  ) } ";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"null",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task if_object_found_then_json_object()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" method() { q-single( select top(1) imie from osoba where imie = 'imie1' ) } ";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"{""imie"":""imie1""}",
+                result.ToJson());
+        }
+
+        [Test]
         async public Task executor_should_understand_object_parameter_in_sql()
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1){ sql( select @param1_imie + '!' + @param1_nazwisko  ) }";
+            var script1 = @" method(param1){ query( select @param1_imie + '!' + @param1_nazwisko  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { new osoba() { imie = "IMIE", nazwisko = "NAZWISKO" } });
@@ -76,7 +110,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) { sql( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
+            var script1 = @" method(param1) { query( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { new osobaWithList() { imie = "IMIE", nazwisko = "NAZWISKO", rodzice = new List<osoba>() { new osoba() { imie = "tata" }, new osoba() { imie = "mama" } } } });
@@ -93,7 +127,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1){ sql( select count(*) from @param1  )} ";
+            var script1 = @" method(param1){ query( select count(*) from @param1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(
@@ -117,7 +151,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" {sql( select imie, nazwisko from osoba where imie = 'imie1' )} ";
+            var script1 = @" {query( select imie, nazwisko from osoba where imie = 'imie1' )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -134,7 +168,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" {sql( select imie, nazwisko, idrodzica from osoba where imie = 'imie1' ), ""parent"": { sql(select imie from osoba where id = @idrodzica) } } ";
+            var script1 = @" {query( select imie, nazwisko, idrodzica from osoba where imie = 'imie1' ), ""parent"": { query(select imie from osoba where id = @idrodzica) } } ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -151,7 +185,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" [{sql( select imie, nazwisko from osoba where idrodzica is not null )}] ";
+            var script1 = @" [{query( select imie, nazwisko from osoba where idrodzica is not null )}] ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -172,7 +206,7 @@ namespace DynJson.tests
         {
             var script = @"
 [
-    @sql(
+    q-many(
 
         begin transaction
 
@@ -211,7 +245,7 @@ namespace DynJson.tests
 
     ),
 
-    @sql(
+    q-many(
 
         begin transaction
 

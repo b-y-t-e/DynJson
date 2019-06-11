@@ -29,9 +29,9 @@ namespace DynJson.tests
 
 method ( osoba : any )  {
 /*
-@sql( insert into osoba(imie) select @osoba_imie; ),
+q-many( insert into osoba(imie) select @osoba_imie; ),
 */
-sql( select imie from osoba where imie = 'test_sql' )
+query( select imie from osoba where imie = 'test_sql' )
 }
 ";
 
@@ -49,9 +49,9 @@ sql( select imie from osoba where imie = 'test_sql' )
             var script1  = @" 
 method ( osoba : any )  {
 /*
-@@( item = dictionary(); item.imie = osoba.imie; db.primary.save('osoba', item)  ),
+@-many( item = dictionary(); item.imie = osoba.imie; db.primary.save('osoba', item)  ),
 */
-sql( select imie from osoba where imie = 'test_dynlan' )
+query( select imie from osoba where imie = 'test_dynlan' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -68,9 +68,9 @@ sql( select imie from osoba where imie = 'test_dynlan' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@@( db.primary.save('osoba', osoba)  ),
+@-many( db.primary.save('osoba', osoba)  ),
 */
-sql( select imie from osoba where imie = 'test_dynlan2' )
+query( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -87,9 +87,9 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@c#( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
+@cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
 */
-sql( select imie from osoba where imie = 'test_dynlan_cs' )
+query( select imie from osoba where imie = 'test_dynlan_cs' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -106,9 +106,9 @@ sql( select imie from osoba where imie = 'test_dynlan_cs' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@c#( db.primary.save(""osoba"", osoba)  ),
+@cs( db.primary.save(""osoba"", osoba)  ),
 */
-sql( select imie from osoba where imie = 'test_dynlan2' )
+query( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -125,9 +125,9 @@ sql( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@c#( db.primary.save(""osoba"", osoba)  ),
+@cs( db.primary.save(""osoba"", osoba)  ),
 */
-@@(osoba.ID)
+@-many(osoba.ID)
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -146,10 +146,10 @@ method ( osoba : any )  {
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@c#( db.primary.save(""dokument"", dokument)  ),
-@c#( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
+@cs( db.primary.save(""dokument"", dokument)  ),
+@cs( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
 */
-sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -166,10 +166,10 @@ sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@@( db.primary.save('dokument', dokument)  ),
-@@( db.primary.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
+@-many( db.primary.save('dokument', dokument)  ),
+@-many( db.primary.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
 */
-sql(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
 ";
             var result = await new S4JExecutorForTests().

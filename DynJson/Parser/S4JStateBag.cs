@@ -395,7 +395,7 @@ namespace DynJson.Parser
 
         public void AddStatesToBag(params S4JStateFunction[] States)
         {
-            foreach (S4JStateFunction state in States.OrderByDescending(s => s.FunctionName))
+            foreach (S4JStateFunction state in States)
             {
                 AddState(state);
                 AddState(state.BracketsDefinition);
@@ -407,6 +407,7 @@ namespace DynJson.Parser
                 Correct(state.BracketsDefinition);
                 Correct(state.QuotationDefinition);
             }
+
             CorrectDependent(States);
             CorrectOrderOfItems();
         }

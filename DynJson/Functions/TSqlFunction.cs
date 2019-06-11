@@ -14,15 +14,15 @@ using DynJson.Tokens;
 
 namespace DynJson.Functions
 {
-    public class TSqlFunction : S4JStateFunction
+    public class TSqlExpandedFunction : S4JStateFunction
     {
-        public TSqlFunction() :
-            this("@sql", "primary")
+        public TSqlExpandedFunction() :
+            this("query;q", "primary")
         {
-            ReturnExactValue = true;
+            ReturnExactValue = false;
         }
 
-        public TSqlFunction(string aliasName, string sourceName) :
+        public TSqlExpandedFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;
@@ -36,15 +36,62 @@ namespace DynJson.Functions
         }
     }
 
-    public class TSqlExpandedFunction : S4JStateFunction
+    public class TSqlManyFunction : S4JStateFunction
     {
-        public TSqlExpandedFunction() :
-            this("sql", "primary")
+        public TSqlManyFunction() :
+            this("q-many", "primary")
         {
-            ReturnExactValue = false;
+            ReturnManyObjects = true;
+            ReturnExactValue = true;
         }
 
-        public TSqlExpandedFunction(string aliasName, string sourceName) :
+        public TSqlManyFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new TSqlBrackets();
+            CommentDefinition = new TSqlComment();
+            QuotationDefinition = new TSqlQuotation();
+            Evaluator = new TSqlEvaluator();
+            FunctionTagExecutor = context =>
+            {
+            };
+        }
+    }
+
+    public class TSqlSingleExpandedFunction : S4JStateFunction
+    {
+        public TSqlSingleExpandedFunction() :
+            this("query-single;q-single", "primary")
+        {
+            ReturnExactValue = true;
+            ReturnSingleObject = true;
+        }
+
+        public TSqlSingleExpandedFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new TSqlBrackets();
+            CommentDefinition = new TSqlComment();
+            QuotationDefinition = new TSqlQuotation();
+            Evaluator = new TSqlEvaluator();
+            FunctionTagExecutor = context =>
+            {
+            };
+        }
+    }
+
+    public class TSqlValueExpandedFunction : S4JStateFunction
+    {
+        public TSqlValueExpandedFunction() :
+            this("query-value;q-value", "primary")
+        {
+            ReturnExactValue = true;
+            ReturnSingleValue = true;
+        }
+
+        public TSqlValueExpandedFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;

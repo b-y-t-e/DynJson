@@ -26,7 +26,7 @@ namespace DynJson.tests
             var script1 = @" 
 method ( a : any ) 
 {
-   { @@(a)}
+   { @-value(a)}
 }";
 
             var result = await new S4JExecutorForTests().
@@ -42,8 +42,8 @@ method ( a : any )
 method ( a : any ) 
 {
 [
-    @@(a) as b,
-    @@(b+1)
+    @(a) as b,
+    @(b+1)
 ]
 }";
 
@@ -59,7 +59,7 @@ method ( a : any )
             var script1 = @" 
 method ( a : any ) 
 {
-    {variable : @@(a)}
+    {variable : @(a)}
 }";
 
             var result = await new S4JExecutorForTests().
@@ -74,7 +74,7 @@ method ( a : any )
             var script1 = @" 
 method ( a : any ) 
 {
-    @@(a.imie)
+    @(a.imie)
 }";
 
             var result = await new S4JExecutorForTests().
@@ -91,7 +91,7 @@ method ( a : any )
 method ( numer : string ) 
 
     #hidden
-    @sql( select * from dokument where numer = @numer ) as @dokument,
+    q-many( select * from dokument where numer = @numer ) as @dokument,
     @dokument[0].numer
 
 
@@ -111,9 +111,9 @@ method ( numer : string )
 method ( numer : string ) 
 {
     /*
-    { sql( select numer, rodzaj from dokument where numer = @numer ) } as dokument,
+    { query( select numer, rodzaj from dokument where numer = @numer ) } as dokument,
     */
-    @@(dokument)
+    @-single(dokument)
 }
 
 ";
@@ -133,9 +133,9 @@ method ( numer : string )
 method ( numer : string ) 
 {
     /*
-    @sql( select numer, rodzaj from dokument where numer = @numer ) as documents,
+    q( select numer, rodzaj from dokument where numer = @numer ) as documents,
     */
-    @@(documents[0])
+    @-single(documents)
 }
 
 ";

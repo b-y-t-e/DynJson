@@ -24,9 +24,13 @@ namespace DynJson.Parser
                             new CSharpExpandedFunction(),
                             new CSharpFunction(),
                             new DynLanExpandedFunction(),
-                            new DynLanFunction(),
+                            new DynLanManyFunction(),
+                            new DynLanSingleFunction(),
+                            new DynLanValueFunction(),
+                            new TSqlSingleExpandedFunction(),
+                            new TSqlValueExpandedFunction(),
                             new TSqlExpandedFunction(),
-                            new TSqlFunction());
+                            new TSqlManyFunction());
                     }
 
             return i;//.Clone();

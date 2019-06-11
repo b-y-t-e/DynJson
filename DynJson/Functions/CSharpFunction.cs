@@ -18,7 +18,7 @@ namespace DynJson.Functions
     public class CSharpFunction : S4JStateFunction
     {
         public CSharpFunction() :
-            this("@c#", "")
+            this("@cs", "")
         {
             ReturnExactValue = true;
         }
@@ -36,7 +36,7 @@ namespace DynJson.Functions
     public class CSharpExpandedFunction : S4JStateFunction
     {
         public CSharpExpandedFunction() :
-            this("c#", "")
+            this("cs", "")
         {
             ReturnExactValue = false;
         }

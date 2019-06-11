@@ -47,7 +47,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_array2()
         {
-            var script1 = @"[  1, @@(  null  )   ]";
+            var script1 = @"[  1, @-many(  null  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -97,7 +97,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_object()
         {
-            var script1 = @"{ a: 1, b: @@(  null  )   }";
+            var script1 = @"{ a: 1, b: @-many(  null  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -112,7 +112,7 @@ namespace DynJson.tests
         [Test]
         async public Task null_in_json_object_is_null_in_object()
         {
-            var script1 = @"{ a: 1, b: { @@(  null  ) }   }";
+            var script1 = @"{ a: 1, b: { @-many(  null  ) }   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -157,7 +157,7 @@ namespace DynJson.tests
         [Test]
         async public Task null_in_json_object_is_null_in_object4()
         {
-            var script1 = @"{ a: 1, b: [ @@(  null  ) ]   }";
+            var script1 = @"{ a: 1, b: [ @-many(  null  ) ]   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

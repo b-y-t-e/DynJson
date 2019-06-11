@@ -18,7 +18,7 @@ namespace DynJson.tests
         [Test]
         async public Task api_call_method_notexists()
         {
-            var script1 = @"{ @@(api.exec('test_method')) }";
+            var script1 = @"{ @-many(api.exec('test_method')) }";
 
             try
             {
@@ -43,7 +43,7 @@ namespace DynJson.tests
         [Test]
         async public Task api_call_method_exists()
         {
-            var script1 = @"@@(api.exec('test_method_2'))";
+            var script1 = @"@(api.exec('test_method_2'))";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

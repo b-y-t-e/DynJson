@@ -391,53 +391,33 @@ namespace DynJson.Executor
                     stateFunction.FunctionTagExecutor(context);
             }
 
-            object result = await function.Evaluator?.Evaluate(this, function, variables);
+            object result = await function.
+                Evaluator?.
+                Evaluate(this, function, variables);
+
+            if(stateFunction.ReturnSingleObject)
+            {
+                result = GetSingleObjectFromResult(result);
+            }
+            else if (stateFunction.ReturnSingleValue)
+            {
+                result = GetSingleAndFirstValueFromResult(result);
+            }
+            else if (stateFunction.ReturnManyObjects)
+            {
+                result = GetManyObjectsFromResult(result);
+            }
 
             function.IsEvaluated = true;
             function.Result = result;
 
-            /*Boolean isResultNull = result == null;
-            Boolean isResultPrimitive = result != null && MyTypeHelper.IsPrimitive(result.GetType());
-                       
-            // { a : 1, b: { @@(null) } } -> { a : 1, b: null }
-            if (function.Parent is S4JTokenObject objectParent1 &&
-                function.IsObjectSingleKey &&
-                isResultNull && objectParent1.Children.Count == 1)
-            {
-                TurnParentIntoNull(objectParent1);
-            }
-            // { a : 1, @@(null) } -> { a : 1 }
-            else if (function.Parent is S4JTokenObject objectParent2 &&
-                function.IsObjectSingleKey &&
-                isResultNull && objectParent2.Children.Count > 1)
-            {
-                RemoveChildInParent(
-                    objectParent2,
-                    function);
-            }
-            // { a : 1, @sql(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
-            else if (function.Parent is S4JTokenObject objectParent3 &&
-                function.IsObjectSingleKey &&
-                !isResultPrimitive)
-            {
-                EvaluateFunctionInsideObject(
-                    objectParent3,
-                    function,
-                    result);
-            }
-            // { @@(1) } -> { 1 }
-            // { a : @@(1) } -> { a : 1 }
-            else if (stateFunction.ReturnExactValue)
-            {
-                function.JsonFromResult = true;
-            }*/
-            // { @@(1) } -> { 1 }
-            // { a : @@(1) } -> { a : 1 }
+            // { @-many(1) } -> { 1 }
+            // { a : @-many(1) } -> { a : 1 }
             if (stateFunction.ReturnExactValue)
             {
                 function.JsonFromResult = true;
             }
-            // { a : 1, @sql(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
+            // { a : 1, q-many(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
             else if (function.Parent is S4JTokenObject objectParent3 &&
                 function.IsObjectSingleKey)
             {
@@ -446,7 +426,7 @@ namespace DynJson.Executor
                     function,
                     result);
             }
-            // [ @@(1), @@(null) ] -> [ 1, null ]
+            // [ @-many(1), @-many(null) ] -> [ 1, null ]
             else if (function.Parent is S4JTokenArray arrayParent)
             {
                 EvaluateFunctionInsideArray(
@@ -544,11 +524,11 @@ namespace DynJson.Executor
                 tokens);
         }
 
-        private void TurnParentIntoNull(
+        /*private void TurnParentIntoNull(
             S4JTokenObject objectParent)
         {
             S4JToken parentOfParent = objectParent.Parent;
-            parentOfParent.RemoveChild(objectParent, ConvertToTokens((object)null, true).ToArray());
+            parentOfParent.RemoveChild(objectParent, ConvertToTokens((object)null, true, false).ToArray());
         }
 
         private void RemoveChildInParent(
@@ -556,7 +536,7 @@ namespace DynJson.Executor
             S4JTokenFunction function)
         {
             objectParent.RemoveChild(function);
-        }
+        }*/
 
         private void EvaluateFunctionInsideArray(
             S4JTokenArray arrayParent,
@@ -578,7 +558,7 @@ namespace DynJson.Executor
         {
             var item = GetSingleAndFirstValueFromResult(result);
 
-            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible).ToArray();
+            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible, true).ToArray();
 
             String text = JsonSerializer.SerializeJson(result);
             function.Children.Clear();
@@ -667,9 +647,9 @@ namespace DynJson.Executor
             };
         }
 
-        private IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible)
+        private IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible, Boolean GenerateNull)
         {
-            if (Value == null)
+            if (!GenerateNull && Value == null)
                 yield break;
 
             yield return new S4JTokenTextValue()

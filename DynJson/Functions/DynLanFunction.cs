@@ -17,15 +17,15 @@ using DynJson.Helpers.DatabaseHelpers;
 
 namespace DynJson.Functions
 {
-    public class DynLanFunction : S4JStateFunction
+    public class DynLanExpandedFunction : S4JStateFunction
     {
-        public DynLanFunction() :
-            this("@@", "")
+        public DynLanExpandedFunction() :
+            this("@", "")
         {
-            ReturnExactValue = true;
+            ReturnExactValue = false;
         }
 
-        public DynLanFunction(string aliasName, string sourceName) :
+        public DynLanExpandedFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;
@@ -36,15 +36,56 @@ namespace DynJson.Functions
         }
     }
 
-    public class DynLanExpandedFunction : S4JStateFunction
+    public class DynLanSingleFunction : S4JStateFunction
     {
-        public DynLanExpandedFunction() :
-            this("@", "")
+        public DynLanSingleFunction() :
+            this("@-single", "")
         {
-            ReturnExactValue = false;
+            ReturnExactValue = true;
+            ReturnSingleObject = true;
         }
 
-        public DynLanExpandedFunction(string aliasName, string sourceName) :
+        public DynLanSingleFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new DynLanBrackets();
+            CommentDefinition = new DynLanComment();
+            QuotationDefinition = new DynLanQuotation();
+            Evaluator = new DynLanEvaluator();
+        }
+    }
+
+    public class DynLanManyFunction : S4JStateFunction
+    {
+        public DynLanManyFunction() :
+            this("@-many", "")
+        {
+            ReturnExactValue = true;
+            ReturnManyObjects = true;
+        }
+
+        public DynLanManyFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new DynLanBrackets();
+            CommentDefinition = new DynLanComment();
+            QuotationDefinition = new DynLanQuotation();
+            Evaluator = new DynLanEvaluator();
+        }
+    }
+
+    public class DynLanValueFunction : S4JStateFunction
+    {
+        public DynLanValueFunction() :
+            this("@-value", "")
+        {
+            ReturnExactValue = true;
+            ReturnSingleValue = true;
+        }
+
+        public DynLanValueFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;
