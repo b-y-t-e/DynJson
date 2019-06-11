@@ -17,6 +17,9 @@ It is possible to use almost any technology compatible with .net environment via
    "TextField" : "abc"
 }
 ```
+```
+{"IntField":1,"TextField":"abc"}
+```
 
  + JSON + dynamic field (current datetime):
 ```
