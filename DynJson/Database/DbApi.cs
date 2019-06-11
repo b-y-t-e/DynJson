@@ -186,7 +186,8 @@ namespace DynJson.Database
             if (!itemExists(con, TableName, Item))
             {
                 Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()");
-                ReflectionHelper.SetItemValue(Item, this.idName, newID);
+                if (newID != null)
+                    ReflectionHelper.SetItemValue(Item, this.idName, newID);
             }
             else
             {
