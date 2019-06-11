@@ -18,7 +18,7 @@ namespace DynJson.Functions
     public class CSharpFunction : S4JStateFunction
     {
         public CSharpFunction() :
-            this("@cs", "")
+            this("cs", "")
         {
             ReturnExactValue = true;
         }
@@ -33,15 +33,76 @@ namespace DynJson.Functions
             Evaluator = new CSharpEvaluator();
         }
     }
-    public class CSharpExpandedFunction : S4JStateFunction
+
+    public class CSharpSingleFunction : S4JStateFunction
     {
-        public CSharpExpandedFunction() :
-            this("cs", "")
+        public CSharpSingleFunction() :
+            this("cs-single;cssingle", "")
+        {
+            ReturnExactValue = true;
+            ReturnSingleObject = true;
+        }
+
+        public CSharpSingleFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new CSharpBrackets();
+            CommentDefinition = new CSharpComment();
+            QuotationDefinition = new CSharpQuotation();
+            Evaluator = new CSharpEvaluator();
+        }
+    }
+
+    public class CSharpValueFunction : S4JStateFunction
+    {
+        public CSharpValueFunction() :
+            this("cs-value;csvalue", "")
+        {
+            ReturnExactValue = true;
+            ReturnSingleValue = true;
+        }
+
+        public CSharpValueFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new CSharpBrackets();
+            CommentDefinition = new CSharpComment();
+            QuotationDefinition = new CSharpQuotation();
+            Evaluator = new CSharpEvaluator();
+        }
+    }
+
+    public class CSharpManyFunction : S4JStateFunction
+    {
+        public CSharpManyFunction() :
+            this("cs-many;csmany", "")
+        {
+            ReturnExactValue = true;
+            ReturnManyObjects = true;
+        }
+
+        public CSharpManyFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new CSharpBrackets();
+            CommentDefinition = new CSharpComment();
+            QuotationDefinition = new CSharpQuotation();
+            Evaluator = new CSharpEvaluator();
+        }
+    }
+
+    public class CSharpFitFunction : S4JStateFunction
+    {
+        public CSharpFitFunction() :
+            this("cs-fit;csfit", "")
         {
             ReturnExactValue = false;
         }
 
-        public CSharpExpandedFunction(string aliasName, string sourceName) :
+        public CSharpFitFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;

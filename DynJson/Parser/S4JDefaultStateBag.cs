@@ -21,12 +21,18 @@ namespace DynJson.Parser
                     {
                         i = new S4JStateBag();
                         i.AddStatesToBag(
-                            new CSharpExpandedFunction(),
+                            new CSharpFitFunction(),
+                            new CSharpSingleFunction(),
+                            new CSharpManyFunction(),
+                            new CSharpValueFunction(),
                             new CSharpFunction(),
-                            new DynLanExpandedFunction(),
+
+                            new DynLanFunction(),
+                            new DynLanFitFunction(),
                             new DynLanManyFunction(),
                             new DynLanSingleFunction(),
                             new DynLanValueFunction(),
+
                             new TSqlSingleExpandedFunction(),
                             new TSqlValueExpandedFunction(),
                             new TSqlExpandedFunction(),

@@ -77,7 +77,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_array_parameter_json()
         {
-            var script1 = @" method ( c: array ){ @cs( c.Count  )} ";
+            var script1 = @" method ( c: array ){ cs( c.Count  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "[1,2,3,4]" });
@@ -88,7 +88,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_parameter_validcase()
         {
-            var script1 = @" method ( c: int ){ @cs( c ) } ";
+            var script1 = @" method ( c: int ){ cs( c ) } ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new object[] { 12 });
@@ -119,7 +119,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_object_parameter_json()
         {
-            var script1 = @" method ( c: object ) {@cs( c.g  ) }";
+            var script1 = @" method ( c: object ) {cs( c.g  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "{g:123}" });

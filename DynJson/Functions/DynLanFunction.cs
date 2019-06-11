@@ -17,15 +17,34 @@ using DynJson.Helpers.DatabaseHelpers;
 
 namespace DynJson.Functions
 {
-    public class DynLanExpandedFunction : S4JStateFunction
+    public class DynLanFunction : S4JStateFunction
     {
-        public DynLanExpandedFunction() :
+        public DynLanFunction() :
             this("@", "")
+        {
+            ReturnExactValue = true;
+        }
+
+        public DynLanFunction(string aliasName, string sourceName) :
+            base(aliasName, sourceName)
+        {
+            Priority = 0;
+            BracketsDefinition = new DynLanBrackets();
+            CommentDefinition = new DynLanComment();
+            QuotationDefinition = new DynLanQuotation();
+            Evaluator = new DynLanEvaluator();
+        }
+    }
+
+    public class DynLanFitFunction : S4JStateFunction
+    {
+        public DynLanFitFunction() :
+            this("@-fit;@fit", "")
         {
             ReturnExactValue = false;
         }
 
-        public DynLanExpandedFunction(string aliasName, string sourceName) :
+        public DynLanFitFunction(string aliasName, string sourceName) :
             base(aliasName, sourceName)
         {
             Priority = 0;
@@ -39,7 +58,7 @@ namespace DynJson.Functions
     public class DynLanSingleFunction : S4JStateFunction
     {
         public DynLanSingleFunction() :
-            this("@-single", "")
+            this("@-single;@single", "")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
@@ -59,7 +78,7 @@ namespace DynJson.Functions
     public class DynLanManyFunction : S4JStateFunction
     {
         public DynLanManyFunction() :
-            this("@-many", "")
+            this("@-many;@many", "")
         {
             ReturnExactValue = true;
             ReturnManyObjects = true;
@@ -79,7 +98,7 @@ namespace DynJson.Functions
     public class DynLanValueFunction : S4JStateFunction
     {
         public DynLanValueFunction() :
-            this("@-value", "")
+            this("@-value;@value", "")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;

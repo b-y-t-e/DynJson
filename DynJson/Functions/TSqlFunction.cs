@@ -39,7 +39,7 @@ namespace DynJson.Functions
     public class TSqlManyFunction : S4JStateFunction
     {
         public TSqlManyFunction() :
-            this("q-many", "primary")
+            this("q-many;qmany", "primary")
         {
             ReturnManyObjects = true;
             ReturnExactValue = true;
@@ -62,7 +62,7 @@ namespace DynJson.Functions
     public class TSqlSingleExpandedFunction : S4JStateFunction
     {
         public TSqlSingleExpandedFunction() :
-            this("query-single;q-single", "primary")
+            this("query-single;q-single;qsingle", "primary")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
@@ -85,7 +85,7 @@ namespace DynJson.Functions
     public class TSqlValueExpandedFunction : S4JStateFunction
     {
         public TSqlValueExpandedFunction() :
-            this("query-value;q-value", "primary")
+            this("query-value;q-value;qvalue", "primary")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;

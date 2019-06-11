@@ -18,14 +18,7 @@ namespace DynJson.Executor
                     return false;
 
                 return true;
-            });
-
-            this.Methods.Add(async (name) =>
-            {
-                if (name == "test_method_2")
-                    return "@-many(1+1)";
-                return null;
-            });
+            }); 
         }
     }
 }

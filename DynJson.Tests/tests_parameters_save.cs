@@ -87,7 +87,7 @@ query( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
+cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
 */
 query( select imie from osoba where imie = 'test_dynlan_cs' )
 }
@@ -106,7 +106,7 @@ query( select imie from osoba where imie = 'test_dynlan_cs' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@cs( db.primary.save(""osoba"", osoba)  ),
+cs( db.primary.save(""osoba"", osoba)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan2' )
 }
@@ -125,7 +125,7 @@ query( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@cs( db.primary.save(""osoba"", osoba)  ),
+cs( db.primary.save(""osoba"", osoba)  ),
 */
 @-many(osoba.ID)
 }
@@ -146,8 +146,8 @@ method ( osoba : any )  {
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@cs( db.primary.save(""dokument"", dokument)  ),
-@cs( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
+cs( db.primary.save(""dokument"", dokument)  ),
+cs( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
 */
 query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }

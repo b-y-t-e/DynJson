@@ -190,7 +190,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object()
         {
-            var script1 = @"{ a: 1, @(  dict = dictionary(); dict.b = 2; dict.c = 3; return dict;  )   }";
+            var script1 = @"{ a: 1, @fit(  dict = dictionary(); dict.b = 2; dict.c = 3; return dict;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -203,7 +203,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_fields_for_object()
         {
-            var script1 = @"{ a: 1, @(  null  ), d: 3   }";
+            var script1 = @"{ a: 1, @fit(  null  ), d: 3   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -216,7 +216,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array()
         {
-            var script1 = @"[ 1, @(  result = list(); result.Add(2); result.Add(3); return result;  )   ]";
+            var script1 = @"[ 1, @fit(  result = list(); result.Add(2); result.Add(3); return result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -244,7 +244,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array2()
         {
-            var script1 = @"[ 1, @(  result = list(); return result;  )   ]";
+            var script1 = @"[ 1, @fit(  result = list(); return result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -274,7 +274,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array2()
         {
-            var script1 = @"[ 1, @(  return null;  )   ]";
+            var script1 = @"[ 1, @fit(  return null;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -289,7 +289,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version2()
         {
-            var script1 = @"[ 1, @(  dict = dictionary(); dict['b'] = 2; dict['c'] = 3; return dict;  )   ]";
+            var script1 = @"[ 1, @-fit(  dict = dictionary(); dict['b'] = 2; dict['c'] = 3; return dict;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -302,7 +302,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version3()
         {
-            var script1 = @"[ 1, @(  
+            var script1 = @"[ 1, @fit(  
                 result = list();
                 {
                     dict = dictionary(); 
@@ -329,7 +329,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_for_array()
         {
-            var script1 = @"[ 1, {@(  
+            var script1 = @"[ 1, {@fit(  
                 lista = list();
                 {
                     dict = dictionary(); 
@@ -356,7 +356,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_with_fields_for_array()
         {
-            var script1 = @"[ 1, {@(  
+            var script1 = @"[ 1, {@fit(  
                 lista = list();
                 {
                     dict = dictionary(); 
@@ -383,7 +383,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_for_array_version2()
         {
-            var script1 = @"[ 1, {@(  
+            var script1 = @"[ 1, {@fit(  
                     dict = dictionary(); 
                     dict['b'] = 2; 
                     dict['c'] = 3;                    
@@ -414,7 +414,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_objects_for_array1()
         {
-            var script1 = @"[ 1, @(  
+            var script1 = @"[ 1, @fit(  
                     null  )   ]";
 
             var result = await new S4JExecutorForTests().
@@ -428,7 +428,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object_version2()
         {
-            var script1 = @"{ a: 1, b: @(  dict = dictionary(); dict['bb'] = 22; dict['cc'] = 33; return dict;  )   }";
+            var script1 = @"{ a: 1, b: @fit(  dict = dictionary(); dict['bb'] = 22; dict['cc'] = 33; return dict;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
