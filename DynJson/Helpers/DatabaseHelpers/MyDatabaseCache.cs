@@ -17,6 +17,18 @@ namespace DynJson.Helpers.DatabaseHelpers
 
         //////////////////////////////////////////
 
+        public static DbDataColumn GetColumn(
+            this DbConnection Connection,
+            String TableName,
+            String ColumnName)
+        {
+            var columns = GetColumns(Connection, TableName);
+            if (columns == null)
+                return null;
+
+            return columns.Values.FirstOrDefault(c => c.Name == ColumnName);
+        }
+
         public static DbDataColumns GetColumns(
             this DbConnection Connection,
             String TableName)
@@ -32,7 +44,7 @@ namespace DynJson.Helpers.DatabaseHelpers
                     using (var lCommand = Connection.CreateCommand())
                     {
                         MyQuery query = new MyQuery();
-                        query.Append("select column_name from information_schema.columns where table_name = {0}", TableName);
+                        query.Append("select column_name, data_type from information_schema.columns where table_name = {0}", TableName);
 
                         lCommand.CommandTimeout = 60 * 5;
                         lCommand.CommandText = query.ToString();
@@ -42,9 +54,12 @@ namespace DynJson.Helpers.DatabaseHelpers
                             while (lReader.Read())
                             {
                                 string name = Convert.ToString(lReader.GetValue(0), CultureInfo.InvariantCulture);
+                                string type = (Convert.ToString(lReader.GetValue(1), CultureInfo.InvariantCulture) ?? "").ToLower();
                                 columns[name] = new DbDataColumn()
                                 {
                                     Name = name,
+                                    DbType = type,
+                                    CsType = type == "uniqueidentifier" ? typeof(Guid) : null
                                 };
                             }
                         }
@@ -95,12 +110,16 @@ namespace DynJson.Helpers.DatabaseHelpers
     {
         public String Name;
 
+        public String DbType;
+
+        public Type CsType;
+
         // public Boolean IsDateTime;
 
-        public String Default;
+        // public String Default;
+        //
+        //  public Boolean IsNull;
 
-        public Boolean IsNull;
-
-        public String ValueForNull;
+        //public String ValueForNull;
     }
 }
