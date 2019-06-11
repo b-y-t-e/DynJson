@@ -26,7 +26,7 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
-        public Dictionary<string, object> select(MyQueryDyn sqlquery)
+        public Dictionary<string, object> single(MyQueryDyn sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -35,7 +35,7 @@ namespace DynJson.Database
             }
         }
 
-        public List<Dictionary<string, object>> selectmany(MyQueryDyn sqlquery)
+        public List<Dictionary<string, object>> many(MyQueryDyn sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -44,7 +44,7 @@ namespace DynJson.Database
             }
         }
 
-        public object selectscalar(MyQueryDyn sqlquery)
+        public object value(MyQueryDyn sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -53,7 +53,7 @@ namespace DynJson.Database
             }
         }
 
-        public IList<object> selectscalars(MyQueryDyn sqlquery)
+        public IList<object> values(MyQueryDyn sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -61,9 +61,10 @@ namespace DynJson.Database
                 return values;
             }
         }
+
         //////////////////////////////////////////////
 
-        public Dictionary<string, object> select(string sqlquery)
+        public Dictionary<string, object> single(string sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -72,7 +73,7 @@ namespace DynJson.Database
             }
         }
 
-        public List<Dictionary<string, object>> selectmany(string sqlquery)
+        public List<Dictionary<string, object>> many(string sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -81,7 +82,7 @@ namespace DynJson.Database
             }
         }
 
-        public object selectscalar(string sqlquery)
+        public object value(string sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -90,7 +91,7 @@ namespace DynJson.Database
             }
         }
 
-        public IList<object> selectscalars(string sqlquery)
+        public IList<object> values(string sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -108,7 +109,7 @@ namespace DynJson.Database
                 IList<Object> items = convertToList(ItemOrItems);
                 saveItems(con, TableName, items);
             }
-            return null;
+            return ItemOrItems;
         }
 
         public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName)
@@ -128,7 +129,7 @@ namespace DynJson.Database
                 deleteItemsByParentPropertyExceptIDs(con, TableName, ids, ParentPropertyName, parentPropertyValue);
                 saveItems(con, TableName, items);
             }
-            return null;
+            return ItemOrItems;
         }
 
         public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, Object ParentPropertyValue)
@@ -144,7 +145,7 @@ namespace DynJson.Database
                 deleteItemsByParentPropertyExceptIDs(con, TableName, ids, ParentPropertyName, ParentPropertyValue);
                 saveItems(con, TableName, items);
             }
-            return null;
+            return ItemOrItems;
         }
 
         //////////////////////////////////////////////
@@ -183,9 +184,14 @@ namespace DynJson.Database
 
         Object saveItem(SqlConnection con, String TableName, Object Item)
         {
-            if (!itemExists(con, TableName, Item))
+            Object idValue = ReflectionHelper.
+                GetItemValue(Item, idName);
+
+            if (!itemExists(con, TableName, idValue))
             {
-                Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()");
+                Boolean overrideKey = !DynLan.Helpers.MyTypeHelper.IsNumeric(idValue);
+
+                Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()", overrideKey);
                 if (newID != null)
                     ReflectionHelper.SetItemValue(Item, this.idName, newID);
             }
@@ -196,13 +202,10 @@ namespace DynJson.Database
             return null;
         }
 
-        bool itemExists(SqlConnection con, String TableName, Object Item)
+        bool itemExists(SqlConnection con, String TableName, Object ItemID)
         {
-            Object idValue = ReflectionHelper.
-                GetItemValue(Item, idName);
-
             MyQuery query = new MyQuery();
-            query.Append("select 1 from " + TableName + " where " + idName + " = {0}", idValue);
+            query.Append("select 1 from " + TableName + " where " + idName + " = {0}", ItemID);
 
             return con.SelectScalar<object>(query.ToString()) != null;
         }
