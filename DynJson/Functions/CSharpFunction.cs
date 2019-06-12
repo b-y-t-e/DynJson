@@ -18,13 +18,13 @@ namespace DynJson.Functions
     public class CSharpFunction : S4JStateFunction
     {
         public CSharpFunction() :
-            this("cs", "")
+            this("cs")
         {
             ReturnExactValue = true;
         }
 
-        public CSharpFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public CSharpFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();
@@ -37,14 +37,14 @@ namespace DynJson.Functions
     public class CSharpSingleFunction : S4JStateFunction
     {
         public CSharpSingleFunction() :
-            this("cs-single;cssingle", "")
+            this("cs-single;cssingle")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
         }
 
-        public CSharpSingleFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public CSharpSingleFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();
@@ -57,14 +57,14 @@ namespace DynJson.Functions
     public class CSharpValueFunction : S4JStateFunction
     {
         public CSharpValueFunction() :
-            this("cs-value;csvalue", "")
+            this("cs-value;csvalue")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;
         }
 
-        public CSharpValueFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public CSharpValueFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();
@@ -77,14 +77,14 @@ namespace DynJson.Functions
     public class CSharpManyFunction : S4JStateFunction
     {
         public CSharpManyFunction() :
-            this("cs-many;csmany", "")
+            this("cs-many;csmany")
         {
             ReturnExactValue = true;
             ReturnManyObjects = true;
         }
 
-        public CSharpManyFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public CSharpManyFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();
@@ -97,13 +97,13 @@ namespace DynJson.Functions
     public class CSharpFitFunction : S4JStateFunction
     {
         public CSharpFitFunction() :
-            this("cs-fit;csfit", "")
+            this("cs-fit;csfit")
         {
             ReturnExactValue = false;
         }
 
-        public CSharpFitFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public CSharpFitFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new CSharpBrackets();

@@ -10,7 +10,7 @@ namespace DynJson.Parser
     {
         public List<String> FunctionNames { get; set; }
 
-        public String SourceName { get; set; }
+        // public String SourceName { get; set; }
 
         ////////////////////////////////////////
 
@@ -36,13 +36,13 @@ namespace DynJson.Parser
 
         ////////////////////////////////////////
 
-        public S4JStateFunction(String FunctionNames, String SourceName)
+        public S4JStateFunction(String FunctionNames) // , String SourceName)
         {
             //if (FunctionNames == null || FunctionNames.Length == 0)
             //    throw new Exception("Function state should have at least one alias!");
 
             this.FunctionNames = FunctionNames.Split(';').Select(i => i.Trim().ToLower()).Where(i => i != "").OrderByDescending(i => i).ToList();
-            this.SourceName = SourceName;
+            // this.SourceName = SourceName;
             this.Priority = 0;
             this.StateType = EStateType.FUNCTION;
             this.AllowedStateTypes = new[]

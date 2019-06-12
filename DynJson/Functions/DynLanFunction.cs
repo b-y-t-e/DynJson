@@ -20,13 +20,13 @@ namespace DynJson.Functions
     public class DynLanFunction : S4JStateFunction
     {
         public DynLanFunction() :
-            this("@;x", "")
+            this("@;x")
         {
             ReturnExactValue = true;
         }
 
-        public DynLanFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public DynLanFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();
@@ -39,13 +39,13 @@ namespace DynJson.Functions
     public class DynLanFitFunction : S4JStateFunction
     {
         public DynLanFitFunction() :
-            this("@-fit;x-fit", "")
+            this("@-fit;x-fit")
         {
             ReturnExactValue = false;
         }
 
-        public DynLanFitFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public DynLanFitFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();
@@ -58,14 +58,14 @@ namespace DynJson.Functions
     public class DynLanSingleFunction : S4JStateFunction
     {
         public DynLanSingleFunction() :
-            this("@-single;x-single", "")
+            this("@-single;x-single")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
         }
 
-        public DynLanSingleFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public DynLanSingleFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();
@@ -78,14 +78,14 @@ namespace DynJson.Functions
     public class DynLanManyFunction : S4JStateFunction
     {
         public DynLanManyFunction() :
-            this("@-many;x-many", "")
+            this("@-many;x-many")
         {
             ReturnExactValue = true;
             ReturnManyObjects = true;
         }
 
-        public DynLanManyFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public DynLanManyFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();
@@ -98,14 +98,14 @@ namespace DynJson.Functions
     public class DynLanValueFunction : S4JStateFunction
     {
         public DynLanValueFunction() :
-            this("@-value;x-value", "")
+            this("@-value;x-value")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;
         }
 
-        public DynLanValueFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public DynLanValueFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new DynLanBrackets();

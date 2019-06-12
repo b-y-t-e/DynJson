@@ -17,13 +17,13 @@ namespace DynJson.Functions
     public class TSqlExpandedFunction : S4JStateFunction
     {
         public TSqlExpandedFunction() :
-            this("query;q", "primary")
+            this("query;q")
         {
             ReturnExactValue = false;
         }
 
-        public TSqlExpandedFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public TSqlExpandedFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new TSqlBrackets();
@@ -39,14 +39,14 @@ namespace DynJson.Functions
     public class TSqlManyFunction : S4JStateFunction
     {
         public TSqlManyFunction() :
-            this("q-many;query-many", "primary")
+            this("q-many;query-many")
         {
             ReturnManyObjects = true;
             ReturnExactValue = true;
         }
 
-        public TSqlManyFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public TSqlManyFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new TSqlBrackets();
@@ -62,14 +62,14 @@ namespace DynJson.Functions
     public class TSqlSingleExpandedFunction : S4JStateFunction
     {
         public TSqlSingleExpandedFunction() :
-            this("query-single;q-single", "primary")
+            this("query-single;q-single")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
         }
 
-        public TSqlSingleExpandedFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public TSqlSingleExpandedFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new TSqlBrackets();
@@ -85,14 +85,14 @@ namespace DynJson.Functions
     public class TSqlValueExpandedFunction : S4JStateFunction
     {
         public TSqlValueExpandedFunction() :
-            this("query-value;q-value", "primary")
+            this("query-value;q-value")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;
         }
 
-        public TSqlValueExpandedFunction(string aliasName, string sourceName) :
-            base(aliasName, sourceName)
+        public TSqlValueExpandedFunction(string aliasName) :
+            base(aliasName)
         {
             Priority = 0;
             BracketsDefinition = new TSqlBrackets();
@@ -193,7 +193,7 @@ namespace DynJson.Functions
 
             query.Append(functionToken.ToJsonWithoutGate());
 
-            String connectionString = Executor.Sources.Get(functionState.SourceName);
+            String connectionString = Executor.Sources.Get(token.TargetSource) ?? Executor.Sources.GetDefault(); // functionState.SourceName);
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 var result = con.SelectItems(query.ToString());
