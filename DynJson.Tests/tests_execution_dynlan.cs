@@ -478,7 +478,7 @@ return abc()
         {
             var script1 = @"{ b : @( 
 
-                db.primary.value('select 1')
+                db().value('select 1')
 
         )   }";
 
@@ -495,9 +495,9 @@ return abc()
         {
             var script1 = @"{ b : @( 
 
-                q = query();
+                q = sqlbuilder();
                 q.append('select 1');
-                db.primary.value(q);
+                db().value(q);
             )
            }";
 

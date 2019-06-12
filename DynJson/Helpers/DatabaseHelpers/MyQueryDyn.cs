@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DynJson.Helpers.DatabaseHelpers
 {
-    public class MyQueryDyn
+    public class SqlBuilder
     {
         private StringBuilder _txt;
 
@@ -23,7 +23,7 @@ namespace DynJson.Helpers.DatabaseHelpers
 
         //////////////////////////////
 
-        public MyQueryDyn(MyQueryProvider QueryHelper = null)
+        public SqlBuilder(MyQueryProvider QueryHelper = null)
         {
             if (QueryHelper == null) this.QueryProvider = CreateQueryProvider();
             else this.QueryProvider = QueryHelper;
@@ -32,71 +32,71 @@ namespace DynJson.Helpers.DatabaseHelpers
 
         //////////////////////////////
 
-        public MyQueryDyn append(String Format)
+        public SqlBuilder append(String Format)
         {
             _txt.Append(Format);
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1)
+        public SqlBuilder append(String Format, Object Param1)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2)
+        public SqlBuilder append(String Format, Object Param1, Object Param2)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5, Param6 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5, Param6, Param7 }));
             return this;
         }
 
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5, Param6, Param7, Param8 }));
             return this;
         }
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8, Object Param9)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8, Object Param9)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5, Param6, Param7, Param8, Param9 }));
             return this;
         }
-        public MyQueryDyn append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8, Object Param9, Object Param10)
+        public SqlBuilder append(String Format, Object Param1, Object Param2, Object Param3, Object Param4, Object Param5, Object Param6, Object Param7, Object Param8, Object Param9, Object Param10)
         {
             _txt.Append(QueryProvider.Format(Format, new[] { Param1, Param2, Param2, Param3, Param4, Param5, Param6, Param7, Param8, Param9, Param10 }));
             return this;
         }
 
-        public MyQueryDyn appendval(Object Obj)
+        public SqlBuilder appendval(Object Obj)
         {
             _txt.Append(QueryProvider.From_val(Obj, true));
             return this;

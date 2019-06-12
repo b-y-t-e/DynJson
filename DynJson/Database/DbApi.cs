@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
+using DynJson.Classes;
 
 namespace DynJson.Database
 {
@@ -15,55 +16,56 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
-        public String ConnectionString { get; set; }
+        public string connectionString { get; set; }
 
         //////////////////////////////////////////////
 
-        public DbApi(String ConnectionString)
+        public DbApi(string connectionString)
         {
-            this.ConnectionString = ConnectionString;
+            this.connectionString = connectionString;
         }
 
         //////////////////////////////////////////////
 
-        public void execute(MyQueryDyn sqlquery)
+        public void execute(object sqlquery)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.ExecuteNonQuery(sqlquery.ToString());
             }
         }
 
-        public Dictionary<string, object> single(MyQueryDyn sqlquery)
+        public object single(object sqlquery)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 Dictionary<string, object> item = con.SelectAsDict(sqlquery.ToString());
                 return item;
             }
         }
 
-        public List<Dictionary<string, object>> many(MyQueryDyn sqlquery)
+        public object many(object sqlquery)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 List<Dictionary<string, object>> items = con.SelectManyAsDict(sqlquery.ToString());
                 return items;
             }
         }
 
-        public object value(MyQueryDyn sqlquery)
+        public object value(object sqlquery)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 object value = con.SelectScalar(sqlquery.ToString());
                 return value;
             }
         }
 
-        public IList<object> values(MyQueryDyn sqlquery)
+
+        public IList<object> values(object sqlquery)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 IList<object> values = con.SelectScalars<object>(sqlquery.ToString());
                 return values;
@@ -72,47 +74,9 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
-        public Dictionary<string, object> single(string sqlquery)
-        {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                Dictionary<string, object> item = con.SelectAsDict(sqlquery);
-                return item;
-            }
-        }
-
-        public List<Dictionary<string, object>> many(string sqlquery)
-        {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                List<Dictionary<string, object>> items = con.SelectManyAsDict(sqlquery);
-                return items;
-            }
-        }
-
-        public object value(string sqlquery)
-        {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                object value = con.SelectScalar(sqlquery);
-                return value;
-            }
-        }
-
-        public IList<object> values(string sqlquery)
-        {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                IList<object> values = con.SelectScalars<object>(sqlquery);
-                return values;
-            }
-        }
-
-        //////////////////////////////////////////////
-
         public Object save(String TableName, Object ItemOrItems)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 IList<Object> items = convertToList(ItemOrItems);
                 saveItems(con, TableName, items);
@@ -122,7 +86,7 @@ namespace DynJson.Database
 
         public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 IList<Object> items = convertToList(ItemOrItems);
                 IList<Object> ids = getIDs(items);
@@ -142,7 +106,7 @@ namespace DynJson.Database
 
         public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, Object ParentPropertyValue)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 IList<Object> items = convertToList(ItemOrItems);
                 IList<Object> ids = getIDs(items);

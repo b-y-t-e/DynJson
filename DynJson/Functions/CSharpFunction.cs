@@ -207,25 +207,43 @@ namespace DynJson.Functions
             StringBuilder code = new StringBuilder();
 
             CSharpEvaluatorGlobals globals = new CSharpEvaluatorGlobals();
-            IDictionary<string, object> globaVariables = globals.Globals as IDictionary<string, object>;
-            // var globalObject = new Dictionary<string, object>();
+            IDictionary<string, object> globalVariables = globals.Globals as IDictionary<string, object>;
 
             foreach (KeyValuePair<string, object> keyAndVal in variables)
+                globalVariables[keyAndVal.Key] = keyAndVal.Value;
+
+            if (!globalVariables.ContainsKey("db"))
             {
-                globaVariables[keyAndVal.Key] = keyAndVal.Value;
-                code.Append("var ").Append(keyAndVal.Key).Append(" = ").Append("Globals.").Append(keyAndVal.Key).Append(";");
+                globalVariables["_dynjsonexecutor"] = Executor;
+                code.Append(@"
+                    DynJson.Database.DbApi db(object targetSource = null) 
+                    { 
+                        string sourceName = DynJson.Helpers.CoreHelpers.UniConvert.ToString(targetSource);
+                        string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                            Globals._dynjsonexecutor.Sources.Get(sourceName) :
+                            Globals._dynjsonexecutor.Sources.GetDefault();
+
+                        return new DynJson.Database.DbApi(connectionString);
+                    }
+                ");
             }
 
-            dynamic dbProxy = new ExpandoObject();
-            foreach (var source in Executor.Sources)
-                (dbProxy as IDictionary<string, object>)[source.Key] = new DbApi(source.Value);
-            globaVariables["db"] = dbProxy;
-            globaVariables["api"] = new DynJsonApi(Executor);
-            code.Append("var ").Append("db").Append(" = ").Append("Globals.").Append("db").Append(";");
+            if (!globalVariables.ContainsKey("api"))
+            {
+                Func<DynJsonApi> getApiDelegate = () => new DynJsonApi(Executor);
+                globalVariables["api"] = getApiDelegate;
+                code.Append(@"
+                    var api = Globals.api;
+                ");
+            }
 
+            foreach (KeyValuePair<string, object> keyAndVal in variables)
+                code.Append("var ").Append(keyAndVal.Key).Append(" = ").Append("Globals.").Append(keyAndVal.Key).Append(";");
+            
             code.Append(function.ToJsonWithoutGate());
 
             var refs = new List<MetadataReference>{
+                MetadataReference.CreateFromFile(typeof(DynJson.Database.DbApi).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(System.Linq.Enumerable).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(System.Runtime.CompilerServices.DynamicAttribute).GetTypeInfo().Assembly.Location)};

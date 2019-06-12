@@ -2,6 +2,7 @@
 using DynJson.Executor;
 using DynJson.Parser;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
@@ -14,6 +15,8 @@ using DynJson.Helpers.CoreHelpers;
 using DynJson.Database;
 using DynLan.Exceptions;
 using DynJson.Helpers.DatabaseHelpers;
+using DynLan.OnpEngine.Models;
+
 
 namespace DynJson.Functions
 {
@@ -232,35 +235,37 @@ namespace DynJson.Functions
             StringBuilder code = new StringBuilder();
 
             DynLanEvaluatorGlobals globals = new DynLanEvaluatorGlobals();
-            IDictionary<string, object> globaVariables = globals.Globals as IDictionary<string, object>;
-            // var globalObject = new Dictionary<string, object>();
+            IDictionary<string, object> globalVariables = globals.Globals as IDictionary<string, object>;
+
+            globalVariables["db"] = new DynMethod((Parameters) =>
+            {
+                string sourceName = UniConvert.ToString(Parameters?.FirstOrDefault());
+                string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                    Executor.Sources.Get(sourceName) :
+                    Executor.Sources.GetDefault();
+
+                DbApi api = new DbApi(connectionString);
+                return api;
+            });
+
+            globalVariables["api"] = new DynMethod((Parameters) =>
+            {
+                DynJsonApi api = new DynJsonApi(Executor);
+                return api;
+            });
+
+            globalVariables["sqlbuilder"] = new DynMethod((Parameters) =>
+            {
+                SqlBuilder sql = new SqlBuilder();
+                return sql;
+            });
 
             foreach (KeyValuePair<string, object> keyAndVal in variables)
             {
-                globaVariables[keyAndVal.Key/*.ToUpper()*/] = keyAndVal.Value;
-                /*if (keyAndVal.Value == null)
-                {
-                    code.Append($"object {keyAndVal.Key} = {keyAndVal.Value.SerializeJson()};\n");
-                }
-                else
-                {
-                    code.Append($"var {keyAndVal.Key} = {keyAndVal.Value.SerializeJson()};\n");
-                }*/
+                globalVariables[keyAndVal.Key] = keyAndVal.Value;
             }
 
-            Dictionary<String, Object> dbProxy = new Dictionary<String, Object>();
-            foreach (var source in Executor.Sources)
-                dbProxy[source.Key] = new DbApi(source.Value);
-            globaVariables["db"] = dbProxy;
-            globaVariables["api"] = new DynJsonApi(Executor);
-
-            Func<MyQueryDyn> getQueryDyn = ()=> new MyQueryDyn();
-            globaVariables["query"] = getQueryDyn;
-            globaVariables["myquery"] = getQueryDyn;
-
             code.Append(function.ToJsonWithoutGate());
-
-            // string finalCode = MyStringHelper.AddReturnStatement(code.ToString());
 
             DynLanProgram program = cache.Get(code.ToString());
             if (program == null)
@@ -272,7 +277,7 @@ namespace DynJson.Functions
             }
 
             Object result = program.
-                Eval(globaVariables);
+                Eval(globalVariables);
 
             return result;
         }

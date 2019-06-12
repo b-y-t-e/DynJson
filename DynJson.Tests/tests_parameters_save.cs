@@ -29,7 +29,7 @@ namespace DynJson.tests
 
 method ( osoba : any )  {
 /*
-q-many( insert into osoba(imie) select @osoba_imie; ),
+q( insert into osoba(imie) select @osoba_imie; ),
 */
 query( select imie from osoba where imie = 'test_sql' )
 }
@@ -49,7 +49,7 @@ query( select imie from osoba where imie = 'test_sql' )
             var script1  = @" 
 method ( osoba : any )  {
 /*
-@-many( item = dictionary(); item.imie = osoba.imie; db.primary.save('osoba', item)  ),
+@( item = dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan' )
 }
@@ -68,7 +68,33 @@ query( select imie from osoba where imie = 'test_dynlan' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@-many( db.primary.save('osoba', osoba)  ),
+@( db('secondary').save('osoba', osoba)  ),
+*/
+query( select imie from osoba where imie = 'test_dynlan22' )
+}
+";
+            try
+            {
+                var result = await new S4JExecutorForTests().
+                    ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_dynlan22' }" });
+
+                throw new Exception("Should throw DynLanExecuteException, becouse we dont have 'secondary' connection string");
+            }
+            catch(DynLan.Exceptions.DynLanExecuteException)
+            {
+                // ok
+            }
+        }
+
+        [Test]
+        async public Task test_complex_parameter_save_dynlan_3()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" 
+method ( osoba : any )  {
+/*
+@( db().save('osoba', osoba)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan2' )
 }
@@ -87,7 +113,7 @@ query( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db.primary.save(""osoba"", item);  ),
+cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db().save(""osoba"", item);  ),
 */
 query( select imie from osoba where imie = 'test_dynlan_cs' )
 }
@@ -106,7 +132,7 @@ query( select imie from osoba where imie = 'test_dynlan_cs' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-cs( db.primary.save(""osoba"", osoba)  ),
+cs( db().save(""osoba"", osoba)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan2' )
 }
@@ -125,7 +151,7 @@ query( select imie from osoba where imie = 'test_dynlan2' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-cs( db.primary.save(""osoba"", osoba)  ),
+cs( db().save(""osoba"", osoba)  ),
 */
 @-many(osoba.ID)
 }
@@ -146,8 +172,8 @@ cs( db.primary.save(""osoba"", osoba)  ),
             var script1 = @" 
 method ( dokument : any )  {
 /*
-cs( db.primary.save(""dokument"", dokument)  ),
-cs( db.primary.savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
+cs( db().save(""dokument"", dokument)  ),
+cs( db().savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
 */
 query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
@@ -166,8 +192,8 @@ query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@-many( db.primary.save('dokument', dokument)  ),
-@-many( db.primary.savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
+@-many( db().save('dokument', dokument)  ),
+@-many( db().savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
 */
 query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }

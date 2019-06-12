@@ -1,7 +1,7 @@
 ﻿
 TODO:  
  + dodanie parametru do 'query' -> aby wskazac datasource
- + zmiana api z db.primary.select -> db.single(source, sql)
+ + zmiana api z db.select -> db.single(source, sql)
  + refactoring -> tak aby system automatycznie dodawal rozszerzenia: single, many, value, fit
 
 OLD:
