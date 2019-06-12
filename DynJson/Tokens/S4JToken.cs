@@ -29,6 +29,8 @@ namespace DynJson.Tokens
 
         public String OutputVariableName { get; set; }
 
+        public String TargetSource { get; set; }
+
         public Object Result { get; set; }
 
         //////////////////////////////////////////////////

@@ -2,27 +2,31 @@
 using DynJson.Helpers.CoreHelpers;
 using DynJson.Parser;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DynJson.Tokens
 {
-    public enum TokenTextType
+    /* public enum TokenTextType
     {
         TEXT = 0,
         // VARIABLE_REFERENCE = 1,
-        VARIABLE_OUTPUT = 2
-    }
+        VARIABLE_OUTPUT = 2,
+        TARGET_SOURCE = 3
+    }*/
 
     public class S4JTokenTextValue : S4JToken
     {
-        public TokenTextType WorkType { get; private set; }
+        // public TokenTextType WorkType { get; private set; }
 
         public String Text { get; set; }
-        
+
         ////////////////////////////////////
 
-        public String VariableName { get; set; }
+        public String VariableNameFromText { get; set; }
+
+        public String TargetSourceFromText { get; set; }
 
         // public String OutputVariableName { get; set; }
 
@@ -30,10 +34,11 @@ namespace DynJson.Tokens
 
         public S4JTokenTextValue()
         {
-            WorkType = TokenTextType.TEXT;
+            // WorkType = TokenTextType.TEXT;
             Text = "";
             IsObjectKey = false;
-            VariableName = null;
+            VariableNameFromText = null;
+            TargetSourceFromText = null;
             //IsVariableReference = false;
             Children = new List<S4JToken>();
             State = S4JDefaultStateBag.Get().ValueState /* new S4JState()
@@ -66,7 +71,11 @@ namespace DynJson.Tokens
             if (!IsVisible && !Force)
                 return false;
 
-            if (VariableName != null)
+            if (VariableNameFromText != null)
+            {
+                Builder.Append(Result.SerializeJson());
+            }
+            else if (TargetSourceFromText != null)
             {
                 Builder.Append(Result.SerializeJson());
             }
@@ -80,20 +89,46 @@ namespace DynJson.Tokens
 
         public override bool Commit()
         {
-            //this.Text = this.Text.Trim();
-            // this.Value = this.Text.DeserializeJson();
+            bool wasExecuted = true;
+
+            List<String> parts = this.Text.Trim().
+                Split(new[] { ' ', '\t', '\n', '\r' }).
+                Select(p => p.Trim()).
+                Where(p => p != "").
+                ToList();
 
             this.IsCommited = true;
-            this.CheckVariable();
 
-            if (this.WorkType == TokenTextType.VARIABLE_OUTPUT)
+            for (var i = 0; i < parts.Count; i += 2)
             {
-                this.PrevToken.OutputVariableName = VariableName;
-                this.Parent.RemoveChild(this);
-                return false;
+                if (i == (parts.Count - 1))
+                    break;
+
+                if (this.CheckVariable(parts[i], parts[i + 1]))
+                    continue;
+
+                if (this.CheckTargetSource(parts[i], parts[i + 1]))
+                    continue;
+
+                break;
             }
 
-            return true;
+            if (!string.IsNullOrEmpty(VariableNameFromText)) // this.WorkType == TokenTextType.VARIABLE_OUTPUT)
+            {
+                this.PrevToken.OutputVariableName = VariableNameFromText;
+                wasExecuted = false;
+            }
+
+            if (!string.IsNullOrEmpty(TargetSourceFromText)) // (this.WorkType == TokenTextType.TARGET_SOURCE)
+            {
+                this.PrevToken.TargetSource = TargetSourceFromText;
+                wasExecuted = false;
+            }
+
+            if (!wasExecuted)
+                this.Parent.RemoveChild(this);
+
+            return wasExecuted;
         }
 
         public override void MarkAsObjectKey()
@@ -108,26 +143,26 @@ namespace DynJson.Tokens
             AnalyseValue();
         }
 
-        private void CheckVariable()
+        private bool CheckVariable(String OperatorText, String VariableNameText) // List<String> Parts)
         {
-            /*if (MyStringHelper.IsVariable(this.Text))
-            {
-                this.WorkType = TokenTextType.VARIABLE_REFERENCE;
-                this.VariablePath = this.Text.Trim().Substring(1).Trim();
-                this.Result = null;
-            }
-            else*/
+            if (!MyStringHelper.IsVariableOutput(OperatorText, VariableNameText))
+                return false;
 
-            if (MyStringHelper.IsVariableOutput(this.Text))
-            {
-                this.WorkType = TokenTextType.VARIABLE_OUTPUT;
-                this.VariableName = this.Text.Trim().Substring(3).Trim();
-                //if (MyStringHelper.IsVariable(this.VariablePath))
-                {
-                    this.VariableName = this.VariableName.Trim();
-                }
-                this.Result = null;
-            }
+            //this.WorkType = TokenTextType.VARIABLE_OUTPUT;
+            this.VariableNameFromText = VariableNameText;
+            this.Result = null;
+            return true;
+        }
+
+        private bool CheckTargetSource(String OperatorText, String TargetSourceText) // List<String> Parts)
+        {
+            if (!MyStringHelper.IsTargetSource(OperatorText, TargetSourceText))
+                return false;
+
+            //this.WorkType = TokenTextType.TARGET_SOURCE;
+            this.TargetSourceFromText = TargetSourceText;
+            this.Result = null;
+            return true;
         }
 
         private void AnalyseValue()

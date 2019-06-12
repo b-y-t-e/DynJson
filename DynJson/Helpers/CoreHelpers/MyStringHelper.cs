@@ -289,21 +289,24 @@ namespace DynJson.Helpers.CoreHelpers
                 }
         }
 
-        /*public static Boolean IsVariable(this String Text)
+
+
+        private static char[] targetSourceString = "at".ToCharArray();
+        public static Boolean IsTargetSource(String OperatorText, String TargetSourceText)
         {
-            Text = (Text ?? "").Trim();
-            if (Text.Length < 2)
+            if (OperatorText.Length != variableOutputString.Length || TargetSourceText.Length == 0)
                 return false;
 
-            if (Text[0] == '@')
+            if (OperatorText[0] == targetSourceString[0] &&
+                OperatorText[1] == targetSourceString[1])
             {
-                if (Char.IsNumber(Text[1]))
+                if (Char.IsNumber(TargetSourceText[0]))
                 {
                     return false;
                 }
                 else
                 {
-                    if (IsQuotedText(Text.Substring(1)))
+                    if (IsQuotedText(TargetSourceText))
                         return false;
                 }
                 return true;
@@ -312,27 +315,24 @@ namespace DynJson.Helpers.CoreHelpers
             {
                 return false;
             }
-        }*/
+        }
 
         private static char[] variableOutputString = "as".ToCharArray();
-        public static Boolean IsVariableOutput(this String Text)
+        public static Boolean IsVariableOutput(String OperatorText, String VariableNameText)
         {
-            Text = (Text ?? "").Trim();
-            if (Text.Length <= 3)
+            if (OperatorText.Length != variableOutputString.Length || VariableNameText.Length == 0)
                 return false;
 
-            if (Text[0] == variableOutputString[0] &&
-                Text[1] == variableOutputString[1] &&
-                Char.IsWhiteSpace(Text[2]))
+            if (OperatorText[0] == variableOutputString[0] &&
+                OperatorText[1] == variableOutputString[1])
             {
-                String variableName = Text.Substring(3).Trim();
-                if (Char.IsNumber(variableName[0]))
+                if (Char.IsNumber(VariableNameText[0]))
                 {
                     return false;
                 }
                 else
                 {
-                    if (IsQuotedText(variableName))
+                    if (IsQuotedText(VariableNameText))
                         return false;
                 }
                 return true;

@@ -38,6 +38,40 @@ namespace DynJson.tests
         }
 
         [Test]
+        async public Task executor_should_understand_targetsource()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" query( select 1 ) at primary ";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"1",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_should_understand_targetsource_and_variablename()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" /* query( select 1 ) at primary as val*/ @-value(val) ";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"1",
+                result.ToJson());
+        }
+
+        [Test]
         async public Task executor_should_understand_parameters_in_sql()
         {
             // await new DbForTest().PrepareDb();

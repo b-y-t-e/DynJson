@@ -333,7 +333,7 @@ namespace DynJson.Executor
                 await EvaluateFunction(function);
                 AfterEvaluateToken(function);
             }
-            else if (token is S4JTokenTextValue textValue && textValue.VariableName != null)
+            else if (token is S4JTokenTextValue textValue && textValue.VariableNameFromText != null)
             {
                 await EvaluateTokenVariable(textValue, variables);
                 AfterEvaluateToken(textValue);
@@ -370,7 +370,7 @@ namespace DynJson.Executor
         async private Task EvaluateTokenVariable(S4JTokenTextValue token, IDictionary<string, object> variables)
         {
             Object value = MyReflectionHelper.
-                GetValueFromPath(variables, token.VariableName);
+                GetValueFromPath(variables, token.VariableNameFromText);
 
             // object value = null;
             //variables.TryGetValue(token.VariablePath, out value);
