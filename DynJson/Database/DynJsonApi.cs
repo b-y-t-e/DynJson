@@ -34,7 +34,6 @@ namespace DynJson.Database
             return JsonToDynamicDeserializer.Deserialize(result.ToJson());
         }
 
-
         public object exec(string name, object p1)
         {
             S4JToken result = null;

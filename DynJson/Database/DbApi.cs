@@ -26,6 +26,14 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
+        public void execute(MyQueryDyn sqlquery)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                con.ExecuteNonQuery(sqlquery.ToString());
+            }
+        }
+
         public Dictionary<string, object> single(MyQueryDyn sqlquery)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
