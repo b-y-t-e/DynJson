@@ -10,7 +10,15 @@ namespace DynJson.Executor
     {
         public S4JExecutorForTests() 
         {
-            Sources.Register("primary", "Data Source=?;uid=?;pwd=?;initial catalog=?;");
+            this.Sources.
+                Register("primary", "Data Source=.;uid=?;pwd=?;initial catalog=?;");
+
+            this.Methods.Add(async (name) =>
+            {
+                if (name == "test_method_2")
+                    return "@(1+1)";
+                return null;
+            });
         }
     }
 }
