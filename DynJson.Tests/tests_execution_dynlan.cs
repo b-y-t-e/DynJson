@@ -478,7 +478,7 @@ return abc()
         {
             var script1 = @"{ b : @( 
 
-                db.primary.selectscalar('select 1')
+                db.primary.value('select 1')
 
         )   }";
 
@@ -497,9 +497,9 @@ return abc()
 
                 q = query();
                 q.append('select 1');
-                db.primary.selectscalar(q);
-
-        )   }";
+                db.primary.value(q);
+            )
+           }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
