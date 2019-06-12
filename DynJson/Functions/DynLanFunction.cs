@@ -20,7 +20,7 @@ namespace DynJson.Functions
     public class DynLanFunction : S4JStateFunction
     {
         public DynLanFunction() :
-            this("@", "")
+            this("@;x", "")
         {
             ReturnExactValue = true;
         }
@@ -39,7 +39,7 @@ namespace DynJson.Functions
     public class DynLanFitFunction : S4JStateFunction
     {
         public DynLanFitFunction() :
-            this("@-fit;@fit", "")
+            this("@-fit;x-fit", "")
         {
             ReturnExactValue = false;
         }
@@ -58,7 +58,7 @@ namespace DynJson.Functions
     public class DynLanSingleFunction : S4JStateFunction
     {
         public DynLanSingleFunction() :
-            this("@-single;@single", "")
+            this("@-single;x-single", "")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
@@ -78,7 +78,7 @@ namespace DynJson.Functions
     public class DynLanManyFunction : S4JStateFunction
     {
         public DynLanManyFunction() :
-            this("@-many;@many", "")
+            this("@-many;x-many", "")
         {
             ReturnExactValue = true;
             ReturnManyObjects = true;
@@ -98,7 +98,7 @@ namespace DynJson.Functions
     public class DynLanValueFunction : S4JStateFunction
     {
         public DynLanValueFunction() :
-            this("@-value;@value", "")
+            this("@-value;x-value", "")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;
