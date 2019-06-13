@@ -16,7 +16,7 @@ using DynJson.Database;
 using DynLan.Exceptions;
 using DynJson.Helpers.DatabaseHelpers;
 using DynLan.OnpEngine.Models;
-
+using System.Diagnostics;
 
 namespace DynJson.Functions
 {
@@ -244,7 +244,7 @@ namespace DynJson.Functions
                     Executor.Sources.Get(sourceName) :
                     Executor.Sources.GetDefault();
 
-                DbApi api = new DbApi(connectionString);
+                DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
                 return api;
             });
 
@@ -270,16 +270,40 @@ namespace DynJson.Functions
             DynLanProgram program = cache.Get(code.ToString());
             if (program == null)
             {
-                program = new Compiler().
-                    Compile(code.ToString());
+                Stopwatch stCompile = Stopwatch.StartNew();
+                try
+                {
+                    program = new Compiler().
+                        Compile(code.ToString());
 
-                cache.Save(code.ToString(), program);
+                    cache.Save(code.ToString(), program);
+                }
+                finally
+                {
+                    if (Logger.IsEnabled)
+                        Logger.LogPerformance("DYNLAN", "compile", stCompile.ElapsedMilliseconds, code.ToString());
+                }
             }
 
-            Object result = program.
-                Eval(globalVariables);
+            Stopwatch st = Stopwatch.StartNew();
+            try
+            {
+                Object result = program.
+                    Eval(globalVariables);
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (Logger.IsEnabled)
+                    Logger.LogError("DYNLAN", "eval", ex.Message, code.ToString());
+                throw;
+            }
+            finally
+            {
+                if (Logger.IsEnabled)
+                    Logger.LogPerformance("DYNLAN", "eval", st.ElapsedMilliseconds, code.ToString());
+            }
         }
     }
 

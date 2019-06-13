@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DynJson.Tokens;
 using DynJson.Database;
+using System.Diagnostics;
 
 namespace DynJson.Functions
 {
@@ -119,7 +120,7 @@ namespace DynJson.Functions
         {
             Priority = 1;
             StateType = EStateType.FUNCTION_COMMENT;
-            AllowedStateTypes = new [] 
+            AllowedStateTypes = new[]
                 {
                     EStateType.FUNCTION_COMMENT
                 };
@@ -172,7 +173,7 @@ namespace DynJson.Functions
         {
             Priority = 3;
             StateType = EStateType.FUNCTION_BRACKETS;
-            AllowedStateTypes = new [] 
+            AllowedStateTypes = new[]
                 {
                     EStateType.FUNCTION_BRACKETS,
                     EStateType.FUNCTION_COMMENT
@@ -223,7 +224,7 @@ namespace DynJson.Functions
                             Globals._dynjsonexecutor.Sources.Get(sourceName) :
                             Globals._dynjsonexecutor.Sources.GetDefault();
 
-                        return new DynJson.Database.DbApi(connectionString);
+                        return new DynJson.Database.DbApi(connectionString, sourceName ?? Globals._dynjsonexecutor.Sources.DefaultSourceName);
                     }
                 ");
             }
@@ -239,7 +240,7 @@ namespace DynJson.Functions
 
             foreach (KeyValuePair<string, object> keyAndVal in variables)
                 code.Append("var ").Append(keyAndVal.Key).Append(" = ").Append("Globals.").Append(keyAndVal.Key).Append(";");
-            
+
             code.Append(function.ToJsonWithoutGate());
 
             var refs = new List<MetadataReference>{
@@ -257,12 +258,27 @@ namespace DynJson.Functions
                     "System.Collections.Generic").
                 WithReferences(refs);
 
-            object result = await CSharpScript.EvaluateAsync(
-                code.ToString(),
-                imports,
-                globals);
+            Stopwatch st = Stopwatch.StartNew();
+            try
+            {
+                object result = await CSharpScript.EvaluateAsync(
+                    code.ToString(),
+                    imports,
+                    globals);
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (Logger.IsEnabled)
+                    Logger.LogError("CSHARP", "eval", ex.Message, code.ToString());
+                throw;
+            }
+            finally
+            {
+                if (Logger.IsEnabled)
+                    Logger.LogPerformance("CSHARP", "eval", st.ElapsedMilliseconds, code.ToString());
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 TODO:  
+ + profilowanie wykonan -> dodac mozliwosc podlaczenia sie loggera
  + dodanie parametru do 'query' -> aby wskazac datasource
  + zmiana api z db.select -> db.single(source, sql)
  + refactoring -> tak aby system automatycznie dodawal rozszerzenia: single, many, value, fit
