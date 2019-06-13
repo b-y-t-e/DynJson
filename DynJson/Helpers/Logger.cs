@@ -6,7 +6,7 @@ namespace DynJson.Helpers
 {
     public static class Logger
     {
-        public static List<DynJsonLogEvent> LogActions;
+        public static List<DynJsonLogEventDelegate> LogActions;
 
         public static Boolean IsEnabled
         {
@@ -17,36 +17,36 @@ namespace DynJson.Helpers
         }
         public static void LogInfo(String SubSystem, String Title, Object Value, String Message)
         {
-            Log(EDynJsonLogType.INFO, SubSystem, Title, Value, Message);
+            Log(new DynJsonLogEvent() { Type = EDynJsonLogType.INFO, SubSystem = SubSystem, Title = Title, Value = Value, Message = Message });
         }
         public static void LogError(String SubSystem, String Title, Object Value, String Message)
         {
-            Log(EDynJsonLogType.ERROR, SubSystem, Title, Value, Message);
+            Log(new DynJsonLogEvent() { Type = EDynJsonLogType.ERROR, SubSystem = SubSystem, Title = Title, Value = Value, Message = Message });
         }
         public static void LogPerformance(String SubSystem, String Title, Object Value, String Message)
         {
-            Log(EDynJsonLogType.PERFORMANCE, SubSystem, Title, Value, Message);
+            Log(new DynJsonLogEvent() { Type = EDynJsonLogType.PERFORMANCE, SubSystem = SubSystem, Title = Title, Value = Value, Message = Message });
         }
         public static void LogWarning(String SubSystem, String Title, Object Value, String Message)
         {
-            Log(EDynJsonLogType.WARNING, SubSystem, Title, Value, Message);
+            Log(new DynJsonLogEvent() { Type = EDynJsonLogType.WARNING, SubSystem = SubSystem, Title = Title, Value = Value, Message = Message });
         }
         public static void LogDebug(String SubSystem, String Title, Object Value, String Message)
         {
-            Log(EDynJsonLogType.DEBUG, SubSystem, Title, Value, Message);
+            Log(new DynJsonLogEvent() { Type = EDynJsonLogType.DEBUG, SubSystem = SubSystem, Title = Title, Value = Value, Message = Message });
         }
-        private static void Log(EDynJsonLogType Type, String SubSystem, String Title, Object Value, String Message)
+        private static void Log(DynJsonLogEvent Event)
         {
             if (!IsEnabled)
                 return;
 
             foreach (var act in LogActions)
-                try { act(Type, SubSystem, Title, Value, Message); }
+                try { act(Event); }
                 catch { }
         }
     }
 
-    public delegate void DynJsonLogEvent(EDynJsonLogType Type, String SubSystem, String Title, Object Value, String Message);
+    public delegate void DynJsonLogEventDelegate(DynJsonLogEvent Event);
 
     public enum EDynJsonLogType
     {
@@ -56,5 +56,14 @@ namespace DynJson.Helpers
 
         WARNING = 3,
         DEBUG = 4
+    }
+
+    public class DynJsonLogEvent
+    {
+        public EDynJsonLogType Type { get; set; }
+        public String SubSystem { get; set; }
+        public String Title { get; set; }
+        public Object Value { get; set; }
+        public String Message { get; set; }
     }
 }
