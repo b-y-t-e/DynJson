@@ -3,6 +3,7 @@
 ## Description
 DynJson is a .net library that allows to rapid API (JSON) prototyping using technologies:
  + json
+ + [javascript](https://github.com/sebastienros/jint)
  + c#
  + sql
  + [dynlan](https://github.com/b-y-t-e/DynLan)
@@ -21,20 +22,23 @@ It is possible to use almost any technology compatible with .net environment via
 {"IntField":1,"TextField":"abc"}
 ```
 
- + JSON + dynamic field (current datetime):
+ + JSON + javascript code:
 ```
 {
    "IntField" : 1,
-   "DateField" : @(getdatetime())
+   "DateField" : js(Date())
 }
+```
+```
+{"IntField":1,"DateField":"Wed Dec 31 1969 16:00:00 GMT-08:00"}
 ```
 
  + JSON + parameters:
 ```
 method(param1, param2: string)
 {
-   "AnyField" : @(param1),
-   "TextField" : @(param2)
+   "AnyField" : js(param1),
+   "TextField" : js(param2)
 }
 ```
 
@@ -43,7 +47,7 @@ method(param1, param2: string)
 method(personID: int)
 {
    {
-      sql(select * from person where id = @personID)
+      query(select * from person where id = @personID)
    }
 }
 ```
@@ -54,7 +58,7 @@ method(filter: string)
 {
    [
       {
-         sql(select * from person where description like '%' + @filter + '%')
+         query(select * from person where description like '%' + @filter + '%')
       }
    ]
 }
@@ -65,20 +69,20 @@ method(filter: string)
 method(text: string)
 {
    {
-      "textLength" : c#(text.Length),
-      "newTextValue" : c#( string newText = "prefix_" + text; return newText; )
+      "textLength" : cs(text.Length),
+      "newTextValue" : cs( string newText = "prefix_" + text; return newText; )
    }
 }
 ```
 
- + JSON + mixed technologies:
+ + JSON + parameter + c# + sql + js:
 ```
 method(text0: string)
 {
    {
-      "newCsValue" : c#( text0 + "!" ) as text1,
-      "newSqlValue" : sql( select @text1 + '!' ) as text2,
-      "newDynlanValue" : @( text2 + '!' )
+      "newCsValue" : cs( text0 + "!" ) as text1,
+      "newSqlValue" : query( select @text1 + '!' ) as text2,
+      "newDynlanValue" : js( text2 + '!' )
    }
 }
 ```
