@@ -254,6 +254,7 @@ namespace DynJson.Functions
                 cfg.Culture(CultureInfo.InvariantCulture);
             });
 
+            engine.SetValue("Guid", TypeReference.CreateTypeReference(engine, typeof(Guid)));
             engine.SetValue("DateTime", TypeReference.CreateTypeReference(engine, typeof(DateTime)));
             engine.SetValue("List", TypeReference.CreateTypeReference(engine, typeof(List<Object>)));
             engine.SetValue("Dictionary", TypeReference.CreateTypeReference(engine, typeof(Dictionary<String, Object>)));
