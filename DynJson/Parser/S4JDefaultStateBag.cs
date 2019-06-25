@@ -33,6 +33,12 @@ namespace DynJson.Parser
                             new DynLanSingleFunction(),
                             new DynLanValueFunction(),
 
+                            new JsFunction(),
+                            new JsFitFunction(),
+                            new JsManyFunction(),
+                            new JsSingleFunction(),
+                            new JsValueFunction(),
+
                             new TSqlSingleExpandedFunction(),
                             new TSqlValueExpandedFunction(),
                             new TSqlExpandedFunction(),
