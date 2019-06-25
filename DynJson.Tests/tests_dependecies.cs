@@ -61,7 +61,7 @@ namespace DynJson.tests
         public async Task inner_dynlan_should_throw_exceptionn_if_method_is_not_avaiable_version2()
         {
             var script1 = @" 
-@-many( item = dictionary(); db().save('osoba', item);  )
+@-many( item = new Dictionary(); db().save('osoba', item);  )
 
 ";
             Assert.ThrowsAsync(typeof(Exception), async () =>

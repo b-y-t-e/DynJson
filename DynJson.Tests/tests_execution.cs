@@ -7,6 +7,7 @@ using NUnit;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace DynJson.tests
 {
@@ -64,7 +65,7 @@ namespace DynJson.tests
             var script1 = @"  method1 (param1, param2, param3, param4) { { ""a"": cs(param1+param2+param3+param4) }}";
 
             var result = await new S4JExecutorForTests().
-                ExecuteWithParameters(script1, new object [] { 1, 10, 100, 1000.0 });
+                ExecuteWithParameters(script1, new object[] { 1, 10, 100, 1000.0 });
 
             var txt = result.ToJson();
 
@@ -216,18 +217,18 @@ namespace DynJson.tests
                 result.ToJson());
         }
 
-        [Test]
-        async public Task executor_should_understand_additional_items_for_array()
+        /*[Test]
+        async public Task executor_now()
         {
-            var script1 = @"[ 1, cs-fit(  var list = new List<Object>(); list.Add(2); list.Add(3); return list;  )   ]";
+            var script1 = @"{data:@(DateTime.Now)}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2,3]",
+                "{data:\"" + DateTime.Now.Date.ToString(null, System.Globalization.DateTimeStyles.RoundtripKind) + "\"}",
                 result.ToJson());
-        }
+        }*/
 
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array()
@@ -243,7 +244,7 @@ namespace DynJson.tests
                 @"[1]",
                 result.ToJson());
         }
-        
+
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array()
         {

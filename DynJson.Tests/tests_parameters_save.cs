@@ -49,7 +49,7 @@ query( select imie from osoba where imie = 'test_sql' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@( item = dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
+@( item = new Dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan' )
 }

@@ -15,6 +15,7 @@ using DynJson.Helpers.DatabaseHelpers;
 using System.Diagnostics;
 using Jint;
 using Jint.Runtime.Interop;
+using System.Globalization;
 
 namespace DynJson.Functions
 {
@@ -246,10 +247,16 @@ namespace DynJson.Functions
                  return new Dictionary<String, Object>();
              });*/
 
-            var engine = new Engine(cfg => cfg.AllowClr());
 
-            engine.SetValue("list", TypeReference.CreateTypeReference(engine, typeof(List<Object>)));
-            engine.SetValue("dictionary", TypeReference.CreateTypeReference(engine, typeof(Dictionary<String, Object>)));
+            var engine = new Engine(cfg =>
+            {
+                cfg.AllowClr();
+                cfg.Culture(CultureInfo.InvariantCulture);
+            });
+
+            engine.SetValue("DateTime", TypeReference.CreateTypeReference(engine, typeof(DateTime)));
+            engine.SetValue("List", TypeReference.CreateTypeReference(engine, typeof(List<Object>)));
+            engine.SetValue("Dictionary", TypeReference.CreateTypeReference(engine, typeof(Dictionary<String, Object>)));
 
             engine.SetValue("db", (Func<Object, DbApi>)((Parameter) =>
              {
@@ -260,7 +267,7 @@ namespace DynJson.Functions
 
                  DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
                  return api;
-            }));
+             }));
 
             engine.SetValue("api", (Func<DynJsonApi>)(() =>
              {
