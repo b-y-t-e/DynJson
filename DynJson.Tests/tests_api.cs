@@ -50,7 +50,7 @@ namespace DynJson.tests
 
             var txt = result.ToJson();
 
-            Assert.AreEqual("2", txt);
+            Assert.AreEqual("2.0", txt);
         }
     }
 }

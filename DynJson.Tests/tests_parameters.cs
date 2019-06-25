@@ -103,16 +103,35 @@ namespace DynJson.tests
         method(a:int, b:int, c:int)
         {
             {
-            a: @-many(a),
-			b: @-many(a + b),
-			c: @-many(a + b + c)
+            a: @-value(a),
+			b: @-value(a + b),
+			c: @-value(a + b + c)
+                }
+        }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1, new object[] { null, null, null });
+
+            Assert.AreEqual("{a:null,b:0.0,c:0.0}", result.ToJson());
+        }
+
+        [Test]
+        async public Task test_parameter_same_names2()
+        {
+            var script1 = @" 
+        method(a:int, b:int, c:int)
+        {
+            {
+            a: @-value(a),
+			b: @-value(a + b),
+			c: @-value(a + b + c)
                 }
         }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new object[] { 1, 2, 3 });
 
-            Assert.AreEqual("{a:null,b:null,c:null}", result.ToJson());
+            Assert.AreEqual("{a:1.0,b:3.0,c:7.0}", result.ToJson());
         }
 
 

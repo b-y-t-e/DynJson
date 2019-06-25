@@ -36,19 +36,25 @@ namespace DynJson.tests
                     Eval();
             });
         }
-        
+
         [Test]
         public async Task inner_dynlan_should_throw_exceptionn_if_method_is_not_avaiable()
         {
             var script1 = @" 
 @-many( db.exec('select 1')  )
 
-";          
-            Assert.ThrowsAsync(typeof(DynLanExecuteException), async () =>
+";
+            try
             {
                 var result2 = await new S4JExecutorForTests().
                     ExecuteWithJsonParameters(script1);
-            });
+
+                throw new Exception("Should throw TypeError: Object has no method 'exec'!");
+            }
+            catch
+            {
+                // ok
+            }
         }
 
         [Test]
@@ -58,7 +64,7 @@ namespace DynJson.tests
 @-many( item = dictionary(); db().save('osoba', item);  )
 
 ";
-            Assert.ThrowsAsync(typeof(DynLanExecuteException), async () =>
+            Assert.ThrowsAsync(typeof(Exception), async () =>
             {
                 var result2 = await new S4JExecutorForTests().
                     ExecuteWithJsonParameters(script1);

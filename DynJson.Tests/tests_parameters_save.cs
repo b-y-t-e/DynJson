@@ -46,7 +46,7 @@ query( select imie from osoba where imie = 'test_sql' )
         {
             // await new DbForTest().PrepareDb();
 
-            var script1  = @" 
+            var script1 = @" 
 method ( osoba : any )  {
 /*
 @( item = dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
@@ -80,7 +80,11 @@ query( select imie from osoba where imie = 'test_dynlan22' )
 
                 throw new Exception("Should throw DynLanExecuteException, becouse we dont have 'secondary' connection string");
             }
-            catch(DynLan.Exceptions.DynLanExecuteException)
+            catch (InvalidOperationException)
+            {
+                // ok
+            }
+            catch (DynLan.Exceptions.DynLanExecuteException)
             {
                 // ok
             }

@@ -21,7 +21,7 @@ namespace DynJson.Functions
     public class JsFunction : S4JStateFunction
     {
         public JsFunction() :
-            this("js")
+            this("@;js")
         {
             ReturnExactValue = true;
         }
@@ -40,7 +40,7 @@ namespace DynJson.Functions
     public class JsFitFunction : S4JStateFunction
     {
         public JsFitFunction() :
-            this("js-fit")
+            this("@-fit;js-fit")
         {
             ReturnExactValue = false;
         }
@@ -59,7 +59,7 @@ namespace DynJson.Functions
     public class JsSingleFunction : S4JStateFunction
     {
         public JsSingleFunction() :
-            this("js-single")
+            this("@-single;js-single")
         {
             ReturnExactValue = true;
             ReturnSingleObject = true;
@@ -79,7 +79,7 @@ namespace DynJson.Functions
     public class JsManyFunction : S4JStateFunction
     {
         public JsManyFunction() :
-            this("js-many")
+            this("@-many;js-many")
         {
             ReturnExactValue = true;
             ReturnManyObjects = true;
@@ -99,7 +99,7 @@ namespace DynJson.Functions
     public class JsValueFunction : S4JStateFunction
     {
         public JsValueFunction() :
-            this("js-value")
+            this("@-value;js-value")
         {
             ReturnExactValue = true;
             ReturnSingleValue = true;
@@ -232,8 +232,8 @@ namespace DynJson.Functions
             S4JTokenFunction function = token as S4JTokenFunction;
             StringBuilder code = new StringBuilder();
 
-            JsEvaluatorGlobals globals = new JsEvaluatorGlobals();
-            IDictionary<string, object> globalVariables = globals.Globals as IDictionary<string, object>;
+            //JsEvaluatorGlobals globals = new JsEvaluatorGlobals();
+            //IDictionary<string, object> globalVariables = globals.Globals as IDictionary<string, object>;
 
 
             /* globalVariables["list"] = (Func<List<Object>>)(() =>
@@ -251,32 +251,33 @@ namespace DynJson.Functions
             engine.SetValue("list", TypeReference.CreateTypeReference(engine, typeof(List<Object>)));
             engine.SetValue("dictionary", TypeReference.CreateTypeReference(engine, typeof(Dictionary<String, Object>)));
 
-            globalVariables["db"] = (Func<Object, DbApi>)((Parameter) =>
-            {
-                string sourceName = UniConvert.ToString(Parameter);
-                string connectionString = !string.IsNullOrEmpty(sourceName) ?
-                    Executor.Sources.Get(sourceName) :
-                    Executor.Sources.GetDefault();
+            engine.SetValue("db", (Func<Object, DbApi>)((Parameter) =>
+             {
+                 string sourceName = UniConvert.ToString(Parameter);
+                 string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                     Executor.Sources.Get(sourceName) :
+                     Executor.Sources.GetDefault();
 
-                DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
-                return api;
-            });
+                 DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
+                 return api;
+            }));
 
-            globalVariables["api"] = (Func<DynJsonApi>)(() =>
-            {
-                DynJsonApi api = new DynJsonApi(Executor);
-                return api;
-            });
+            engine.SetValue("api", (Func<DynJsonApi>)(() =>
+             {
+                 DynJsonApi api = new DynJsonApi(Executor);
+                 return api;
+             }));
 
-            globalVariables["sqlbuilder"] = (Func<SqlBuilder>)(() =>
+            engine.SetValue("sqlbuilder", (Func<SqlBuilder>)(() =>
             {
                 SqlBuilder sql = new SqlBuilder();
                 return sql;
-            });
+            }));
 
             foreach (KeyValuePair<string, object> keyAndVal in variables)
             {
-                globalVariables[keyAndVal.Key] = keyAndVal.Value;
+                engine.SetValue(keyAndVal.Key, keyAndVal.Value);
+                // globalVariables[keyAndVal.Key] = keyAndVal.Value;
             }
 
             // code.Append("function DynJsonRootFunction() { ").Append(function.ToJsonWithoutGate()).Append(" } DynJsonRootFunctionResult = DynJsonRootFunction(); ");
@@ -304,8 +305,8 @@ namespace DynJson.Functions
             try
             {
                 //engine.SetValue("DynJsonRootFunctionResult", (object)null);
-                foreach (var var in globalVariables)
-                    engine.SetValue(var.Key, var.Value);
+                //foreach (var var in globalVariables)
+                //engine.SetValue(var.Key, var.Value);
                 engine.Execute(code.ToString());
                 object result = engine.GetCompletionValue().ToObject();
                 //object result = engine.GetValue("DynJsonRootFunctionResult");

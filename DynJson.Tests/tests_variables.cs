@@ -32,7 +32,7 @@ method ( a : any )
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 1 });
 
-            Assert.AreEqual("{1}", result.ToString());
+            Assert.AreEqual("{1.0}", result.ToString());
         }
 
         [Test]
@@ -50,7 +50,7 @@ method ( a : any )
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 1 });
 
-            Assert.AreEqual("[1,2]", result.ToString());
+            Assert.AreEqual("[1.0,2.0]", result.ToString());
         }
 
         [Test]
@@ -65,7 +65,7 @@ method ( a : any )
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 1 });
 
-            Assert.AreEqual("{variable:1}", result.ToString());
+            Assert.AreEqual("{variable:1.0}", result.ToString());
         }
 
         [Test]

@@ -307,7 +307,7 @@ namespace DynJson.Executor
             if (token == null)
                 return;
 
-            IDictionary<string, object> variables = GetExecutingVariables(token);
+            IDictionary<string, object> variables = GetExecutingVariables(null, token);
 
             bool isVisible = true;
             if (token.Tags.Count > 0 && TagValidators?.Count > 0)
@@ -383,7 +383,7 @@ namespace DynJson.Executor
                 return;
 
             S4JStateFunction stateFunction = function.State as S4JStateFunction;
-            IDictionary<String, object> variables = GetExecutingVariables(function?.Parent);
+            IDictionary<String, object> variables = GetExecutingVariables(function, function?.Parent);
 
             if (stateFunction.FunctionTagExecutor != null)
             {
@@ -395,7 +395,7 @@ namespace DynJson.Executor
                 Evaluator?.
                 Evaluate(this, function, variables);
 
-            if(stateFunction.ReturnSingleObject)
+            if (stateFunction.ReturnSingleObject)
             {
                 result = GetSingleObjectFromResult(result);
             }
@@ -567,25 +567,33 @@ namespace DynJson.Executor
             // function.Result = item;
         }
 
-        private IDictionary<String, object> GetExecutingVariables(S4JToken token)
+        private IDictionary<String, object> GetExecutingVariables(S4JToken thisToken, S4JToken parentToken)
         {
             Dictionary<String, object> variables = new Dictionary<string, object>();
+
+            string objectKeyName = null;
+            if (thisToken != null && thisToken.IsObjectValue && thisToken.PrevToken != null)
             {
-                S4JToken parentToken = token;
-                while (parentToken != null)
+                objectKeyName = UniConvert.ToString(thisToken.PrevToken.Result);
+            }
+
+            {
+                S4JToken currentToken = parentToken;
+                while (currentToken != null)
                 {
-                    Dictionary<string, object> parentParameters = parentToken.GetParameters();
+                    Dictionary<string, object> parentParameters = currentToken.GetParameters();
                     if (parentParameters != null)
                     {
                         foreach (KeyValuePair<string, object> keyAndVal in parentParameters)
                         {
-                            if (!variables.ContainsKey(keyAndVal.Key))
-                            {
-                                variables[keyAndVal.Key] = keyAndVal.Value;
-                            }
+                            if (currentToken == parentToken && objectKeyName == keyAndVal.Key)
+                                continue;
+
+                            if (!variables.ContainsKey(keyAndVal.Key))                            
+                                variables[keyAndVal.Key] = keyAndVal.Value;                            
                         }
                     }
-                    parentToken = parentToken.Parent;
+                    currentToken = currentToken.Parent;
                 }
             }
 

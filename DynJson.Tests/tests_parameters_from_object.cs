@@ -33,7 +33,7 @@ namespace DynJson.tests
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new [] { new S4JExecutorParam("anyParam", "123"), new S4JExecutorParam("body", "{a:1,b:2}")});
 
-            Assert.AreEqual(@"2", result.ToJson());
+            Assert.AreEqual(@"2.0", result.ToJson());
         }
     }
 }
