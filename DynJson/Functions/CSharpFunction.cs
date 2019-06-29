@@ -21,7 +21,7 @@ namespace DynJson.Functions
         public CSharpFunction() :
             this("cs")
         {
-            ReturnExactValue = true;
+
         }
 
         public CSharpFunction(string aliasName) :
@@ -35,7 +35,27 @@ namespace DynJson.Functions
         }
     }
 
-    public class CSharpSingleFunction : S4JStateFunction
+    /*public class CSharpMergeFunction : S4JStateFunction
+    {
+        public CSharpMergeFunction() :
+            this("cs-merge")
+        {
+            ReturnExactValue = false;
+            ReturnManyObjects = true;
+        }
+
+        public CSharpMergeFunction(string aliasName) :
+            base(aliasName)
+        {
+            Priority = 0;
+            BracketsDefinition = new CSharpBrackets();
+            CommentDefinition = new CSharpComment();
+            QuotationDefinition = new CSharpQuotation();
+            Evaluator = new CSharpEvaluator();
+        }
+    }*/
+
+    /*public class CSharpSingleFunction : S4JStateFunction
     {
         public CSharpSingleFunction() :
             this("cs-single;cssingle")
@@ -73,9 +93,9 @@ namespace DynJson.Functions
             QuotationDefinition = new CSharpQuotation();
             Evaluator = new CSharpEvaluator();
         }
-    }
+    }*/
 
-    public class CSharpManyFunction : S4JStateFunction
+    /*public class CSharpManyFunction : S4JStateFunction
     {
         public CSharpManyFunction() :
             this("cs-many;csmany")
@@ -93,26 +113,26 @@ namespace DynJson.Functions
             QuotationDefinition = new CSharpQuotation();
             Evaluator = new CSharpEvaluator();
         }
-    }
+    }*/
 
-    public class CSharpFitFunction : S4JStateFunction
-    {
-        public CSharpFitFunction() :
-            this("cs-fit;csfit")
-        {
-            ReturnExactValue = false;
-        }
+    /* public class CSharpFitFunction : S4JStateFunction
+     {
+         public CSharpFitFunction() :
+             this("cs-fit;csfit")
+         {
+             ReturnExactValue = false;
+         }
 
-        public CSharpFitFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new CSharpBrackets();
-            CommentDefinition = new CSharpComment();
-            QuotationDefinition = new CSharpQuotation();
-            Evaluator = new CSharpEvaluator();
-        }
-    }
+         public CSharpFitFunction(string aliasName) :
+             base(aliasName)
+         {
+             Priority = 0;
+             BracketsDefinition = new CSharpBrackets();
+             CommentDefinition = new CSharpComment();
+             QuotationDefinition = new CSharpQuotation();
+             Evaluator = new CSharpEvaluator();
+         }
+     }*/
 
     public class CSharpComment : S4JState
     {

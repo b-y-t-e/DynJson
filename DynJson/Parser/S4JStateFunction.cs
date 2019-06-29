@@ -25,14 +25,17 @@ namespace DynJson.Parser
         public IEvaluator Evaluator { get; set; }
 
         ////////////////////////////////////////
+        ///
+        // public Boolean ReturnExactValue { get; set; }
 
-        public Boolean ReturnExactValue { get; set; }
+            public S4JFunctionResult ResultType { get; set; }
 
-        public Boolean ReturnManyObjects { get; set; }
+       /* public Boolean ReturnManyObjects { get; set; }
 
         public Boolean ReturnSingleObject { get; set; }
 
         public Boolean ReturnSingleValue { get; set; }
+        */
 
         ////////////////////////////////////////
 
@@ -50,6 +53,7 @@ namespace DynJson.Parser
                     EStateType.FUNCTION_COMMENT,
                     EStateType.FUNCTION_BRACKETS,
                 };
+            // this.ReturnExactValue = true;
 
             foreach (var functionName in this.FunctionNames.OrderByDescending(n => n.Length))
             {
@@ -60,5 +64,13 @@ namespace DynJson.Parser
                 });
             }
         }
+    }
+
+    public enum S4JFunctionResult
+    {
+        UNDEFINED = 0,
+        MANY_RESULTS = 1,
+        SINGE_RESULT = 2,
+        SINGLE_SCALAR = 3
     }
 }

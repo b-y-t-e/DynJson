@@ -21,27 +21,29 @@ namespace DynJson.Parser
                     {
                         i = new S4JStateBag();
                         i.AddStatesToBag(
-                            new CSharpFitFunction(),
+                            /*new CSharpFitFunction(),
                             new CSharpSingleFunction(),
                             new CSharpManyFunction(),
-                            new CSharpValueFunction(),
+                            new CSharpValueFunction(),*/
+                           // new CSharpMergeFunction(),
                             new CSharpFunction(),
 
-                            new DynLanFunction(),
+                           /* new DynLanFunction(),
                             new DynLanFitFunction(),
                             new DynLanManyFunction(),
                             new DynLanSingleFunction(),
-                            new DynLanValueFunction(),
+                            new DynLanValueFunction(),*/
 
                             new JsFunction(),
-                            new JsFitFunction(),
+                            //new JsMergeFunction(),
+                            /*new JsFitFunction(),
                             new JsManyFunction(),
                             new JsSingleFunction(),
-                            new JsValueFunction(),
+                            new JsValueFunction(),*/
 
                             new TSqlSingleExpandedFunction(),
                             new TSqlValueExpandedFunction(),
-                            new TSqlExpandedFunction(),
+                            // new TSqlExpandedFunction(),
                             new TSqlManyFunction());
                     }
 

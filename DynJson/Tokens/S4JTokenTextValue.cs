@@ -28,6 +28,8 @@ namespace DynJson.Tokens
 
         public String TargetSourceFromText { get; set; }
 
+        public String InArrayFromText { get; set; }
+
         // public String OutputVariableName { get; set; }
 
         ////////////////////////////////////
@@ -39,6 +41,7 @@ namespace DynJson.Tokens
             IsObjectKey = false;
             VariableNameFromText = null;
             TargetSourceFromText = null;
+            InArrayFromText = null;
             //IsVariableReference = false;
             Children = new List<S4JToken>();
             State = S4JDefaultStateBag.Get().ValueState /* new S4JState()
@@ -71,7 +74,11 @@ namespace DynJson.Tokens
             if (!IsVisible && !Force)
                 return false;
 
-            if (VariableNameFromText != null)
+            if (InArrayFromText != null)
+            {
+                Builder.Append(Result.SerializeJson());
+            }
+            else if (VariableNameFromText != null)
             {
                 Builder.Append(Result.SerializeJson());
             }
@@ -110,6 +117,9 @@ namespace DynJson.Tokens
                 if (this.CheckTargetSource(parts[i], parts[i + 1]))
                     continue;
 
+                if (this.CheckInArray(parts[i], parts[i + 1]))
+                    continue;
+
                 break;
             }
 
@@ -122,6 +132,12 @@ namespace DynJson.Tokens
             if (!string.IsNullOrEmpty(TargetSourceFromText)) // (this.WorkType == TokenTextType.TARGET_SOURCE)
             {
                 this.PrevToken.TargetSource = TargetSourceFromText;
+                wasExecuted = false;
+            }
+
+            if (!string.IsNullOrEmpty(InArrayFromText)) // (this.WorkType == TokenTextType.TARGET_SOURCE)
+            {
+                this.PrevToken.InArray = true;
                 wasExecuted = false;
             }
 
@@ -161,6 +177,17 @@ namespace DynJson.Tokens
 
             //this.WorkType = TokenTextType.TARGET_SOURCE;
             this.TargetSourceFromText = TargetSourceText;
+            this.Result = null;
+            return true;
+        }
+        
+        private bool CheckInArray(String OperatorText, String InArrayText) // List<String> Parts)
+        {
+            if (!MyStringHelper.CheckInArray(OperatorText, InArrayText))
+                return false;
+
+            //this.WorkType = TokenTextType.TARGET_SOURCE;
+            this.InArrayFromText = InArrayText;
             this.Result = null;
             return true;
         }

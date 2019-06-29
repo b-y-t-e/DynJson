@@ -14,7 +14,7 @@ using DynJson.Tokens;
 
 namespace DynJson.Functions
 {
-    public class TSqlExpandedFunction : S4JStateFunction
+    /*public class TSqlExpandedFunction : S4JStateFunction
     {
         public TSqlExpandedFunction() :
             this("query;q")
@@ -34,15 +34,14 @@ namespace DynJson.Functions
             {
             };
         }
-    }
+    }*/
 
     public class TSqlManyFunction : S4JStateFunction
     {
         public TSqlManyFunction() :
-            this("q-many;query-many")
+            this("query;q")
         {
-            ReturnManyObjects = true;
-            ReturnExactValue = true;
+            ResultType = S4JFunctionResult.MANY_RESULTS;
         }
 
         public TSqlManyFunction(string aliasName) :
@@ -64,8 +63,7 @@ namespace DynJson.Functions
         public TSqlSingleExpandedFunction() :
             this("query-single;q-single")
         {
-            ReturnExactValue = true;
-            ReturnSingleObject = true;
+            ResultType = S4JFunctionResult.SINGE_RESULT;
         }
 
         public TSqlSingleExpandedFunction(string aliasName) :
@@ -85,10 +83,9 @@ namespace DynJson.Functions
     public class TSqlValueExpandedFunction : S4JStateFunction
     {
         public TSqlValueExpandedFunction() :
-            this("query-value;q-value")
+            this("query-scalar;q-scalar")
         {
-            ReturnExactValue = true;
-            ReturnSingleValue = true;
+            ResultType = S4JFunctionResult.SINGLE_SCALAR;
         }
 
         public TSqlValueExpandedFunction(string aliasName) :

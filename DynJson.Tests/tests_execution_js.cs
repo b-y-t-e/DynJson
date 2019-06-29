@@ -31,7 +31,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_empty_arguments()
         {
-            var script1 = @"  method1 (param1) { {""a"": js-many(param1)} }";
+            var script1 = @"  method1 (param1) { {""a"": js(param1)} }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -108,7 +108,7 @@ namespace DynJson.tests
         /*[Test]
         async public Task executor_should_understand_additional_class_fields_for_object()
         {
-            var script1 = @"{ a: 1, js-many( 
+            var script1 = @"{ a: 1, js( 
 class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwisko = 'adsafasg'; return o;
 )  }";
 
@@ -190,7 +190,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object()
         {
-            var script1 = @"{ a: 1, js-fit(  dict = new Dictionary(); dict.b = 2; dict.c = 3; dict;  )   }";
+            var script1 = @"{ a: 1, js(  dict = new Dictionary(); dict.b = 2; dict.c = 3; dict;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -203,7 +203,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_fields_for_object()
         {
-            var script1 = @"{ a: 1, js-fit(  null  ), d: 3   }";
+            var script1 = @"{ a: 1, js(  null  ), d: 3   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -216,7 +216,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array()
         {
-            var script1 = @"[ 1, js-fit(  result = new List(); result.Add(2); result.Add(3); result;  )   ]";
+            var script1 = @"[ 1, js(  result = new List(); result.Add(2); result.Add(3); result;  ) in array  ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -229,7 +229,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array()
         {
-            var script1 = @"[ 1, js-many(  var ListOfString = System.Collections.Generic.List(System.String); result = new ListOfString(); result;  )   ]";
+            var script1 = @"[ 1, js(  var ListOfString = System.Collections.Generic.List(System.String); result = new ListOfString(); result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -244,7 +244,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array3()
         {
-            var script1 = @"[ 1, js-many(  result = new List(); result;  )   ]";
+            var script1 = @"[ 1, js(  result = new List(); result;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -259,7 +259,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array2()
         {
-            var script1 = @"[ 1, js-fit(  result = new List(); result;  )   ]";
+            var script1 = @"[ 1, js(  result = new List(); result;  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -274,7 +274,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array()
         {
-            var script1 = @"[ 1, js-many(  null;  )   ]";
+            var script1 = @"[ 1, js(  null;  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -289,7 +289,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array2()
         {
-            var script1 = @"[ 1, js-fit(  null;  )   ]";
+            var script1 = @"[ 1, js(  null;  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -304,20 +304,20 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version2()
         {
-            var script1 = @"[ 1, js-fit(  dict = new Dictionary(); dict['b'] = 2; dict['c'] = 3; dict;  )   ]";
+            var script1 = @"[ 1, js(  dict = new Dictionary(); dict['b'] = 2; dict['c'] = 3; dict;  ) in array  ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0]",
+                @"[1,{""b"":2.0,""c"":3.0}]",
                 result.ToJson());
         }
 
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version3()
         {
-            var script1 = @"[ 1, js-fit(  
+            var script1 = @"[ 1, js(  
                 result = new List();
                 {
                     dict = new Dictionary(); 
@@ -331,20 +331,20 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                     dict['c'] = 33; 
                     result.Add(dict);
                 }
-                result;  )   ]";
+                result;  )  in array ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0,22.0]",
+                @"[1,{""b"":2.0,""c"":3.0},{""b"":22.0,""c"":33.0}]",
                 result.ToJson());
         }
 
         [Test]
         async public Task executor_should_understand_additional_objects_for_array()
         {
-            var script1 = @"[ 1, {js-fit(  
+            var script1 = @"[ 1, {js(  
                 lista = new List();
                 {
                     dict = new Dictionary(); 
@@ -371,7 +371,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_with_fields_for_array()
         {
-            var script1 = @"[ 1, {js-fit(  
+            var script1 = @"[ 1, {js(  
                 lista = new List();
                 {
                     dict = new Dictionary(); 
@@ -398,7 +398,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_objects_for_array_version2()
         {
-            var script1 = @"[ 1, {js-fit(  
+            var script1 = @"[ 1, {js(  
                     dict = new Dictionary(); 
                     dict['b'] = 2; 
                     dict['c'] = 3;                    
@@ -415,7 +415,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_objects_for_array()
         {
-            var script1 = @"[ 1, js-many(  
+            var script1 = @"[ 1, js(  
                     null  )   ]";
 
             var result = await new S4JExecutorForTests().
@@ -429,8 +429,8 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_objects_for_array1()
         {
-            var script1 = @"[ 1, js-fit(  
-                    null  )   ]";
+            var script1 = @"[ 1, js(  
+                    null  )  in array ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -443,7 +443,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_fields_for_object_version2()
         {
-            var script1 = @"{ a: 1, b: js-fit(  dict = new Dictionary(); dict['bb'] = 22; dict['cc'] = 33; dict;  )   }";
+            var script1 = @"{ a: 1, b: js(  22;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -456,7 +456,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_field_for_object()
         {
-            var script1 = @"{ a: 1, b: js-many(  null  )   }";
+            var script1 = @"{ a: 1, b: js(  null  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

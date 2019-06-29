@@ -22,9 +22,9 @@ namespace DynJson.Functions
     public class JsFunction : S4JStateFunction
     {
         public JsFunction() :
-            this("@;js")
+            this("js")
         {
-            ReturnExactValue = true;
+
         }
 
         public JsFunction(string aliasName) :
@@ -38,7 +38,26 @@ namespace DynJson.Functions
         }
     }
 
-    public class JsFitFunction : S4JStateFunction
+   /* public class JsMergeFunction : S4JStateFunction
+    {
+        public JsMergeFunction() :
+            this("@-merge;js-merge")
+        {
+            ReturnExactValue = false;
+        }
+
+        public JsMergeFunction(string aliasName) :
+            base(aliasName)
+        {
+            Priority = 0;
+            BracketsDefinition = new JsBrackets();
+            CommentDefinition = new JsComment();
+            QuotationDefinition = new JsQuotation();
+            Evaluator = new JsEvaluator();
+        }
+    }*/
+
+    /*public class JsFitFunction : S4JStateFunction
     {
         public JsFitFunction() :
             this("@-fit;js-fit")
@@ -115,7 +134,7 @@ namespace DynJson.Functions
             QuotationDefinition = new JsQuotation();
             Evaluator = new JsEvaluator();
         }
-    }
+    }*/
 
     public class JsComment : S4JState
     {

@@ -399,50 +399,51 @@ namespace DynJson.Executor
                 Evaluator?.
                 Evaluate(this, function, variables);
 
-            if (stateFunction.ReturnSingleObject)
+            if (stateFunction.ResultType == S4JFunctionResult.SINGE_RESULT)
             {
-                result = GetSingleObjectFromResult(result);
+                result = S4jExecutorResultExtractor.GetSingleObjectFromResult(result);
             }
-            else if (stateFunction.ReturnSingleValue)
+            else if (stateFunction.ResultType == S4JFunctionResult.SINGLE_SCALAR)
             {
-                result = GetSingleAndFirstValueFromResult(result);
+                result = S4jExecutorResultExtractor.GetSingleAndFirstValueFromResult(result);
             }
-            else if (stateFunction.ReturnManyObjects)
+            else if (stateFunction.ResultType == S4JFunctionResult.MANY_RESULTS)
             {
-                result = GetManyObjectsFromResult(result);
+                result = S4jExecutorResultExtractor.GetManyObjectsFromResult(result);
             }
 
             function.IsEvaluated = true;
             function.Result = result;
 
-            // { @-many(1) } -> { 1 }
-            // { a : @-many(1) } -> { a : 1 }
-            if (stateFunction.ReturnExactValue)
+            if (function.IsObjectSingleKey || function.InArray)
             {
-                function.JsonFromResult = true;
-            }
-            // { a : 1, q-many(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
-            else if (function.Parent is S4JTokenObject objectParent3 &&
-                function.IsObjectSingleKey)
-            {
-                await EvaluateFunctionInsideObject(
-                    objectParent3,
-                    function,
-                    result);
-            }
-            // [ @-many(1), @-many(null) ] -> [ 1, null ]
-            else if (function.Parent is S4JTokenArray arrayParent)
-            {
-                EvaluateFunctionInsideArray(
-                    arrayParent,
-                    function,
-                    result);
+                // { a : 1, q(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
+                if (function.Parent is S4JTokenObject objectParent3 &&
+                    function.IsObjectSingleKey)
+                {
+                    await EvaluateFunctionInsideObject(
+                        objectParent3,
+                        function,
+                        result);
+                }
+                // [ @(1), @(null) ] -> [ 1, null ]
+                else if (function.Parent is S4JTokenArray arrayParent)
+                {
+                    EvaluateFunctionInsideArray(
+                        arrayParent,
+                        function,
+                        result);
+                }
+                else
+                {
+                    EvaluateFunctionInsideAnyOther(
+                        function,
+                        result);
+                }
             }
             else
             {
-                EvaluateFunctionInsideAnyOther(
-                    function,
-                    result);
+                function.JsonFromResult = true;
             }
         }
 
@@ -475,13 +476,13 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            IList<Object> list = GetManyObjectsFromResult(result);
+            IList<Object> list = S4jExecutorResultExtractor.GetManyObjectsFromResult(result);
 
             if (objectParent.Children.Count == 1)
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
 
-                IList<S4JToken> tokensFromResult = ConvertToToken(list, function.IsVisible).ToArray();
+                IList<S4JToken> tokensFromResult = S4jTokenConverter.ConvertToToken(list, function.IsVisible).ToArray();
 
                 objectParent.Parent.RemoveChild(
                     objectParent,
@@ -491,7 +492,7 @@ namespace DynJson.Executor
             {
                 Int32 indexOfFun = objectParent.IndexOfChild(function);
 
-                IList<S4JToken> tokensFromResult = ConvertToManyTokens(list, function.IsVisible).ToArray();
+                IList<S4JToken> tokensFromResult = S4jTokenConverter.ConvertToManyTokens(list, function.IsVisible).ToArray();
 
                 List<S4JToken> newTokens = new List<S4JToken>();
                 foreach (S4JToken tokenFromResult in tokensFromResult)
@@ -535,13 +536,24 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            IDictionary<string, object> item = GetSingleObjectFromResult(result);
+            var item = S4jExecutorResultExtractor.GetSingleObjectFromResult(result);
 
-            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible).ToArray();
+            IList<S4JToken> tokens = S4jTokenConverter.ConvertToTokens(item, function.IsVisible, true).ToArray();
 
-            objectParent.RemoveChild(
-                function,
-                tokens);
+            if (function.IsObjectSingleKey &&
+                objectParent.Children.Count == 1 &&
+                tokens.Count == 0)
+            {
+                objectParent.Parent.RemoveChild(
+                    objectParent,
+                    S4jTokenConverter.GetNullToken(function.IsVisible));
+            }
+            else
+            {
+                objectParent.RemoveChild(
+                    function,
+                    tokens);
+            }
         }
 
         /*private void TurnParentIntoNull(
@@ -563,9 +575,9 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            var list = GetListOfSingleObjectsFromResult(result);
+            var list = S4jExecutorResultExtractor.GetListOfSingleObjectsFromResult(result);
 
-            IList<S4JToken> tokens = ConvertToToken(list, function.IsVisible).ToArray();
+            IList<S4JToken> tokens = S4jTokenConverter.ConvertToToken(list, function.IsVisible).ToArray();
 
             function.Parent.RemoveChild(
                 function,
@@ -576,9 +588,9 @@ namespace DynJson.Executor
             S4JTokenFunction function,
             object result)
         {
-            var item = GetSingleAndFirstValueFromResult(result);
+            var item = S4jExecutorResultExtractor.GetSingleAndFirstValueFromResult(result);
 
-            IList<S4JToken> tokens = ConvertToTokens(item, function.IsVisible, true).ToArray();
+            IList<S4JToken> tokens = S4jTokenConverter.ConvertToTokens(item, function.IsVisible, false).ToArray();
 
             String text = JsonSerializer.SerializeJson(result);
             function.Children.Clear();
@@ -623,209 +635,6 @@ namespace DynJson.Executor
             return variables;
         }
 
-        private IEnumerable<S4JToken> ConvertToToken(IList<Object> List, Boolean IsVisible)
-        {
-            if (List == null || List.Count == 0)
-                yield break;
-
-            yield return new S4JTokenObjectContent()
-            {
-                IsVisible = IsVisible,
-                Result = List,
-                Text = List.SerializeJsonNoBrackets(),
-                //IsKey = true,
-                IsObjectSingleKey = true,
-                IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
-            };
-        }
-
-        private IEnumerable<S4JToken> ConvertToManyTokens(IList<Object> List, Boolean IsVisible)
-        {
-            if (List == null)
-                yield break;
-
-            foreach (Object item in List)
-                yield return new S4JTokenObjectContent()
-                {
-                    Result = item,
-                    IsVisible = IsVisible,
-                    Text = item.SerializeJsonNoBrackets(),
-                    //IsKey = true,
-                    IsObjectSingleKey = true,
-                    IsCommited = true,
-                    State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
-                };
-        }
-
-        private IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary, Boolean IsVisible)
-        {
-            if (Dictionary == null)
-                yield break;
-
-            yield return new S4JTokenObjectContent()
-            {
-                IsVisible = IsVisible,
-                Result = Dictionary,
-                Text = Dictionary.SerializeJsonNoBrackets(),
-                //IsKey = true,
-                IsObjectSingleKey = true,
-                IsCommited = true,
-                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
-            };
-        }
-
-        private IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible, Boolean GenerateNull)
-        {
-            if (!GenerateNull && Value == null)
-                yield break;
-
-            yield return new S4JTokenTextValue()
-            {
-                IsVisible = IsVisible,
-                Text = Value.SerializeJson(),
-                IsObjectSingleKey = true,
-                IsCommited = true,
-                State = S4JDefaultStateBag.Get().ValueState // new S4JState() { StateType = EStateType.S4J_TEXT_VALUE, IsValue = true, IsSimpleValue = true }
-            };
-        }
-
-        private IList<Object> GetManyObjectsFromResult(Object value, Boolean AnalyseSubValues = true)
-        {
-            if (value == null)
-                return null;
-
-            List<Object> list = new List<object>();
-
-            if (MyTypeHelper.IsPrimitive(value.GetType()))
-                list.Add(value);
-
-            else if (value is IDictionary<String, Object>)
-                list.Add(value);
-
-            else if (value is ICollection)
-            {
-                if (AnalyseSubValues)
-                {
-                    foreach (Object subValue in (ICollection)value)
-                        list.AddRange(GetManyObjectsFromResult(subValue, false));
-                }
-                else
-                {
-                    list.Add(value);
-                }
-            }
-
-            else if (value.GetType().IsClass)
-            {
-                list.Add(value);
-            }
-
-            return list;
-        }
-
-        private IDictionary<String, Object> GetSingleObjectFromResult(Object value)
-        {
-            if (value == null)
-                return null;
-
-            if (MyTypeHelper.IsPrimitive(value.GetType()))
-            {
-                return new Dictionary<string, object>
-                {
-                    { "value", value }
-                };
-            }
-
-            else if (value is IDictionary<String, Object>)
-            {
-                return (IDictionary<String, Object>)value;
-            }
-
-            else if (value is ICollection)
-            {
-                foreach (Object subValue in (ICollection)value)
-                    return GetSingleObjectFromResult(subValue);
-            }
-
-            else if (value.GetType().IsClass)
-            {
-                return ReflectionHelper.ToDictionary(value);
-            }
-
-            return null;
-        }
-
-        private List<Object> GetListOfSingleObjectsFromResult(Object value, Boolean AnalyseSubValues = true)
-        {
-            if (value == null)
-                return null;
-
-            List<Object> list = new List<object>();
-
-            if (MyTypeHelper.IsPrimitive(value.GetType()))
-            {
-                list.Add(value);
-            }
-
-            else if (value is IDictionary<String, Object> dict)
-            {
-                if (dict.Count > 0)
-                    list.Add(dict.First().Value);
-            }
-
-            else if (value is ICollection)
-            {
-                if (AnalyseSubValues)
-                {
-                    foreach (Object subValue in (ICollection)value)
-                        list.AddRange(GetListOfSingleObjectsFromResult(subValue, false));
-                }
-                else
-                {
-                    list.Add(value);
-                }
-            }
-
-            else if (value.GetType().IsClass)
-            {
-                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
-                if (dictForValue.Count > 0)
-                    list.Add(dictForValue.First().Value);
-            }
-
-            return list;
-        }
-
-        private Object GetSingleAndFirstValueFromResult(Object value)
-        {
-            if (value == null)
-                return null;
-
-            if (MyTypeHelper.IsPrimitive(value.GetType()))
-            {
-                return value;
-            }
-
-            else if (value is IDictionary<String, Object> dict)
-            {
-                return dict.Count > 0 ? dict.FirstOrDefault().Value : null;
-            }
-
-            else if (value is ICollection)
-            {
-                foreach (Object subValue in (ICollection)value)
-                    return GetSingleAndFirstValueFromResult(subValue);
-            }
-
-            else if (value.GetType().IsClass)
-            {
-                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
-                return dictForValue.Count > 0 ? dictForValue.FirstOrDefault().Value : null;
-            }
-
-            return null;
-        }
 
         Object ValidateFieldDescription(S4JFieldDescription FieldDescription, Object Value)
         {
@@ -931,6 +740,240 @@ namespace DynJson.Executor
         {
             this.Name = Name;
             this.Value = Value;
+        }
+    }
+
+    public static class S4jExecutorResultExtractor
+    {
+        public static IList<Object> GetManyObjectsFromResult(Object value, Boolean AnalyseSubValues = true)
+        {
+            if (value == null)
+                return null;
+
+            List<Object> list = new List<object>();
+
+            if (MyTypeHelper.IsPrimitive(value.GetType()))
+                list.Add(value);
+
+            else if (value is IDictionary<String, Object>)
+                list.Add(value);
+
+            else if (value is ICollection)
+            {
+                if (AnalyseSubValues)
+                {
+                    foreach (Object subValue in (ICollection)value)
+                        list.AddRange(GetManyObjectsFromResult(subValue, false));
+                }
+                else
+                {
+                    list.Add(value);
+                }
+            }
+
+            else if (value.GetType().IsClass)
+            {
+                list.Add(value);
+            }
+
+            return list;
+        }
+
+        public static Object GetSingleObjectFromResult(Object value)
+        {
+            if (value == null)
+                return null;
+
+            if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
+                return value;
+                /*return new Dictionary<string, object>
+                {
+                    { "value", value }
+                };*/
+            }
+
+            else if (value is IDictionary<String, Object>)
+            {
+                return (IDictionary<String, Object>)value;
+            }
+
+            else if (value is ICollection)
+            {
+                foreach (Object subValue in (ICollection)value)
+                    return GetSingleObjectFromResult(subValue);
+            }
+
+            else if (value.GetType().IsClass)
+            {
+                return ReflectionHelper.ToDictionary(value);
+            }
+
+            return null;
+        }
+
+        public static List<Object> GetListOfSingleObjectsFromResult(Object value, Boolean AnalyseSubValues = true)
+        {
+            if (value == null)
+                return null;
+
+            List<Object> list = new List<object>();
+
+            if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
+                list.Add(value);
+            }
+
+            else if (value is IDictionary<String, Object> dict)
+            {
+                list.Add(value);
+
+                /*if (dict.Count > 0)
+                    list.Add(dict.First().Value);*/
+            }
+
+            else if (value is ICollection)
+            {
+                if (AnalyseSubValues)
+                {
+                    foreach (Object subValue in (ICollection)value)
+                        list.AddRange(GetListOfSingleObjectsFromResult(subValue, false));
+                }
+                else
+                {
+                    list.Add(value);
+                }
+            }
+
+            else if (value.GetType().IsClass)
+            {
+                list.Add(ReflectionHelper.ToDictionary(value));
+                /*return (IDictionary<String, Object>)value;
+                return ReflectionHelper.ToDictionary(value);
+
+                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
+                if (dictForValue.Count > 0)
+                    list.Add(dictForValue.First().Value);*/
+            }
+
+            return list;
+        }
+
+        public static Object GetSingleAndFirstValueFromResult(Object value)
+        {
+            if (value == null)
+                return null;
+
+            if (MyTypeHelper.IsPrimitive(value.GetType()))
+            {
+                return value;
+            }
+
+            else if (value is IDictionary<String, Object> dict)
+            {
+                return dict.Count > 0 ? dict.FirstOrDefault().Value : null;
+            }
+
+            else if (value is ICollection)
+            {
+                foreach (Object subValue in (ICollection)value)
+                    return GetSingleAndFirstValueFromResult(subValue);
+            }
+
+            else if (value.GetType().IsClass)
+            {
+                Dictionary<string, object> dictForValue = ReflectionHelper.ToDictionary(value);
+                return dictForValue.Count > 0 ? dictForValue.FirstOrDefault().Value : null;
+            }
+
+            return null;
+        }
+
+    }
+
+    public static class S4jTokenConverter
+    {
+        public static IEnumerable<S4JToken> ConvertToToken(IList<Object> List, Boolean IsVisible)
+        {
+            if (List == null || List.Count == 0)
+                yield break;
+
+            yield return new S4JTokenObjectContent()
+            {
+                IsVisible = IsVisible,
+                Result = List,
+                Text = List.SerializeJsonNoBrackets(),
+                //IsKey = true,
+                IsObjectSingleKey = true,
+                IsCommited = true,
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+            };
+        }
+
+        public static IEnumerable<S4JToken> ConvertToManyTokens(IList<Object> List, Boolean IsVisible)
+        {
+            if (List == null)
+                yield break;
+
+            foreach (Object item in List)
+                yield return new S4JTokenObjectContent()
+                {
+                    Result = item,
+                    IsVisible = IsVisible,
+                    Text = item.SerializeJsonNoBrackets(),
+                    //IsKey = true,
+                    IsObjectSingleKey = true,
+                    IsCommited = true,
+                    State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+                };
+        }
+
+        public static IList<S4JToken> GetNullToken(Boolean IsVisible)
+        {
+            return new[] { new S4JTokenObjectContent()
+            {
+                IsVisible = IsVisible,
+                Result = null,
+                Text = "null",
+                //IsKey = true,
+                IsObjectSingleKey = true,
+                IsCommited = true,
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+            }};
+        }
+
+        /*public static IEnumerable<S4JToken> ConvertToTokens(IDictionary<String, Object> Dictionary, Boolean IsVisible)
+        {
+            if (Dictionary == null)
+                yield break;
+
+            yield return new S4JTokenObjectContent()
+            {
+                IsVisible = IsVisible,
+                Result = Dictionary,
+                Text = Dictionary.SerializeJsonNoBrackets(),
+                //IsKey = true,
+                IsObjectSingleKey = true,
+                IsCommited = true,
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+            };
+        }*/
+
+        public static IEnumerable<S4JToken> ConvertToTokens(Object Value, Boolean IsVisible, Boolean MergeWithObject)
+        {
+            if (Value == null)
+                yield break;
+
+            yield return new S4JTokenObjectContent()
+            {
+                IsVisible = IsVisible,
+                Result = Value,
+                Text = MergeWithObject ? Value.SerializeJsonNoBrackets() : Value.SerializeJson(),
+                IsObjectSingleKey = true,
+                IsCommited = true,
+                State = new S4JState() { StateType = EStateType.S4J_OBJECT_CONTENT }
+                //State = S4JDefaultStateBag.Get().ValueState // new S4JState() { StateType = EStateType.S4J_TEXT_VALUE, IsValue = true, IsSimpleValue = true }
+            };
         }
     }
 }

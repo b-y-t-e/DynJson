@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 using System.IO;
-using DynLan.Helpers;
 using System.Collections;
 
 namespace DynJson.Helpers.CoreHelpers
@@ -294,7 +293,7 @@ namespace DynJson.Helpers.CoreHelpers
         private static char[] targetSourceString = "at".ToCharArray();
         public static Boolean IsTargetSource(String OperatorText, String TargetSourceText)
         {
-            if (OperatorText.Length != variableOutputString.Length || TargetSourceText.Length == 0)
+            if (OperatorText.Length != targetSourceString.Length || TargetSourceText.Length == 0)
                 return false;
 
             if (OperatorText[0] == targetSourceString[0] &&
@@ -316,6 +315,37 @@ namespace DynJson.Helpers.CoreHelpers
                 return false;
             }
         }
+
+        private static char[] inArrayString = "in".ToCharArray();
+        public static Boolean CheckInArray(String OperatorText, String InArrayText)
+        {
+            if (OperatorText.Length != inArrayString.Length || InArrayText.Length == 0)
+                return false;
+
+            if (OperatorText[0] == inArrayString[0] &&
+                OperatorText[1] == inArrayString[1])
+            {
+                if (InArrayText == "array")
+                    return true;
+                return false;
+
+                /*if (Char.IsNumber(InArrayText[0]))
+                {
+                    return false;
+                }
+                else
+                {
+                    if (IsQuotedText(InArrayText))
+                        return false;
+                }
+                return true;*/
+            }
+            else
+            {
+                return false;
+            }
+        }
+
 
         private static char[] variableOutputString = "as".ToCharArray();
         public static Boolean IsVariableOutput(String OperatorText, String VariableNameText)

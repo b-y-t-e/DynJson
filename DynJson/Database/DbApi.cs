@@ -288,7 +288,7 @@ namespace DynJson.Database
 
             if (!itemExists(con, TableName, idValue))
             {
-                Boolean overrideKey = !DynLan.Helpers.MyTypeHelper.IsNumeric(idValue);
+                Boolean overrideKey = !MyTypeHelper.IsNumeric(idValue);
 
                 Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()", overrideKey);
                 if (newID != null)

@@ -103,9 +103,9 @@ namespace DynJson.tests
         method(a:int, b:int, c:int)
         {
             {
-            a: @-value(a),
-			b: @-value(a + b),
-			c: @-value(a + b + c)
+            a: js(a),
+			b: js(a + b),
+			c: js(a + b + c)
                 }
         }";
 
@@ -122,9 +122,9 @@ namespace DynJson.tests
         method(a:int, b:int, c:int)
         {
             {
-            a: @-value(a),
-			b: @-value(a + b),
-			c: @-value(a + b + c)
+            a: js(a),
+			b: js(a + b),
+			c: js(a + b + c)
                 }
         }";
 
@@ -149,7 +149,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_int_parameter_json()
         {
-            var script1 = @" method ( a : any, b : string!, c: int ){ query( select @c  ) }";
+            var script1 = @" method ( a : any, b : string!, c: int ){ query-scalar( select @c  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "4.1", "''", "4" });
@@ -160,7 +160,7 @@ namespace DynJson.tests
         [Test]
         async public Task test_int_complex_parameter_json()
         {
-            var script1 = @" method ( a : any, b : string!, c: int ) {query( select @c + @a_f2  ) }";
+            var script1 = @" method ( a : any, b : string!, c: int ) {query-scalar( select @c + @a_f2  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithJsonParameters(script1, new string[] { "{ f1: 1, f2 : 2, f3: 'c' }", "''", "4" });

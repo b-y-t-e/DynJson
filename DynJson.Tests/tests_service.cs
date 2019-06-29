@@ -25,7 +25,7 @@ method ( osoba : any )
 /*
 q-many( insert into osoba(imie) select @osoba_imie; )
 */
-query( select imie from osoba where imie = 'test_sql' )
+query-scalar( select imie from osoba where imie = 'test_sql' )
 }
 
 ";

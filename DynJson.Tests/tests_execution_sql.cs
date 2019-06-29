@@ -25,7 +25,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" query( select 1  ) ";
+            var script1 = @" query-scalar( select 1  ) ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -42,7 +42,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" query( select 1 ) at primary ";
+            var script1 = @" query-scalar( select 1 ) at primary ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -59,7 +59,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" /* query( select 1 ) at primary as val*/ @-value(val) ";
+            var script1 = @" /* query-scalar( select 1 ) at primary as val*/ js(val) ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -67,7 +67,7 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"1",
+                @"1.0",
                 result.ToJson());
         }
 
@@ -76,7 +76,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) {query( select @param1 + 1  )} ";
+            var script1 = @" method(param1) {query-scalar( select @param1 + 1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { 199 });
@@ -127,7 +127,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1){ query( select @param1_imie + '!' + @param1_nazwisko  ) }";
+            var script1 = @" method(param1){ query-scalar( select @param1_imie + '!' + @param1_nazwisko  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { new osoba() { imie = "IMIE", nazwisko = "NAZWISKO" } });
@@ -144,7 +144,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1) { query( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
+            var script1 = @" method(param1) { query-scalar( select @param1_imie + '!' + @param1_nazwisko + '!' + cast((select count(*) from @param1_rodzice) as varchar(max))  ) }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1, new[] { new osobaWithList() { imie = "IMIE", nazwisko = "NAZWISKO", rodzice = new List<osoba>() { new osoba() { imie = "tata" }, new osoba() { imie = "mama" } } } });
@@ -161,7 +161,7 @@ namespace DynJson.tests
         {
             // await new DbForTest().PrepareDb();
 
-            var script1 = @" method(param1){ query( select count(*) from @param1  )} ";
+            var script1 = @" method(param1){ query-scalar( select count(*) from @param1  )} ";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(

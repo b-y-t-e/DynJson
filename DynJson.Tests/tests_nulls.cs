@@ -32,7 +32,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_array()
         {
-            var script1 = @"[  1, @-fit(  null  )   ]";
+            var script1 = @"[  1, js(  null  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -47,7 +47,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_array2()
         {
-            var script1 = @"[  1, @(  null  )   ]";
+            var script1 = @"[  1, js(  null  )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -63,7 +63,7 @@ namespace DynJson.tests
         [Test]
         async public Task null_in_json_object_is_null_in_array2()
         {
-            var script1 = @"[ 1, { @-fit(  null  ) }   ]";
+            var script1 = @"[ 1, { js(  null  ) }   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -97,7 +97,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_object()
         {
-            var script1 = @"{ a: 1, b: @-fit(  null  )   }";
+            var script1 = @"{ a: 1, b: js(  null  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -112,7 +112,7 @@ namespace DynJson.tests
         [Test]
         async public Task null_in_json_object_is_null_in_object()
         {
-            var script1 = @"{ a: 1, b: { @-many(  null  ) }   }";
+            var script1 = @"{ a: 1, b: { query-scalar( select null  ) }   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -120,14 +120,14 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{a:1,b:{null}}",
+                @"{a:1,b:null}",
                 result.ToJson());
         }
-
+        
         [Test]
         async public Task null_in_json_object_is_null_in_object2()
         {
-            var script1 = @"{ a: 1, b: { @(  null  ) }   }";
+            var script1 = @"{ a: 1, b: { query-scalar( select null  ), c:2 }   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -135,14 +135,60 @@ namespace DynJson.tests
             var txt = result.ToJson();
 
             Assert.AreEqual(
-                @"{a:1,b:{null}}",
+                @"{a:1,b:{c:2}}",
+                result.ToJson());
+        }
+
+
+        [Test]
+        async public Task null_in_json_object_is_null_in_object22()
+        {
+            var script1 = @"{  null  }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"{null}",
                 result.ToJson());
         }
 
         [Test]
         async public Task null_in_json_object_is_null_in_object3()
         {
-            var script1 = @"{ a: 1, b: [ @(  null  ) ]   }";
+            var script1 = @"{  { query-scalar( select null  ) }   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"{null}",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task null_in_json_object_is_null_in_object4()
+        {
+            var script1 = @"{ a: 1, b: { js(  null  ) }   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"{a:1,b:null}",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task null_in_json_object_is_null_in_object5()
+        {
+            var script1 = @"{ a: 1, b: [ js(  null  ) ]   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -155,9 +201,24 @@ namespace DynJson.tests
         }
 
         [Test]
-        async public Task null_in_json_object_is_null_in_object4()
+        async public Task null_in_json_object_is_null_in_object6()
         {
-            var script1 = @"{ a: 1, b: [ @-fit(  null  ) ]   }";
+            var script1 = @"{ a: 1, b: [ js(  null  ) ]   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"{a:1,b:[null]}",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task null_in_json_object_is_null_in_object66()
+        {
+            var script1 = @"{ a: 1, b: [ js(  null  ) in array ]   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -170,9 +231,9 @@ namespace DynJson.tests
         }
 
         [Test]
-        async public Task null_in_json_object_is_null_in_object5()
+        async public Task null_in_json_object_is_null_in_object7()
         {
-            var script1 = @"{ a: 1, b: [ @(  null  ) ]   }";
+            var script1 = @"{ a: 1, b: [ js(  null  ) ]   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

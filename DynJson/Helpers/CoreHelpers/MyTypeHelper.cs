@@ -48,6 +48,15 @@ namespace DynJson.Helpers.CoreHelpers
                 Type == typeof(TimeSpan?));
         }
 
+        public static bool IsNumeric(
+            this
+             Object AnyType)
+        {
+            if (AnyType != null)
+                IsNumeric(AnyType.GetType());
+            return false;
+        }
+
         public static bool IsNumeric(this Type Type)
         {
             if (Type == typeof(Decimal) ||

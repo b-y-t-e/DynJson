@@ -40,7 +40,7 @@ namespace DynJson.Helpers.DatabaseHelpers
             for (var i = 0; i < Reader.FieldCount; i++)
             {
                 var name = Reader.GetName(i);
-                var setter = DynLan.Helpers.RefUnsensitiveHelper.I.GetProperty(destType, name);
+                var setter = RefUnsensitiveHelper.I.GetProperty(destType, name);
                 if (setter != null)
                 {
                     var propertyType = setter.PropertyType;

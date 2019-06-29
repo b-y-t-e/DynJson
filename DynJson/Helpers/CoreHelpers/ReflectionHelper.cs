@@ -40,7 +40,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                propertyValue = DynLan.Helpers.RefUnsensitiveHelper.I.
+                propertyValue = RefUnsensitiveHelper.I.
                     GetValue(Item, PropertyName);
             }
             return propertyValue;
@@ -58,7 +58,7 @@ namespace DynJson.Helpers.CoreHelpers
             }
             else
             {
-                return DynLan.Helpers.RefUnsensitiveHelper.I.
+                return RefUnsensitiveHelper.I.
                     SetValue(Item, PropertyName, Value);
             }
             return false;
@@ -86,7 +86,7 @@ namespace DynJson.Helpers.CoreHelpers
                 foreach (var field in GetFields(Value))
                     resultDict[field.Name] = field.GetValue(Value);
 
-                foreach (var property in DynLan.Helpers.RefSensitiveHelper.I.GetPropertyinfos(Value))
+                foreach (var property in RefSensitiveHelper.I.GetPropertyinfos(Value))
                     resultDict[property.Name] = property.GetValue(Value);
             }
 

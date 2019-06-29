@@ -458,13 +458,13 @@ namespace DynJson.Helpers.DatabaseHelpers
             {
                 foreach (DbDataColumn databaseColumn in DbFields.Values)
                 {
-                    if (null == DynLan.Helpers.RefUnsensitiveHelper.I.GetProperty(Item, databaseColumn.Name))
+                    if (null == RefUnsensitiveHelper.I.GetProperty(Item, databaseColumn.Name))
                         continue;
 
                     yield return new DbDataColumnValue()
                     {
                         Name = databaseColumn.Name,
-                        Value = DynLan.Helpers.RefUnsensitiveHelper.I.GetValue(Item, databaseColumn.Name)
+                        Value = RefUnsensitiveHelper.I.GetValue(Item, databaseColumn.Name)
                     };
                 }
             }

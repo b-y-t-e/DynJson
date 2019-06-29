@@ -16,15 +16,15 @@ using Microsoft.CodeAnalysis.Scripting;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using DynLan;
-using DynLan.Exceptions;
+/*using DynLan;
+using DynLan.Exceptions;*/
 
 namespace DynJson.tests
 {
     [TestFixture]
     public class tests_dependecies
     {
-        [Test]
+       /* [Test]
         public void dynlan_should_throw_exceptionn_if_method_is_not_avaiable()
         {
             string code = "db.exec('select 1') ";
@@ -36,7 +36,7 @@ namespace DynJson.tests
                     Eval();
             });
         }
-
+        */
         [Test]
         public async Task inner_dynlan_should_throw_exceptionn_if_method_is_not_avaiable()
         {

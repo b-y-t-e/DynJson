@@ -8,7 +8,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DynJson.Exceptions;
-using DynLan.Exceptions;
 
 namespace DynJson.tests
 {
@@ -18,7 +17,7 @@ namespace DynJson.tests
         [Test]
         async public Task api_call_method_notexists()
         {
-            var script1 = @"{ @-many(api().exec('test_method')) }";
+            var script1 = @"{ js(api().exec('test_method')) }";
 
             try
             {
@@ -29,11 +28,11 @@ namespace DynJson.tests
 
                 throw new Exception("MethodNotFoundException should by thrown!");
             }
-            catch (DynLanExecuteException ex)
+            /*catch (DynLanExecuteException ex)
             {
                 if (ex.Message != "Method test_method was not found")
                     throw;
-            }
+            }*/
             catch (MethodNotFoundException ex)
             {
 
@@ -43,7 +42,7 @@ namespace DynJson.tests
         [Test]
         async public Task api_call_method_exists()
         {
-            var script1 = @"@(api().exec('test_method_2'))";
+            var script1 = @"js(api().exec('test_method_2'))";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

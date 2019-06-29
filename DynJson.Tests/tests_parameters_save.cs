@@ -31,7 +31,7 @@ method ( osoba : any )  {
 /*
 q( insert into osoba(imie) select @osoba_imie; ),
 */
-query( select imie from osoba where imie = 'test_sql' )
+query-scalar( select imie from osoba where imie = 'test_sql' )
 }
 ";
 
@@ -49,9 +49,9 @@ query( select imie from osoba where imie = 'test_sql' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@( item = new Dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
+js( item = new Dictionary(); item.imie = osoba.imie; db().save('osoba', item)  ),
 */
-query( select imie from osoba where imie = 'test_dynlan' )
+query-scalar( select imie from osoba where imie = 'test_dynlan' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -68,7 +68,7 @@ query( select imie from osoba where imie = 'test_dynlan' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@( db('secondary').save('osoba', osoba)  ),
+js( db('secondary').save('osoba', osoba)  ),
 */
 query( select imie from osoba where imie = 'test_dynlan22' )
 }
@@ -84,10 +84,10 @@ query( select imie from osoba where imie = 'test_dynlan22' )
             {
                 // ok
             }
-            catch (DynLan.Exceptions.DynLanExecuteException)
+           /* catch (DynLan.Exceptions.DynLanExecuteException)
             {
                 // ok
-            }
+            }*/
         }
 
         [Test]
@@ -98,9 +98,9 @@ query( select imie from osoba where imie = 'test_dynlan22' )
             var script1 = @" 
 method ( osoba : any )  {
 /*
-@( db().save('osoba', osoba)  ),
+js( db().save('osoba', osoba)  ),
 */
-query( select imie from osoba where imie = 'test_dynlan2' )
+query-scalar( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -119,7 +119,7 @@ method ( osoba : any )  {
 /*
 cs( var item = new Dictionary<string, object>(); item[""imie""] = osoba.imie; db().save(""osoba"", item);  ),
 */
-query( select imie from osoba where imie = 'test_dynlan_cs' )
+query-scalar( select imie from osoba where imie = 'test_dynlan_cs' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -138,7 +138,7 @@ method ( osoba : any )  {
 /*
 cs( db().save(""osoba"", osoba)  ),
 */
-query( select imie from osoba where imie = 'test_dynlan2' )
+query-scalar( select imie from osoba where imie = 'test_dynlan2' )
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -179,7 +179,7 @@ method ( dokument : any )  {
 cs( db().save(""dokument"", dokument)  ),
 cs( db().savechildren(""pozycjaDokumentu"", dokument.Pozycje, ""iddokumentu"", dokument.ID)  ),
 */
-query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+query-scalar(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
 ";
             var result = await new S4JExecutorForTests().
@@ -196,10 +196,10 @@ query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
             var script1 = @" 
 method ( dokument : any )  {
 /*
-@-many( db().save('dokument', dokument)  ),
-@-many( db().savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
+js( db().save('dokument', dokument)  ),
+js( db().savechildren('pozycjaDokumentu', dokument.Pozycje, 'iddokumentu', dokument.ID)  ),
 */
-query(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
+query-scalar(select count(*) from pozycjaDokumentu where iddokumentu = @dokument_id)
 }
 ";
             var result = await new S4JExecutorForTests().

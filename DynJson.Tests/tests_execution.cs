@@ -109,12 +109,12 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_class_fields_for_object()
         {
-            var script1 = @"{ a: 1, cs-fit( 
+            var script1 = @"{ a: 1, cs( 
     class osoba { public string imie; public string nazwisko; } 
     osoba o = new osoba(); 
     o.imie = ""adam""; 
     o.nazwisko = ""adsafasg""; 
-    return o; )  }";
+    return o; ) in array }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -194,7 +194,20 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_fields_for_object()
         {
-            var script1 = @"{ a: 1, cs-fit(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  )   }";
+            var script1 = @"{ a: 1, cs(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  )   }";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            Assert.AreEqual(
+                @"{a:1,""b"":2,""c"":3}",
+                result.ToJson());
+        }
+
+        [Test]
+        async public Task executor_should_understand_additional_fields_for_object2()
+        {
+            var script1 = @"{ a: 1, cs(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  ) in array  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -207,7 +220,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_null_fields_for_object()
         {
-            var script1 = @"{ a: 1, cs-fit(  null  ), d: 3   }";
+            var script1 = @"{ a: 1, cs(  null  ) in array, d: 3   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -220,7 +233,7 @@ namespace DynJson.tests
         /*[Test]
         async public Task executor_now()
         {
-            var script1 = @"{data:@(DateTime.Now)}";
+            var script1 = @"{data:js(DateTime.Now)}";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -233,7 +246,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array()
         {
-            var script1 = @"[ 1, cs-fit(  var list = new List<Object>(); return list;  )   ]";
+            var script1 = @"[ 1, cs(  var list = new List<Object>(); return list;  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -248,7 +261,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array()
         {
-            var script1 = @"[ 1, cs-fit(  return null;  )   ]";
+            var script1 = @"[ 1, cs(  return null;  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -261,9 +274,24 @@ namespace DynJson.tests
         }
 
         [Test]
+        async public Task executor_should_understand_additional_null_items_for_array2()
+        {
+            var script1 = @"[ 1, cs(  return null;  )    ]";
+
+            var result = await new S4JExecutorForTests().
+                ExecuteWithParameters(script1);
+
+            var txt = result.ToJson();
+
+            Assert.AreEqual(
+                @"[1,null]",
+                result.ToJson());
+        }
+
+        [Test]
         async public Task executor_should_understand_additional_items_for_array_version2()
         {
-            var script1 = @"[ 1, cs-fit(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  )   ]";
+            var script1 = @"[ 1, cs(  return 2; )   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -276,7 +304,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version3()
         {
-            var script1 = @"[ 1, cs-fit(  
+            var script1 = @"[ 1, cs(  
                 var list = new List<Object>();
                 {
                     var dict = new Dictionary<String, Object>(); 
@@ -290,20 +318,20 @@ namespace DynJson.tests
                     dict[""c""] = 33; 
                     list.Add(dict);
                 }
-                return list;  )   ]";
+                return list;  ) in array   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2,22]",
+                @"[1,{""b"":2,""c"":3},{""b"":22,""c"":33}]",
                 result.ToJson());
         }
 
         [Test]
         async public Task executor_should_understand_additional_objects_for_array()
         {
-            var script1 = @"[ 1, {cs-fit(  
+            var script1 = @"[ 1, {cs(  
                 var list = new List<Object>();
                 {
                     var dict = new Dictionary<String, Object>(); 
@@ -330,7 +358,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_objects_with_fields_for_array()
         {
-            var script1 = @"[ 1, {cs-fit(  
+            var script1 = @"[ 1, {cs(  
                 var list = new List<Object>();
                 {
                     var dict = new Dictionary<String, Object>(); 
@@ -357,7 +385,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_objects_for_array_version2()
         {
-            var script1 = @"[ 1, {cs-fit(  
+            var script1 = @"[ 1, {cs(  
                     var dict = new Dictionary<String, Object>(); 
                     dict[""b""] = 2; 
                     dict[""c""] = 3;                    
@@ -388,7 +416,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_fields_for_object_version2()
         {
-            var script1 = @"{ a: 1, b: cs-fit(  var dict = new Dictionary<String, Object>(); dict[""bb""] = 22; dict[""cc""] = 33; return dict;  )   }";
+            var script1 = @"{ a: 1, b: cs(  return 22;  )   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
