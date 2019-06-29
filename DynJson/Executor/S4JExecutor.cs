@@ -345,8 +345,12 @@ namespace DynJson.Executor
                 {
                     S4JToken child = children[i];
                     await Evaluate(child);
+                    if (token.WasRemoved)
+                        break;
                 }
-                AfterEvaluateToken(token);
+
+                if (!token.WasRemoved)
+                    AfterEvaluateToken(token);
             }
         }
 
@@ -421,7 +425,7 @@ namespace DynJson.Executor
             else if (function.Parent is S4JTokenObject objectParent3 &&
                 function.IsObjectSingleKey)
             {
-                EvaluateFunctionInsideObject(
+                await EvaluateFunctionInsideObject(
                     objectParent3,
                     function,
                     result);
@@ -442,7 +446,7 @@ namespace DynJson.Executor
             }
         }
 
-        private void EvaluateFunctionInsideObject(
+        private async Task EvaluateFunctionInsideObject(
             S4JTokenObject objectParent,
             S4JTokenFunction function,
             object result)
@@ -452,7 +456,7 @@ namespace DynJson.Executor
 
             if (objectParent.Parent is S4JTokenArray)
             {
-                EvaluateFunctionInsideObjectInsideArray(
+                await EvaluateFunctionInsideObjectInsideArray(
                     objectParent,
                     function,
                     result);
@@ -466,7 +470,7 @@ namespace DynJson.Executor
             }
         }
 
-        private void EvaluateFunctionInsideObjectInsideArray(
+        private async Task EvaluateFunctionInsideObjectInsideArray(
             S4JTokenObject objectParent,
             S4JTokenFunction function,
             object result)
@@ -502,9 +506,25 @@ namespace DynJson.Executor
                     newTokens.Add(newObjectToken);
                 }
 
+                objectParent.WasRemoved = true;
+
                 objectParent.Parent.RemoveChild(
                     objectParent,
                     newTokens);
+
+                foreach (var newToken in newTokens)
+                {
+                    for (var i = 0; i < newToken.Children.Count; i++)
+                    {
+                        if (i == indexOfFun)
+                            continue;
+
+                        S4JToken child = newToken.Children[i];
+                        await Evaluate(child);
+                    }
+
+                    AfterEvaluateToken(newToken);
+                }
             }
 
             // function.Result = list;
@@ -589,8 +609,8 @@ namespace DynJson.Executor
                             if (currentToken == parentToken && objectKeyName == keyAndVal.Key)
                                 continue;
 
-                            if (!variables.ContainsKey(keyAndVal.Key))                            
-                                variables[keyAndVal.Key] = keyAndVal.Value;                            
+                            if (!variables.ContainsKey(keyAndVal.Key))
+                                variables[keyAndVal.Key] = keyAndVal.Value;
                         }
                     }
                     currentToken = currentToken.Parent;

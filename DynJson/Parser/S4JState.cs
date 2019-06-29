@@ -89,8 +89,8 @@ namespace DynJson.Parser
         {
             S4JState item = (S4JState)this.MemberwiseClone();
             item.AllowedStateTypes = this.AllowedStateTypes;
-            item.Gates = this.Gates.ToList();
-            item.FoundGates = null;
+            item.Gates = this.Gates?.ToList();
+            item.FoundGates = this.FoundGates?.ToList();
             return item;
         }
     }

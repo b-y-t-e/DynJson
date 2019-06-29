@@ -285,6 +285,8 @@ namespace DynJson.tests
 
         delete from dbo.dokument
 
+        delete from dbo.pozycjaDokumentu
+
         insert into dbo.dokument(numer, rodzaj)
         select 'numer1', 0
 
@@ -299,6 +301,21 @@ namespace DynJson.tests
 
         insert into dbo.dokument(numer, rodzaj)
         select 'numer5', 1
+
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer6', 1
+
+        insert into dbo.dokument(numer, rodzaj)
+        select 'numer7', 1
+
+        insert into dbo.pozycjaDokumentu(iddokumentu, lp)
+        select (select id from dokument where numer = 'numer6'), 10
+
+        insert into dbo.pozycjaDokumentu(iddokumentu, lp)
+        select (select id from dokument where numer = 'numer6'), 11
+
+        insert into dbo.pozycjaDokumentu(iddokumentu, lp)
+        select (select id from dokument where numer = 'numer7'), 20
 
         delete from dbo.osoba
 

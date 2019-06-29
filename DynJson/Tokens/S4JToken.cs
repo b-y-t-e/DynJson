@@ -51,6 +51,8 @@ namespace DynJson.Tokens
 
         public bool IsCommited { get; set; }
 
+        public bool WasRemoved { get; set; }
+
         //////////////////////////////////////////////////
 
         public S4JToken()
