@@ -1,12 +1,10 @@
 # [DYNJSON] | Dynamic API prototyping | JSON | in .NET
 
 ## Description
-DynJson is a .net library that allows to rapid API (JSON) prototyping using technologies:
- + json
+DynJson is a .net library that allows to rapid API (JSON) prototyping using languages:
  + [javascript](https://github.com/sebastienros/jint)
- + c#
  + sql
- + [dynlan](https://github.com/b-y-t-e/DynLan)
+ + c#
 
 It is possible to use almost any technology compatible with .net environment via a plugin mechanism.
 
