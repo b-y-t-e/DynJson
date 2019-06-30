@@ -46,9 +46,7 @@ method(param1, param2: string)
 ```
 method(personID: int)
 {
-   {
-      query(select * from person where id = @personID)
-   }
+   query(select * from person where id = @personID)
 }
 ```
 
@@ -56,11 +54,9 @@ method(personID: int)
 ```
 method(filter: string)
 {
-   [
-      {
-         query(select * from person where description like '%' + @filter + '%')
-      }
-   ]
+   {
+       "filteredPeople" : query(select * from person where description like '%' + @filter + '%')
+   }
 }
 ```
 
@@ -81,7 +77,7 @@ method(text0: string)
 {
    {
       "newCsValue" : cs( text0 + "!" ) as text1,
-      "newSqlValue" : query( select @text1 + '!' ) as text2,
+      "newSqlValue" : query-scalar( select @text1 + '!' ) as text2,
       "newDynlanValue" : js( text2 + '!' )
    }
 }
