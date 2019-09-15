@@ -415,7 +415,7 @@ namespace DynJson.Executor
             function.IsEvaluated = true;
             function.Result = result;
 
-            if (function.IsObjectSingleKey || function.InArray)
+            if (function.IsObjectSingleKey || function.ExpandValues)
             {
                 // { a : 1, q(select id, nazwa from towar where id = 123) } -> { a : 1, id : 123, nazwa : 'nazwa' }
                 if (function.Parent is S4JTokenObject objectParent3 &&

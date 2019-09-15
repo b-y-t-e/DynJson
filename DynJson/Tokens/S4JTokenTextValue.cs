@@ -28,7 +28,8 @@ namespace DynJson.Tokens
 
         public String TargetSourceFromText { get; set; }
 
-        public String InArrayFromText { get; set; }
+        public Boolean ExpandValues { get; set; }
+        // public String InArrayFromText { get; set; }
 
         // public String OutputVariableName { get; set; }
 
@@ -41,7 +42,8 @@ namespace DynJson.Tokens
             IsObjectKey = false;
             VariableNameFromText = null;
             TargetSourceFromText = null;
-            InArrayFromText = null;
+            // InArrayFromText/ = null;
+            ExpandValues = false;
             //IsVariableReference = false;
             Children = new List<S4JToken>();
             State = S4JDefaultStateBag.Get().ValueState /* new S4JState()
@@ -74,7 +76,7 @@ namespace DynJson.Tokens
             if (!IsVisible && !Force)
                 return false;
 
-            if (InArrayFromText != null)
+            if (ExpandValues) // InArrayFromText != null)
             {
                 Builder.Append(Result.SerializeJson());
             }
@@ -106,21 +108,28 @@ namespace DynJson.Tokens
 
             this.IsCommited = true;
 
-            for (var i = 0; i < parts.Count; i += 2)
+            var i = 0;
+            if (parts.Count >= 0)
             {
-                if (i == (parts.Count - 1))
+                if (this.CheckOperatorExpand(parts[0]))
+                    i++;
+            }
+
+            if (parts.Count >= 2)
+            {
+                for (; i < parts.Count; i += 2)
+                {
+                    //if (i == (parts.Count - 1))
+                    //    break;
+
+                    if (this.CheckVariable(parts[i], parts[i + 1]))
+                        continue;
+
+                    if (this.CheckTargetSource(parts[i], parts[i + 1]))
+                        continue;
+                        
                     break;
-
-                if (this.CheckVariable(parts[i], parts[i + 1]))
-                    continue;
-
-                if (this.CheckTargetSource(parts[i], parts[i + 1]))
-                    continue;
-
-                if (this.CheckInArray(parts[i], parts[i + 1]))
-                    continue;
-
-                break;
+                }
             }
 
             if (!string.IsNullOrEmpty(VariableNameFromText)) // this.WorkType == TokenTextType.VARIABLE_OUTPUT)
@@ -135,9 +144,9 @@ namespace DynJson.Tokens
                 wasExecuted = false;
             }
 
-            if (!string.IsNullOrEmpty(InArrayFromText)) // (this.WorkType == TokenTextType.TARGET_SOURCE)
+            if (ExpandValues) // !string.IsNullOrEmpty(InArrayFromText)) // (this.WorkType == TokenTextType.TARGET_SOURCE)
             {
-                this.PrevToken.InArray = true;
+                this.PrevToken.ExpandValues = true;
                 wasExecuted = false;
             }
 
@@ -180,14 +189,14 @@ namespace DynJson.Tokens
             this.Result = null;
             return true;
         }
-        
-        private bool CheckInArray(String OperatorText, String InArrayText) // List<String> Parts)
+
+        private bool CheckOperatorExpand(String OperatorText) //, String InArrayText) // List<String> Parts)
         {
-            if (!MyStringHelper.CheckInArray(OperatorText, InArrayText))
+            if (!MyStringHelper.CheckOperatorExpand(OperatorText)) //, InArrayText))
                 return false;
 
             //this.WorkType = TokenTextType.TARGET_SOURCE;
-            this.InArrayFromText = InArrayText;
+            this.ExpandValues = true; // InArrayText;
             this.Result = null;
             return true;
         }

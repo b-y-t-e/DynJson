@@ -32,7 +32,7 @@ namespace DynJson.tests
         [Test]
         async public Task executed_null_as_value_is_null_in_array()
         {
-            var script1 = @"[  1, js(  null  ) in array   ]";
+            var script1 = @"[  1, js(  null  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -218,7 +218,7 @@ namespace DynJson.tests
         [Test]
         async public Task null_in_json_object_is_null_in_object66()
         {
-            var script1 = @"{ a: 1, b: [ js(  null  ) in array ]   }";
+            var script1 = @"{ a: 1, b: [ js(  null  ) expand ]   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

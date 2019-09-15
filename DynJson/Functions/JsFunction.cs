@@ -38,104 +38,6 @@ namespace DynJson.Functions
         }
     }
 
-   /* public class JsMergeFunction : S4JStateFunction
-    {
-        public JsMergeFunction() :
-            this("@-merge;js-merge")
-        {
-            ReturnExactValue = false;
-        }
-
-        public JsMergeFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new JsBrackets();
-            CommentDefinition = new JsComment();
-            QuotationDefinition = new JsQuotation();
-            Evaluator = new JsEvaluator();
-        }
-    }*/
-
-    /*public class JsFitFunction : S4JStateFunction
-    {
-        public JsFitFunction() :
-            this("@-fit;js-fit")
-        {
-            ReturnExactValue = false;
-        }
-
-        public JsFitFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new JsBrackets();
-            CommentDefinition = new JsComment();
-            QuotationDefinition = new JsQuotation();
-            Evaluator = new JsEvaluator();
-        }
-    }
-
-    public class JsSingleFunction : S4JStateFunction
-    {
-        public JsSingleFunction() :
-            this("@-single;js-single")
-        {
-            ReturnExactValue = true;
-            ReturnSingleObject = true;
-        }
-
-        public JsSingleFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new JsBrackets();
-            CommentDefinition = new JsComment();
-            QuotationDefinition = new JsQuotation();
-            Evaluator = new JsEvaluator();
-        }
-    }
-
-    public class JsManyFunction : S4JStateFunction
-    {
-        public JsManyFunction() :
-            this("@-many;js-many")
-        {
-            ReturnExactValue = true;
-            ReturnManyObjects = true;
-        }
-
-        public JsManyFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new JsBrackets();
-            CommentDefinition = new JsComment();
-            QuotationDefinition = new JsQuotation();
-            Evaluator = new JsEvaluator();
-        }
-    }
-
-    public class JsValueFunction : S4JStateFunction
-    {
-        public JsValueFunction() :
-            this("@-value;js-value")
-        {
-            ReturnExactValue = true;
-            ReturnSingleValue = true;
-        }
-
-        public JsValueFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new JsBrackets();
-            CommentDefinition = new JsComment();
-            QuotationDefinition = new JsQuotation();
-            Evaluator = new JsEvaluator();
-        }
-    }*/
-
     public class JsComment : S4JState
     {
         public JsComment()
@@ -169,8 +71,6 @@ namespace DynJson.Functions
         {
             Priority = 2;
             StateType = EStateType.FUNCTION_QUOTATION;
-            //IsValue = true;
-            //IsQuotation = true;
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -200,7 +100,7 @@ namespace DynJson.Functions
                     EStateType.FUNCTION_BRACKETS,
                     EStateType.FUNCTION_COMMENT
                 };
-            //IsValue = true;
+                
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -222,50 +122,12 @@ namespace DynJson.Functions
         }
     }
 
-    /*public class JsProgramCache
-    {
-        Dictionary<string, JsProgram> cache =
-            new Dictionary<string, JsProgram>();
-
-        public void Save(string code, JsProgram program)
-        {
-            lock (cache)
-                cache[code] = program;
-        }
-
-        public JsProgram Get(string code)
-        {
-            JsProgram program = null;
-            lock (cache)
-                cache.TryGetValue(code, out program);
-            return program;
-        }
-    }*/
-
     public class JsEvaluator : IEvaluator
     {
-        /*static JsProgramCache cache =
-            new JsProgramCache();*/
-
         public async Task<Object> Evaluate(S4JExecutor Executor, S4JToken token, IDictionary<String, object> variables)
         {
             S4JTokenFunction function = token as S4JTokenFunction;
             StringBuilder code = new StringBuilder();
-
-            //JsEvaluatorGlobals globals = new JsEvaluatorGlobals();
-            //IDictionary<string, object> globalVariables = globals.Globals as IDictionary<string, object>;
-
-
-            /* globalVariables["list"] = (Func<List<Object>>)(() =>
-             {
-                 return new List<Object>();
-             });
-
-             globalVariables["dictionary"] = (Func<Dictionary<String, Object>>)(() =>
-             {
-                 return new Dictionary<String, Object>();
-             });*/
-
 
             var engine = new Engine(cfg =>
             {
@@ -304,39 +166,15 @@ namespace DynJson.Functions
             foreach (KeyValuePair<string, object> keyAndVal in variables)
             {
                 engine.SetValue(keyAndVal.Key, keyAndVal.Value);
-                // globalVariables[keyAndVal.Key] = keyAndVal.Value;
             }
 
-            // code.Append("function DynJsonRootFunction() { ").Append(function.ToJsonWithoutGate()).Append(" } DynJsonRootFunctionResult = DynJsonRootFunction(); ");
             code.Append(function.ToJsonWithoutGate());
-
-            //JsProgram program = cache.Get(code.ToString());
-            /*if (program == null)
-            {
-                Stopwatch stCompile = Stopwatch.StartNew();
-                try
-                {
-                    program = new Engine().
-                        Compile(code.ToString());
-
-                    //cache.Save(code.ToString(), program);
-                }
-                finally
-                {
-                    if (Logger.IsEnabled)
-                        Logger.LogPerformance("DYNLAN", "compile", stCompile.ElapsedMilliseconds, code.ToString());
-                }
-            }*/
 
             Stopwatch st = Stopwatch.StartNew();
             try
             {
-                //engine.SetValue("DynJsonRootFunctionResult", (object)null);
-                //foreach (var var in globalVariables)
-                //engine.SetValue(var.Key, var.Value);
                 engine.Execute(code.ToString());
                 object result = engine.GetCompletionValue().ToObject();
-                //object result = engine.GetValue("DynJsonRootFunctionResult");
 
                 return result;
             }

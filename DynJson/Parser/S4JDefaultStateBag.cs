@@ -20,30 +20,11 @@ namespace DynJson.Parser
                     if (i == null)
                     {
                         i = new S4JStateBag();
-                        i.AddStatesToBag(
-                            /*new CSharpFitFunction(),
-                            new CSharpSingleFunction(),
-                            new CSharpManyFunction(),
-                            new CSharpValueFunction(),*/
-                           // new CSharpMergeFunction(),
+                        i.AddStates(
                             new CSharpFunction(),
-
-                           /* new DynLanFunction(),
-                            new DynLanFitFunction(),
-                            new DynLanManyFunction(),
-                            new DynLanSingleFunction(),
-                            new DynLanValueFunction(),*/
-
                             new JsFunction(),
-                            //new JsMergeFunction(),
-                            /*new JsFitFunction(),
-                            new JsManyFunction(),
-                            new JsSingleFunction(),
-                            new JsValueFunction(),*/
-
                             new TSqlSingleExpandedFunction(),
                             new TSqlValueExpandedFunction(),
-                            // new TSqlExpandedFunction(),
                             new TSqlManyFunction());
                     }
 

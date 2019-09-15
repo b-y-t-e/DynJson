@@ -393,7 +393,7 @@ namespace DynJson.Parser
             CorrectOrderOfItems();
         }
 
-        public void AddStatesToBag(params S4JStateFunction[] States)
+        public void AddStates(params S4JStateFunction[] States)
         {
             foreach (S4JStateFunction state in States)
             {

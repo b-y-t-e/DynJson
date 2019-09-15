@@ -316,29 +316,15 @@ namespace DynJson.Helpers.CoreHelpers
             }
         }
 
-        private static char[] inArrayString = "in".ToCharArray();
-        public static Boolean CheckInArray(String OperatorText, String InArrayText)
+        private static String operatorExpandString = "expand";
+        public static Boolean CheckOperatorExpand(String OperatorText) // , String InArrayText)
         {
-            if (OperatorText.Length != inArrayString.Length || InArrayText.Length == 0)
+            if (OperatorText.Length != operatorExpandString.Length) // || InArrayText.Length == 0)
                 return false;
 
-            if (OperatorText[0] == inArrayString[0] &&
-                OperatorText[1] == inArrayString[1])
+            if (OperatorText == operatorExpandString)
             {
-                if (InArrayText == "array")
-                    return true;
-                return false;
-
-                /*if (Char.IsNumber(InArrayText[0]))
-                {
-                    return false;
-                }
-                else
-                {
-                    if (IsQuotedText(InArrayText))
-                        return false;
-                }
-                return true;*/
+                return true;
             }
             else
             {

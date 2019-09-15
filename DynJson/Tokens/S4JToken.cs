@@ -31,7 +31,7 @@ namespace DynJson.Tokens
 
         public String TargetSource { get; set; }
 
-        public Boolean InArray { get; set; }
+        public Boolean ExpandValues { get; set; }
 
         public Object Result { get; set; }
 

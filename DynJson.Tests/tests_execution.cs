@@ -114,7 +114,7 @@ namespace DynJson.tests
     osoba o = new osoba(); 
     o.imie = ""adam""; 
     o.nazwisko = ""adsafasg""; 
-    return o; ) in array }";
+    return o; ) expand }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -207,7 +207,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_fields_for_object2()
         {
-            var script1 = @"{ a: 1, cs(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  ) in array  }";
+            var script1 = @"{ a: 1, cs(  var dict = new Dictionary<String, Object>(); dict[""b""] = 2; dict[""c""] = 3; return dict;  ) expand  }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -220,7 +220,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_null_fields_for_object()
         {
-            var script1 = @"{ a: 1, cs(  null  ) in array, d: 3   }";
+            var script1 = @"{ a: 1, cs(  null  ) expand, d: 3   }";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -246,7 +246,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array()
         {
-            var script1 = @"[ 1, cs(  var list = new List<Object>(); return list;  ) in array   ]";
+            var script1 = @"[ 1, cs(  var list = new List<Object>(); return list;  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -261,7 +261,7 @@ namespace DynJson.tests
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array()
         {
-            var script1 = @"[ 1, cs(  return null;  ) in array   ]";
+            var script1 = @"[ 1, cs(  return null;  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -318,7 +318,7 @@ namespace DynJson.tests
                     dict[""c""] = 33; 
                     list.Add(dict);
                 }
-                return list;  ) in array   ]";
+                return list;  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

@@ -216,7 +216,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array()
         {
-            var script1 = @"[ 1, js(  result = new List(); result.Add(2); result.Add(3); result;  ) in array  ]";
+            var script1 = @"[ 1, js(  result = new List(); result.Add(2); result.Add(3); result;  ) expand  ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -259,7 +259,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_empty_items_for_array2()
         {
-            var script1 = @"[ 1, js(  result = new List(); result;  ) in array   ]";
+            var script1 = @"[ 1, js(  result = new List(); result;  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -289,7 +289,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_null_items_for_array2()
         {
-            var script1 = @"[ 1, js(  null;  ) in array   ]";
+            var script1 = @"[ 1, js(  null;  ) expand   ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -304,7 +304,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         [Test]
         async public Task executor_should_understand_additional_items_for_array_version2()
         {
-            var script1 = @"[ 1, js(  dict = new Dictionary(); dict['b'] = 2; dict['c'] = 3; dict;  ) in array  ]";
+            var script1 = @"[ 1, js(  dict = new Dictionary(); dict['b'] = 2; dict['c'] = 3; dict;  ) expand  ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -331,7 +331,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                     dict['c'] = 33; 
                     result.Add(dict);
                 }
-                result;  )  in array ]";
+                result;  )  expand ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);
@@ -430,7 +430,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
         async public Task executor_should_understand_additional_null_objects_for_array1()
         {
             var script1 = @"[ 1, js(  
-                    null  )  in array ]";
+                    null  )  expand ]";
 
             var result = await new S4JExecutorForTests().
                 ExecuteWithParameters(script1);

@@ -14,28 +14,6 @@ using DynJson.Tokens;
 
 namespace DynJson.Functions
 {
-    /*public class TSqlExpandedFunction : S4JStateFunction
-    {
-        public TSqlExpandedFunction() :
-            this("query;q")
-        {
-            ReturnExactValue = false;
-        }
-
-        public TSqlExpandedFunction(string aliasName) :
-            base(aliasName)
-        {
-            Priority = 0;
-            BracketsDefinition = new TSqlBrackets();
-            CommentDefinition = new TSqlComment();
-            QuotationDefinition = new TSqlQuotation();
-            Evaluator = new TSqlEvaluator();
-            FunctionTagExecutor = context =>
-            {
-            };
-        }
-    }*/
-
     public class TSqlManyFunction : S4JStateFunction
     {
         public TSqlManyFunction() :
