@@ -1,12 +1,10 @@
 # [DYNJSON] | Dynamic API prototyping | JSON | in .NET
 
 ## Description
-DynJson is a .net library that allows to rapid API (JSON) prototyping using technologies:
- + json
+DynJson is a .net library that allows to rapid API (JSON) prototyping using languages:
  + [javascript](https://github.com/sebastienros/jint)
- + c#
  + sql
- + [dynlan](https://github.com/b-y-t-e/DynLan)
+ + c#
 
 It is possible to use almost any technology compatible with .net environment via a plugin mechanism.
 
@@ -46,9 +44,7 @@ method(param1, param2: string)
 ```
 method(personID: int)
 {
-   {
-      query(select * from person where id = @personID)
-   }
+   query(select * from person where id = @personID)
 }
 ```
 
@@ -56,11 +52,9 @@ method(personID: int)
 ```
 method(filter: string)
 {
-   [
-      {
-         query(select * from person where description like '%' + @filter + '%')
-      }
-   ]
+   {
+       "filteredPeople" : query(select * from person where description like '%' + @filter + '%')
+   }
 }
 ```
 
@@ -81,7 +75,7 @@ method(text0: string)
 {
    {
       "newCsValue" : cs( text0 + "!" ) as text1,
-      "newSqlValue" : query( select @text1 + '!' ) as text2,
+      "newSqlValue" : query-scalar( select @text1 + '!' ) as text2,
       "newDynlanValue" : js( text2 + '!' )
    }
 }
