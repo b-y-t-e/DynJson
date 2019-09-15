@@ -28,7 +28,7 @@ namespace DynJson.Parser
                             new TSqlManyFunction());
                     }
 
-            return i;//.Clone();
+            return i;
         }
     }
 }

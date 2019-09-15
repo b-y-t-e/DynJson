@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using DynJson.Helpers.CoreHelpers;
 using DynJson.Tokens;
 using DynJson.Classes;
+using System.Threading;
 
 namespace DynJson.Executor
 {
@@ -39,6 +40,7 @@ namespace DynJson.Executor
         }
     }
 
+
     public class S4JExecutor
     {
         public S4JStateBag StateBag { get; private set; }
@@ -52,6 +54,29 @@ namespace DynJson.Executor
         public Methods Methods { get; set; }
 
         private Dictionary<string, Object> globalVariables;
+
+        //////////////////////////////////
+
+        private static Dictionary<int, S4JExecutor> executors =
+        new Dictionary<int, S4JExecutor>();
+        public static S4JExecutor Current
+        {
+            get
+            {
+                S4JExecutor executor = null;
+                lock (executors) executors.TryGetValue(Thread.CurrentThread.ManagedThreadId, out executor);
+                return executor;
+            }
+            private set
+            {
+                if (value != null)
+                    executors[Thread.CurrentThread.ManagedThreadId] = value;
+                else
+                    executors.Remove(Thread.CurrentThread.ManagedThreadId);
+            }
+        }
+
+        //////////////////////////////////
 
         public S4JExecutor(S4JStateBag StateBag)
         {
@@ -304,53 +329,61 @@ namespace DynJson.Executor
 
         async private Task Evaluate(S4JToken token)
         {
-            if (token == null)
-                return;
-
-            IDictionary<string, object> variables = GetExecutingVariables(null, token);
-
-            bool isVisible = true;
-            if (token.Tags.Count > 0 && TagValidators?.Count > 0)
+            S4JExecutor.Current = this;
+            try
             {
-                foreach (var tagValidator in TagValidators)
+                if (token == null)
+                    return;
+
+                IDictionary<string, object> variables = GetExecutingVariables(null, token);
+
+                bool isVisible = true;
+                if (token.Tags.Count > 0 && TagValidators?.Count > 0)
                 {
-                    using (ExecutorContext context = new ExecutorContext(token, variables))
+                    foreach (var tagValidator in TagValidators)
                     {
-                        isVisible = tagValidator(context);
-                        if (!isVisible)
-                            break;
+                        using (ExecutorContext context = new ExecutorContext(token, variables))
+                        {
+                            isVisible = tagValidator(context);
+                            if (!isVisible)
+                                break;
+                        }
                     }
                 }
-            }
 
-            if (token.IsVisible && !isVisible)
-                token.IsVisible = false;
-            //if (!canBeEvaluated)
-            //    return;
+                if (token.IsVisible && !isVisible)
+                    token.IsVisible = false;
+                //if (!canBeEvaluated)
+                //    return;
 
-            if (token is S4JTokenFunction function) // .State.StateType == EStateType.FUNCTION)
-            {
-                await EvaluateFunction(function);
-                AfterEvaluateToken(function);
-            }
-            else if (token is S4JTokenTextValue textValue && textValue.VariableNameFromText != null)
-            {
-                await EvaluateTokenVariable(textValue, variables);
-                AfterEvaluateToken(textValue);
-            }
-            else
-            {
-                var children = token.Children.ToArray();
-                for (var i = 0; i < children.Length; i++)
+                if (token is S4JTokenFunction function) // .State.StateType == EStateType.FUNCTION)
                 {
-                    S4JToken child = children[i];
-                    await Evaluate(child);
-                    if (token.WasRemoved)
-                        break;
+                    await EvaluateFunction(function);
+                    AfterEvaluateToken(function);
                 }
+                else if (token is S4JTokenTextValue textValue && textValue.VariableNameFromText != null)
+                {
+                    await EvaluateTokenVariable(textValue, variables);
+                    AfterEvaluateToken(textValue);
+                }
+                else
+                {
+                    var children = token.Children.ToArray();
+                    for (var i = 0; i < children.Length; i++)
+                    {
+                        S4JToken child = children[i];
+                        await Evaluate(child);
+                        if (token.WasRemoved)
+                            break;
+                    }
 
-                if (!token.WasRemoved)
-                    AfterEvaluateToken(token);
+                    if (!token.WasRemoved)
+                        AfterEvaluateToken(token);
+                }
+            }
+            finally
+            {
+                S4JExecutor.Current = null;
             }
         }
 

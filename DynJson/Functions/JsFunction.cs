@@ -100,7 +100,7 @@ namespace DynJson.Functions
                     EStateType.FUNCTION_BRACKETS,
                     EStateType.FUNCTION_COMMENT
                 };
-                
+
             Gates = new List<S4JStateGate>()
                 {
                     new S4JStateGate()
@@ -122,6 +122,81 @@ namespace DynJson.Functions
         }
     }
 
+    public static class JsApiDefault
+    {
+        static Object lck = new Object();
+        static JsApi i;
+        public static JsApi Get()
+        {
+            if (i == null)
+                lock (lck)
+                    if (i == null)
+                    {
+                        i = new JsApi();
+
+                        JsApiDefault.Get().AddType("Guid", typeof(Guid));
+                        JsApiDefault.Get().AddType("DateTime", typeof(DateTime));
+                        JsApiDefault.Get().AddType("List", typeof(List<Object>));
+                        JsApiDefault.Get().AddType("Dictionary", typeof(Dictionary<String, Object>));
+                        JsApiDefault.Get().AddDelegate("api", (Func<DynJsonApi>)(() =>
+                        {
+                            DynJsonApi api = new DynJsonApi(S4JExecutor.Current);
+                            return api;
+                        }));
+                        JsApiDefault.Get().AddDelegate("db", (Func<Object, DbApi>)((Parameter) =>
+                        {
+                            string sourceName = UniConvert.ToString(Parameter);
+                            string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                                    S4JExecutor.Current.Sources.Get(sourceName) :
+                                    S4JExecutor.Current.Sources.GetDefault();
+
+                            DbApi api = new DbApi(connectionString, sourceName ?? S4JExecutor.Current.Sources.DefaultSourceName);
+                            return api;
+                        }));
+                        JsApiDefault.Get().AddDelegate("sqlbuilder", (Func<SqlBuilder>)(() =>
+                        {
+                            SqlBuilder sql = new SqlBuilder();
+                            return sql;
+                        }));
+                    }
+
+            return i;
+        }
+    }
+
+    public class JsApi
+    {
+        private Dictionary<String, Object> cache;
+
+        public IEnumerable<KeyValuePair<String, Object>> Items
+        {
+            get { return cache; }
+        }
+
+        public S4JExecutor Executor { get; set; }
+
+        public JsApi()
+        {
+            cache = new Dictionary<string, object>();
+        }
+
+        public void AddType(String Name, Type TypeName)
+        {
+            cache[Name] = TypeName;
+        }
+
+        public void AddDelegate(String Name, Delegate Delegate)
+        {
+            cache[Name] = Delegate;
+        }
+
+        public void AddValue(String Name, Object Object)
+        {
+            cache[Name] = Object;
+        }
+    }
+
+
     public class JsEvaluator : IEvaluator
     {
         public async Task<Object> Evaluate(S4JExecutor Executor, S4JToken token, IDictionary<String, object> variables)
@@ -135,33 +210,10 @@ namespace DynJson.Functions
                 cfg.Culture(CultureInfo.InvariantCulture);
             });
 
-            engine.SetValue("Guid", TypeReference.CreateTypeReference(engine, typeof(Guid)));
-            engine.SetValue("DateTime", TypeReference.CreateTypeReference(engine, typeof(DateTime)));
-            engine.SetValue("List", TypeReference.CreateTypeReference(engine, typeof(List<Object>)));
-            engine.SetValue("Dictionary", TypeReference.CreateTypeReference(engine, typeof(Dictionary<String, Object>)));
-
-            engine.SetValue("db", (Func<Object, DbApi>)((Parameter) =>
-             {
-                 string sourceName = UniConvert.ToString(Parameter);
-                 string connectionString = !string.IsNullOrEmpty(sourceName) ?
-                     Executor.Sources.Get(sourceName) :
-                     Executor.Sources.GetDefault();
-
-                 DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
-                 return api;
-             }));
-
-            engine.SetValue("api", (Func<DynJsonApi>)(() =>
-             {
-                 DynJsonApi api = new DynJsonApi(Executor);
-                 return api;
-             }));
-
-            engine.SetValue("sqlbuilder", (Func<SqlBuilder>)(() =>
+            foreach (KeyValuePair<string, object> keyAndVal in JsApiDefault.Get().Items)
             {
-                SqlBuilder sql = new SqlBuilder();
-                return sql;
-            }));
+                engine.SetValue(keyAndVal.Key, keyAndVal.Value);
+            }
 
             foreach (KeyValuePair<string, object> keyAndVal in variables)
             {
