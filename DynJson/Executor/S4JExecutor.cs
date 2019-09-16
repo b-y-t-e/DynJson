@@ -721,14 +721,23 @@ namespace DynJson.Executor
             if (value == null)
                 return null;
 
-            if (value is S4JExecutorParam)
+            if (value is String)
+            {
+                return JsonToDynamicDeserializer.Deserialize((string)value);
+            }
+            else
+            {
+                return value;
+            }
+
+            /*if (value is S4JExecutorParam)
             {
                 return value;
             }
             else
             {
                 return JsonToDynamicDeserializer.Deserialize((string)value);
-            }
+            }*/
         }
 
     }

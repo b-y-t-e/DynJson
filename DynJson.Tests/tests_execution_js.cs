@@ -222,7 +222,7 @@ class osoba() { imie= ''; nazwisko = ''; } o = osoba(); o.imie = 'adam'; o.nazwi
                 ExecuteWithParameters(script1);
 
             Assert.AreEqual(
-                @"[1,2.0,3.0]",
+                @"[1,2.0,3.0]", 
                 result.ToJson());
         }
 

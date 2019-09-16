@@ -11,7 +11,7 @@ namespace DynJson.Executor
         public S4JExecutorForTests() 
         {
             this.Sources.
-                Register("primary", "Data Source=.;uid=dba;pwd=sql;initial catalog=dynjson;");
+                Register("primary", "Data Source=.;uid=dba;pwd=sql;initial catalog=testsdb;");
 
             this.Methods.Add(async (name) =>
             {

@@ -13,6 +13,9 @@ namespace DynJson.Helpers.CoreHelpers
     {
         public static Object Deserialize(String Json)
         {
+            if (Json == null)
+                return null;
+
             Char? firstChar = Json.FirstOrDefault(ch => !char.IsWhiteSpace(ch));
             if (firstChar == '{')
                 return JsonConvert.DeserializeObject<IDictionary<string, object>>(Json, new DynamicDictionaryConverter());
