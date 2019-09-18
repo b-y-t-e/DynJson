@@ -179,7 +179,7 @@ namespace DynJson.Database
             }
         }
 
-        public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, params String[] FieldsToSave)
+        /*public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, params String[] FieldsToSave)
         {
             Stopwatch st = Stopwatch.StartNew();
             IList<Object> items = null;
@@ -213,7 +213,7 @@ namespace DynJson.Database
                 if (Logger.IsEnabled)
                     Logger.LogPerformance("SQL-" + dbName, "savechildren#1", st.ElapsedMilliseconds, $"{TableName} / {items?.Count ?? 0}");
             }
-        }
+        }*/
 
         public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, Object ParentPropertyValue, params String[] FieldsToSave)
         {
