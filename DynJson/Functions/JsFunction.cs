@@ -122,65 +122,82 @@ namespace DynJson.Functions
         }
     }
 
-    public static class JsApiDefault
+    public class JsApiDefault : JsApi
     {
-        static Object lck = new Object();
-        static JsApi i;
-        public static JsApi Get()
+        private static Dictionary<String, Object> staticCache =
+            new Dictionary<string, object>();
+
+        public static void AddType(String Name, Type TypeName)
         {
-            if (i == null)
-                lock (lck)
-                    if (i == null)
-                    {
-                        i = new JsApi();
-
-                        JsApiDefault.Get().AddType("Guid", typeof(Guid));
-                        JsApiDefault.Get().AddType("DateTime", typeof(DateTime));
-                        JsApiDefault.Get().AddType("List", typeof(List<Object>));
-                        JsApiDefault.Get().AddType("Dictionary", typeof(Dictionary<String, Object>));
-                        JsApiDefault.Get().AddDelegate("api", (Func<DynJsonApi>)(() =>
-                        {
-                            DynJsonApi api = new DynJsonApi(S4JExecutor.Current);
-                            return api;
-                        }));
-                        JsApiDefault.Get().AddDelegate("db", (Func<Object, DbApi>)((Parameter) =>
-                        {
-                            string sourceName = UniConvert.ToString(Parameter);
-                            string connectionString = !string.IsNullOrEmpty(sourceName) ?
-                                    S4JExecutor.Current.Sources.Get(sourceName) :
-                                    S4JExecutor.Current.Sources.GetDefault();
-
-                            DbApi api = new DbApi(connectionString, sourceName ?? S4JExecutor.Current.Sources.DefaultSourceName);
-                            return api;
-                        }));
-                        JsApiDefault.Get().AddDelegate("sqlbuilder", (Func<SqlBuilder>)(() =>
-                        {
-                            SqlBuilder sql = new SqlBuilder();
-                            return sql;
-                        }));
-                    }
-
-            return i;
+            staticCache[Name] = TypeName;
         }
+
+        public static void AddDelegate(String Name, Delegate Delegate)
+        {
+            staticCache[Name] = Delegate;
+        }
+
+        public static void AddValue(String Name, Object Object)
+        {
+            staticCache[Name] = Object;
+        }
+
+        public JsApiDefault(S4JExecutor aExecutor) : base(aExecutor)
+        {
+            this.Add("Guid", typeof(Guid));
+            this.Add("DateTime", typeof(DateTime));
+            this.Add("List", typeof(List<Object>));
+            this.Add("Dictionary", typeof(Dictionary<String, Object>));
+            this.Add("api", (Func<DynJsonApi>)(() =>
+            {
+                DynJsonApi api = new DynJsonApi(Executor);
+                return api;
+            }));
+            this.Add("db", (Func<Object, DbApi>)((Parameter) =>
+            {
+                string sourceName = UniConvert.ToString(Parameter);
+                string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                        Executor.Sources.Get(sourceName) :
+                        Executor.Sources.GetDefault();
+
+                DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
+                return api;
+            }));
+            this.Add("sqlbuilder", (Func<SqlBuilder>)(() =>
+            {
+                SqlBuilder sql = new SqlBuilder();
+                return sql;
+            }));
+
+            foreach (var api in staticCache)
+                this.Add(api.Key, api.Value);
+        }
+
     }
 
-    public class JsApi
+    public abstract class JsApi
     {
         private Dictionary<String, Object> cache;
 
-        public IEnumerable<KeyValuePair<String, Object>> Items
-        {
-            get { return cache; }
-        }
-
         public S4JExecutor Executor { get; set; }
 
-        public JsApi()
+        public JsApi(S4JExecutor Executor)
         {
-            cache = new Dictionary<string, object>();
+            this.Executor = Executor;
+            this.cache = new Dictionary<string, object>();
         }
 
-        public void AddType(String Name, Type TypeName)
+        public virtual IEnumerable<KeyValuePair<String, Object>> GetApi()
+        {
+            return cache;
+        }
+
+        protected void Add(String Name, Object Object)
+        {
+            cache[Name] = Object;
+        }
+
+        /*public void AddType(String Name, Type TypeName)
         {
             cache[Name] = TypeName;
         }
@@ -193,14 +210,24 @@ namespace DynJson.Functions
         public void AddValue(String Name, Object Object)
         {
             cache[Name] = Object;
-        }
+        }*/
     }
 
 
     public class JsEvaluator : IEvaluator
     {
+        public JsApi Api { get; set; }
+
+        public JsEvaluator()
+        {
+
+        }
+
         public async Task<Object> Evaluate(S4JExecutor Executor, S4JToken token, IDictionary<String, object> variables)
         {
+            if (Api == null)
+                Api = new JsApiDefault(Executor);
+
             S4JTokenFunction function = token as S4JTokenFunction;
             StringBuilder code = new StringBuilder();
 
@@ -210,7 +237,7 @@ namespace DynJson.Functions
                 cfg.Culture(CultureInfo.InvariantCulture);
             });
 
-            foreach (KeyValuePair<string, object> keyAndVal in JsApiDefault.Get().Items)
+            foreach (KeyValuePair<string, object> keyAndVal in Api.GetApi())
             {
                 engine.SetValue(keyAndVal.Key, keyAndVal.Value);
             }

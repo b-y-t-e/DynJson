@@ -57,27 +57,6 @@ namespace DynJson.Executor
 
         //////////////////////////////////
 
-        private static Dictionary<int, S4JExecutor> executors =
-        new Dictionary<int, S4JExecutor>();
-        public static S4JExecutor Current
-        {
-            get
-            {
-                S4JExecutor executor = null;
-                lock (executors) executors.TryGetValue(Thread.CurrentThread.ManagedThreadId, out executor);
-                return executor;
-            }
-            private set
-            {
-                if (value != null)
-                    executors[Thread.CurrentThread.ManagedThreadId] = value;
-                else
-                    executors.Remove(Thread.CurrentThread.ManagedThreadId);
-            }
-        }
-
-        //////////////////////////////////
-
         public S4JExecutor(S4JStateBag StateBag)
         {
             this.globalVariables = new Dictionary<string, object>();
@@ -329,7 +308,6 @@ namespace DynJson.Executor
 
         async private Task Evaluate(S4JToken token)
         {
-            S4JExecutor.Current = this;
             try
             {
                 if (token == null)
@@ -383,7 +361,7 @@ namespace DynJson.Executor
             }
             finally
             {
-                S4JExecutor.Current = null;
+                
             }
         }
 
