@@ -148,31 +148,35 @@ namespace DynJson.Functions
             this.Add("DateTime", typeof(DateTime));
             this.Add("List", typeof(List<Object>));
             this.Add("Dictionary", typeof(Dictionary<String, Object>));
-            this.Add("api", (Func<DynJsonApi>)(() =>
-            {
-                DynJsonApi api = new DynJsonApi(Executor);
-                return api;
-            }));
-            this.Add("db", (Func<Object, DbApi>)((Parameter) =>
-            {
-                string sourceName = UniConvert.ToString(Parameter);
-                string connectionString = !string.IsNullOrEmpty(sourceName) ?
-                        Executor.Sources.Get(sourceName) :
-                        Executor.Sources.GetDefault();
-
-                DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
-                return api;
-            }));
-            this.Add("sqlbuilder", (Func<SqlBuilder>)(() =>
-            {
-                SqlBuilder sql = new SqlBuilder();
-                return sql;
-            }));
+            this.Add("api", (Func<DynJsonApi>)api);
+            this.Add("db", (Func<Object, DbApi>)db);
+            this.Add("sqlbuilder", (Func<SqlBuilder>)sqlbuilder);
 
             foreach (var api in staticCache)
                 this.Add(api.Key, api.Value);
         }
 
+        DynJsonApi api()
+        {
+            DynJsonApi api = new DynJsonApi(Executor);
+            return api;
+        }
+
+        DbApi db(object Parameter)
+        {
+            string sourceName = UniConvert.ToString(Parameter);
+            string connectionString = !string.IsNullOrEmpty(sourceName) ?
+                    Executor.Sources.Get(sourceName) :
+                    Executor.Sources.GetDefault();
+
+            DbApi api = new DbApi(connectionString, sourceName ?? Executor.Sources.DefaultSourceName);
+            return api;
+        }
+
+        SqlBuilder sqlbuilder()
+        {
+            return new SqlBuilder();
+        }
     }
 
     public abstract class JsApi
@@ -225,8 +229,7 @@ namespace DynJson.Functions
 
         public async Task<Object> Evaluate(S4JExecutor Executor, S4JToken token, IDictionary<String, object> variables)
         {
-            if (Api == null)
-                Api = new JsApiDefault(Executor);
+            JsApi Api = new JsApiDefault(Executor);
 
             S4JTokenFunction function = token as S4JTokenFunction;
             StringBuilder code = new StringBuilder();
