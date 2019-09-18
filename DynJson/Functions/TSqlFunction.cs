@@ -186,8 +186,8 @@ namespace DynJson.Functions
 
             if (MyTypeHelper.IsPrimitive(Value))
             {
-                Query.Append($"declare @{name} {TSqlHelper.GetSqlType(Value?.GetType())};\n");
-                Query.Append($"set @{name} = {{0}};\n", Value);
+                Query.Append($"declare @{correctSqlVariableName(name)} {TSqlHelper.GetSqlType(Value?.GetType())};\n");
+                Query.Append($"set @{correctSqlVariableName(name)} = {{0}};\n", Value);
             }
 
             else if (Value is IDictionary<string, object> dict)
@@ -256,12 +256,12 @@ namespace DynJson.Functions
 
             else if (Value is IDictionary<string, object> dict)
             {
-                Query.Append("declare @").Append(TableName).Append(" table (");
+                Query.Append("declare @").Append(correctSqlVariableName(TableName)).Append(" table (");
                 Int32 index = 0;
                 foreach (var keyAndValue in dict)
                 {
                     if (index > 0) Query.Append(", ");
-                    Query.Append(keyAndValue.Key).Append(" ").Append(TSqlHelper.GetSqlType(keyAndValue.Value?.GetType()));
+                    Query.Append("[").Append(correctSqlVariableName(keyAndValue.Key)).Append("] ").Append(TSqlHelper.GetSqlType(keyAndValue.Value?.GetType()));
                     index++;
                 }
                 Query.Append(");");
@@ -278,6 +278,15 @@ namespace DynJson.Functions
             }
         }
 
+        string correctSqlVariableName(String name)
+        {
+            StringBuilder str = new StringBuilder();
+            foreach (var ch in name)
+                if (Char.IsLetterOrDigit(ch) || ch == '_')
+                    str.Append(ch);
+            return str.ToString();
+        }
+
         void BuildInsertIntoTableScriptForVariable(
             MyQuery Query,
             String TableName,
@@ -290,12 +299,12 @@ namespace DynJson.Functions
 
             else if (Value is IDictionary<string, object> dict)
             {
-                Query.Append("insert into @").Append(TableName).Append(" (");
+                Query.Append("insert into @").Append(correctSqlVariableName(TableName)).Append(" (");
                 Int32 index = 0;
                 foreach (var keyAndValue in dict)
                 {
                     if (index > 0) Query.Append(", ");
-                    Query.Append(keyAndValue.Key);
+                    Query.Append(correctSqlVariableName(keyAndValue.Key));
                     index++;
                 }
                 Query.Append(") values (");

@@ -153,7 +153,7 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
-        public Object save(String TableName, Object ItemOrItems)
+        public Object save(String TableName, Object ItemOrItems, params String[] FieldsToSave)
         {
             Stopwatch st = Stopwatch.StartNew();
             IList<Object> items = null;
@@ -162,7 +162,7 @@ namespace DynJson.Database
                 items = convertToList(ItemOrItems);
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    saveItems(con, TableName, items);
+                    saveItems(con, TableName, items, FieldsToSave);
                 }
                 return ItemOrItems;
             }
@@ -179,7 +179,7 @@ namespace DynJson.Database
             }
         }
 
-        public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName)
+        public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, params String[] FieldsToSave)
         {
             Stopwatch st = Stopwatch.StartNew();
             IList<Object> items = null;
@@ -198,7 +198,7 @@ namespace DynJson.Database
                     }
 
                     deleteItemsByParentPropertyExceptIDs(con, TableName, ids, ParentPropertyName, parentPropertyValue);
-                    saveItems(con, TableName, items);
+                    saveItems(con, TableName, items, FieldsToSave);
                 }
                 return ItemOrItems;
             }
@@ -215,7 +215,7 @@ namespace DynJson.Database
             }
         }
 
-        public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, Object ParentPropertyValue)
+        public Object savechildren(String TableName, Object ItemOrItems, String ParentPropertyName, Object ParentPropertyValue, params String[] FieldsToSave)
         {
             Stopwatch st = Stopwatch.StartNew();
             IList<Object> items = null;
@@ -230,7 +230,7 @@ namespace DynJson.Database
                         ReflectionHelper.SetItemValue(item, ParentPropertyName, ParentPropertyValue);
 
                     deleteItemsByParentPropertyExceptIDs(con, TableName, ids, ParentPropertyName, ParentPropertyValue);
-                    saveItems(con, TableName, items);
+                    saveItems(con, TableName, items, FieldsToSave);
                 }
                 return ItemOrItems;
             }
@@ -275,13 +275,13 @@ namespace DynJson.Database
 
         //////////////////////////////////////////////
 
-        void saveItems(SqlConnection con, String TableName, IList<Object> Items)
+        void saveItems(SqlConnection con, String TableName, IList<Object> Items, string[] FieldsToSave)
         {
             foreach (Object obj in Items)
-                saveItem(con, TableName, obj);
+                saveItem(con, TableName, obj, FieldsToSave);
         }
 
-        Object saveItem(SqlConnection con, String TableName, Object Item)
+        Object saveItem(SqlConnection con, String TableName, Object Item, string[] FieldsToSave)
         {
             Object idValue = ReflectionHelper.
                 GetItemValue(Item, idName);
@@ -290,13 +290,13 @@ namespace DynJson.Database
             {
                 Boolean overrideKey = !MyTypeHelper.IsNumeric(idValue);
 
-                Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()", overrideKey);
+                Object newID = con.Insert(TableName, Item, idName, "select SCOPE_IDENTITY()", overrideKey, FieldsToSave);
                 if (newID != null)
                     ReflectionHelper.SetItemValue(Item, this.idName, newID);
             }
             else
             {
-                con.Update(TableName, Item, idName, "");
+                con.Update(TableName, Item, idName, "", FieldsToSave);
             }
             return null;
         }

@@ -347,9 +347,10 @@ namespace DynJson.Helpers.DatabaseHelpers
             String TableName,
             Object Item,
             String PrimaryKey,
-            String PostfixSql)
+            String PostfixSql,
+            string[] FieldsToSave = null)
         {
-            Save(Connection, TableName, Item, PrimaryKey, false, PostfixSql, false);
+            Save(Connection, TableName, Item, PrimaryKey, false, PostfixSql, false, FieldsToSave);
         }
 
         /// <summary>
@@ -361,9 +362,10 @@ namespace DynJson.Helpers.DatabaseHelpers
             Object Item,
             String PrimaryKey,
             String PostfixSql,
-            Boolean OverridePrimaryKey = false)
+            Boolean OverridePrimaryKey = false,
+            string[] FieldsToSave = null)
         {
-            return Save(Connection, TableName, Item, PrimaryKey, true, PostfixSql, OverridePrimaryKey);
+            return Save(Connection, TableName, Item, PrimaryKey, true, PostfixSql, OverridePrimaryKey, FieldsToSave);
         }
 
         /// <summary>
@@ -403,9 +405,10 @@ namespace DynJson.Helpers.DatabaseHelpers
             String PrimaryKey,
             Boolean IsInsert,
             String PostfixSql,
-            Boolean OverridePrimaryKey = false)
+            Boolean OverridePrimaryKey = false,
+            String[] FieldsToSave = null)
         {
-            String finalQuery = SqlGenerateSave(Connection, TableName, Item, PrimaryKey, IsInsert, PostfixSql, OverridePrimaryKey);
+            String finalQuery = SqlGenerateSave(Connection, TableName, Item, PrimaryKey, IsInsert, PostfixSql, OverridePrimaryKey, FieldsToSave);
 
             if (finalQuery == null)
                 return null;
@@ -480,7 +483,8 @@ namespace DynJson.Helpers.DatabaseHelpers
             String PrimaryKey,
             Boolean IsInsert,
             String PostfixSql,
-            Boolean OverridePrimaryKey = false)
+            Boolean OverridePrimaryKey = false,
+            String[] FieldsToSave = null)
         {
             if (Connection != null)
             {
@@ -491,7 +495,7 @@ namespace DynJson.Helpers.DatabaseHelpers
                 DbDataColumns databaseColumns = DatabaseCache.GetColumns(Connection, TableName);
                 MyQuery saveQuery = new MyQuery();
 
-                Object primaryKeyValue = ReflectionHelper. GetItemValue(Item, PrimaryKey);
+                Object primaryKeyValue = ReflectionHelper.GetItemValue(Item, PrimaryKey);
                 IList<DbDataColumnValue> valuesToSave = GetItemValuesForDbFields(Item, databaseColumns).ToArray();
 
                 if (valuesToSave.Count > 0)
@@ -502,14 +506,25 @@ namespace DynJson.Helpers.DatabaseHelpers
                             Append(" insert into " + TableName + " ( ");
 
                         var lCount = 0;
-                        foreach (DbDataColumnValue lValue in valuesToSave)
+                        foreach (DbDataColumnValue column in valuesToSave)
                         {
-                            // dla sqlite
-                            if (OverridePrimaryKey || !lValue.Name.EqualsNonsensitive(PrimaryKey))
+                            if (column.Name.EqualsNonsensitive(PrimaryKey))
                             {
-                                if (lCount > 0) saveQuery.Append(", ");
-                                saveQuery.Append(lValue.Name);
-                                lCount++;
+                                if (OverridePrimaryKey)
+                                {
+                                    if (lCount > 0) saveQuery.Append(", ");
+                                    saveQuery.Append(column.Name);
+                                    lCount++;
+                                }
+                            }
+                            else
+                            {
+                                if (FieldsToSave == null || FieldsToSave.Length == 0 || FieldsToSave.Any(f => f.EqualsNonsensitive(column.Name)))
+                                {
+                                    if (lCount > 0) saveQuery.Append(", ");
+                                    saveQuery.Append(column.Name);
+                                    lCount++;
+                                }
                             }
                         }
 
@@ -517,21 +532,26 @@ namespace DynJson.Helpers.DatabaseHelpers
                             Append(" ) values ( ");
 
                         lCount = 0;
-                        foreach (DbDataColumnValue lValue in valuesToSave)
+                        foreach (DbDataColumnValue column in valuesToSave)
                         {
-                            if (OverridePrimaryKey || !lValue.Name.EqualsNonsensitive(PrimaryKey))
+                            if (column.Name.EqualsNonsensitive(PrimaryKey))
                             {
-                                if (lCount > 0) saveQuery.Append(", ");
-                                saveQuery.AppendVal(lValue.Value);
-                                lCount++;
+                                if (OverridePrimaryKey)
+                                {
+                                    if (lCount > 0) saveQuery.Append(", ");
+                                    saveQuery.AppendVal(column.Value);
+                                    lCount++;
+                                }
                             }
-                            // dla sqlite
-                            /*else
+                            else
                             {
-                                if (lCount > 0) lQuery.Append(", ");
-                                lQuery.AppendVal(null);
-                                lCount++;
-                            }*/
+                                if (FieldsToSave == null || FieldsToSave.Length == 0 || FieldsToSave.Any(f => f.EqualsNonsensitive(column.Name)))
+                                {
+                                    if (lCount > 0) saveQuery.Append(", ");
+                                    saveQuery.AppendVal(column.Value);
+                                    lCount++;
+                                }
+                            }
                         }
 
                         saveQuery.
@@ -542,13 +562,16 @@ namespace DynJson.Helpers.DatabaseHelpers
                         saveQuery.Append(" update " + TableName + " set ");
 
                         var lCount = 0;
-                        foreach (DbDataColumnValue lValue in valuesToSave)
+                        foreach (DbDataColumnValue column in valuesToSave)
                         {
-                            if (!lValue.Name.EqualsNonsensitive(PrimaryKey))
+                            if (!column.Name.EqualsNonsensitive(PrimaryKey))
                             {
-                                if (lCount > 0) saveQuery.Append(", ");
-                                saveQuery.Append(lValue.Name).Append(" = ").AppendVal(lValue.Value);
-                                lCount++;
+                                if (FieldsToSave == null || FieldsToSave.Length == 0 || FieldsToSave.Any(f => f.EqualsNonsensitive(column.Name)))
+                                {
+                                    if (lCount > 0) saveQuery.Append(", ");
+                                    saveQuery.Append(column.Name).Append(" = ").AppendVal(column.Value);
+                                    lCount++;
+                                }
                             }
                         }
 

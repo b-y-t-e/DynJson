@@ -42,6 +42,35 @@ query-scalar( select imie from osoba where imie = 'test_sql' )
         }
 
         [Test]
+        async public Task test_complex_parameter_update_js()
+        {
+            // await new DbForTest().PrepareDb();
+
+            var script1 = @" 
+method ( osoba : any )  {
+/*
+q( delete from osoba where imie = @osoba_imie )
+js( 
+    item = {
+        imie : osoba.imie,
+        nazwisko : osoba.nazwisko,
+    };
+    item = db().save('osoba', item);
+
+    item.nazwisko = 'zmienione_nazwisko';
+    db().save('osoba', item, 'imie');
+),
+*/
+q-scalar( select nazwisko from osoba where imie = @osoba_imie )
+}
+";
+            var result = await new S4JExecutorForTests().
+                ExecuteWithJsonParameters(script1, new[] { "{ imie: 'test_js_to_update', nazwisko: 'test_js_to_update_nazwisko' }" });
+
+            Assert.AreEqual("\"test_js_to_update_nazwisko\"", result.ToJson());
+        }
+
+        [Test]
         async public Task test_complex_parameter_save_dynlan_1()
         {
             // await new DbForTest().PrepareDb();
